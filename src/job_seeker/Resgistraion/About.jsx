@@ -103,7 +103,7 @@ const About = () => {
                 value={formData.name}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className='text-base'>Mobile Number</label>
                 <input
@@ -127,7 +127,7 @@ const About = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className='text-base'>Gender</label>
                 <select
@@ -165,7 +165,7 @@ const About = () => {
                 value={formData.email}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className='text-base'>Date of Birth</label>
                 <input
