@@ -77,7 +77,7 @@ const VerifyLogin = () => {
           toast.success('Number verified and employee registered successfully!');
           
           // Pass the employeeId and mobile_no to About component
-          navigate('/personalDetails', { state: { employeeId:data.employee._id, mobile_no: contactInfo } });
+          navigate('/personalDetails', { state: { employeeId:registrationData.employee._id, mobile_no: contactInfo } });
         } else {
           throw new Error(registrationData.msg || 'Failed to register employee');
         }

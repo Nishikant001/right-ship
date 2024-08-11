@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Background from "../../images/background.jpg";
@@ -6,7 +6,12 @@ import Background from "../../images/background.jpg";
 const About = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { employeeId, mobile_no } = location.state || {}; // Retrieve from state
+  const state = location.state || {}; // Retrieve from state
+  const mobile_no = state.mobile_no || '';
+  const employeeId = state.employeeId || '';
+
+  console.log('Location State:', location.state); // Add this line
+  console.log('Employee ID:', employeeId); // Add this line
 
   const [formData, setFormData] = useState({
     name: '',
@@ -24,26 +29,26 @@ const About = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({ ...prevState, [name]: value }));
-    console.log('Form data updated:', { ...formData, [name]: value });
   };
 
   const handleNext = async () => {
     console.log('Submitting form data:', formData);
     console.log('Employee ID:', employeeId);
-
-    const requiredFields = ['name', 'mobile_no', 'whatsappNumber', 'gender', 'country', 'email', 'dob', 'availability'];
+  
+    const requiredFields = ['mobile_no', 'whatsappNumber', 'gender', 'country', 'email', 'dob', 'availability'];
     const missingFields = requiredFields.filter(field => !formData[field]);
-
+  
     if (missingFields.length > 0) {
       setError(`Missing required fields: ${missingFields.join(', ')}`);
       return;
     }
-
+  
     if (!employeeId) {
       setError('Employee ID is required.');
+      console.log('Location State:', location.state);
       return;
     }
-
+  
     try {
       const response = await axios.post('https://api.rightships.com/employee/update', {
         employee_id: employeeId,
@@ -53,9 +58,9 @@ const About = () => {
           'Content-Type': 'application/json'
         }
       });
-
+  
       console.log('Response:', response);
-
+  
       if (response.status === 200) {
         console.log('Update successful:', response.data);
         navigate('/experienceDetails');
@@ -73,7 +78,7 @@ const About = () => {
       }
     }
   };
-
+  
   return (
     <div className="flex h-screen">
       <div className="hidden md:block w-2/5 h-screen bg-cover bg-center" style={{ backgroundImage: `url(${Background})` }}></div>
