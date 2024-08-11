@@ -44,7 +44,7 @@ function ProfileCard() {
             <img
               src={profileImage}
               alt="Profile"
-              className="w-28 h-28 -ms-32 aspect-square rounded-full border-2 border-gray-300 profileImg border-customBlue"
+              className="h-28 -ms-32 aspect-square rounded-full border-2 border-gray-300 profileImg border-customBlue"
             />
             <div className='-ms-6 mt-20 size-5 bg-customBlue rounded-lg border border-customBlue icon'>
               <FaRegEdit onClick={handleEditClick} className='cursor-pointer ms-1 mt-0.5 size-3.5 text-white' />

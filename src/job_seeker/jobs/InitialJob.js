@@ -114,7 +114,7 @@ const MyJobs = () => {
                 </div>
                 <div className="flex mt-2 md:mt-0 items-center space-x-2">
                   <button
-                    className={`w-28 px-4 py-2 ${
+                    className={`px-4 py-2 ${
                       job.applied ? 'border-2 border-customBlue text-customBlue font-semibold rounded-md' : 'border-2 border-customBlue text-white bg-customBlue font-semibold rounded-md'
                     }`}
                     onClick={() => toggleApply(job.id)}
@@ -137,7 +137,7 @@ const MyJobs = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <button
-                    className="w-28 px-4 py-2 border-2 border-customBlue text-customBlue font-semibold rounded-md"
+                    className="px-4 py-2 border-2 border-customBlue text-customBlue font-semibold rounded-md"
                     onClick={() => toggleApply(job.id)}
                   >
                     Unapply

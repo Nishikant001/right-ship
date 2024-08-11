@@ -155,7 +155,7 @@ const JobDashboard = () => {
                                 </div>
                                 <div className="flex mt-2 md:mt-0 items-center space-x-2">
                                     <button
-                                        className={`w-28 mt-2 py-1.5 ${job.applied ? 'border-2 border-customBlue text-customBlue font-bold rounded-md' : 'border-2 border-customBlue text-customBlue font-bold rounded-md'}`}
+                                        className={`mt-2 py-1.5 ${job.applied ? 'border-2 border-customBlue text-customBlue font-bold rounded-md' : 'border-2 border-customBlue text-customBlue font-bold rounded-md'}`}
                                         onClick={(e) => { e.stopPropagation(); toggleApply(job.id); }}
                                     >
                                         {job.applied ? 'Unapply' : 'Apply'}
