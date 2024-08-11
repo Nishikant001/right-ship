@@ -155,16 +155,16 @@ const Header3 = () => {
             </button>
             {userDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
-                <Link to="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
+                <Link to="/profile" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
                   <MessageSquare size={20} className="mr-2" /> Profile
                 </Link>
-                <Link to="/myjobs" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
+                <Link to="/myjobs" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
                   <MessageSquare size={20} className="mr-2" /> My Jobs
                 </Link>
-                <Link to="/settings" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
+                <Link to="/settings" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
                   <MessageSquare size={20} className="mr-2" /> Settings
                 </Link>
-                <Link to="/" className="block px-4 py-2 mt-1 text-gray-800 hover:bg-gray-100 flex justify-center border-t font-bold">Sign Out</Link>
+                <Link to="/" className="px-4 py-2 mt-1 text-gray-800 hover:bg-gray-100 flex justify-center border-t font-bold">Sign Out</Link>
               </div>
             )}
           </div>
