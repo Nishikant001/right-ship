@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaRegEdit } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import {Link} from "react-router-dom"
 import Modal from 'react-modal';
 import ChangeMail from './ChangeMail';
 import ChangeNumber from './ChangeNumber';
@@ -42,9 +43,11 @@ function Setting() {
           </div>
         </div>
         <div className="flex justify-center">
-          <button className="px-4 py-2 font-medium text-white bg-red-500 rounded-sm hover:bg-red-600">
-            Logout
-          </button>
+          <Link to="/">
+            <button className="px-4 py-2 font-medium text-white bg-red-500 rounded-sm hover:bg-red-600">
+              Logout
+            </button>
+          </Link>
         </div>
       </div>
 
