@@ -84,8 +84,8 @@ const About = () => {
       <div className="hidden md:block w-2/5 h-screen bg-cover bg-center" style={{ backgroundImage: `url(${Background})` }}></div>
       <div className="w-full md:w-3/5 h-screen overflow-y-auto bg-white flex justify-center">
         <div className="container-fluid w-9/12">
-          <h1 className="text-3xl md:text-4xl font-semibold mt-14 mb-2">Your Personal Details</h1>
-          <h6 className='text-lg font-semibold mb-4'>Manish Sir</h6>
+          <h1 className="text-3xl md:text-4xl font-semibold mt-14 mb-2">Personal Details</h1>
+          <h6 className='text-lg font-semibold mb-4'>__________</h6>
           {error && (
             <div className="bg-red-200 text-red-800 p-3 mb-4 rounded">
               {error}
@@ -188,7 +188,7 @@ const About = () => {
               </div>
             </div>
             <div className="flex justify-start">
-              <button type='button' className="bg-customBlue text-white font-bold py-2.5 rounded w-24 text-center" onClick={handleNext}>
+              <button type='button' className="bg-customBlue text-white font-bold py-2.5 rounded w-24 text-center mb-5" onClick={handleNext}>
                 Next
               </button>
             </div>
