@@ -107,7 +107,7 @@ const Resume = () => {
       if (response.status === 200) {
         console.log('Update successful:', response.data);
         setSuccess(true);
-        navigate('/login');
+        navigate('/profile',{state:{ employeeId }});
       } else {
         console.error('Failed to update:', response);
         setError('Failed to update employee details. Please try again.');

@@ -69,7 +69,9 @@ const employeeId = state.employeeId || '';
 
       if (response.status === 200) {
         console.log('Update successful:', response.data);
-        console.log('Navigating to Experience with Employee ID:', employeeId);
+        // console.log('Navigating to Experience with Employee ID:', employeeId);
+        console.log('Navigating with employeeId:', employeeId);
+
         // navigate('/experinceDetails', { state: { employeeId } });
         navigate('/resume&profile',{ state: { employeeId } });
       } else {
