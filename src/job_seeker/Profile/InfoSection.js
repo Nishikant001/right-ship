@@ -73,7 +73,7 @@ function InfoSection() {
     axios.post('https://api.rightships.com/employee/update', payload, {
       headers: {
         'Content-Type': 'application/json',
-        'Accept': '/',
+        'Accept': '*/*',
       },
     })
     .then((response) => {

@@ -22,14 +22,12 @@ function FileUploadComponent() {
   };
 
   return (
-    <div className="h-20 w-full border border-b-2 p-4 flex items-center">
-        
-      
+    <div className="h-20 w-full border-b-2 p-4 flex items-center">
       <div className="ml-auto flex items-center">
         {file && (
-          <div className="flex items-center mr-32">
+          <div className="flex items-center mr-8 md:mr-32">
             <i className={`fas ${getFileIcon(file.type)} text-2xl text-gray-600 mr-2`}></i>
-            <span className='ms-3'>{file.name}</span>
+            <span className='ml-3 text-sm md:text-base '>{file.name}</span>
           </div>
         )}
         <input
@@ -38,8 +36,8 @@ function FileUploadComponent() {
           className="hidden"
           onChange={handleFileChange}
         />
-        <label htmlFor="fileUpload" className="cursor-pointer text-black me-5">
-        <FaRegEdit className='size-5' />
+        <label htmlFor="fileUpload" className="cursor-pointer text-black">
+          <FaRegEdit className='text-xl md:text-2xl' />
         </label>
       </div>
     </div>

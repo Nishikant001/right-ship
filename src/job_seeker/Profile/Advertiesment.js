@@ -1,11 +1,11 @@
-import React from 'react'
+import React from 'react';
 
-const Advertiesment = () => {
+const Advertisement = () => {
   return (
-    <div className='h-screenborder  bg-black '>
-      
+    <div className='h-screen border bg-black'>
+      {/* Add your advertisement content here */}
     </div>
-  )
+  );
 }
 
-export default Advertiesment
+export default Advertisement;
