@@ -87,8 +87,8 @@ const About = () => {
       <div className="hidden md:block w-2/5 h-screen bg-cover bg-center" style={{ backgroundImage: `url(${Background})` }}></div>
       <div className="w-full md:w-3/5 h-screen overflow-y-auto bg-white flex justify-center">
         <div className="container-fluid w-9/12">
-          <h1 className="text-4xl font-semibold mt-14 mb-2">Your Personal Details</h1>
-          <h6 className='text-lg font-semibold mb-4'>Manish Sir</h6>
+          <h1 className="text-3xl md:text-4xl font-semibold mt-14 mb-2">Personal Details</h1>
+          <h6 className='text-lg font-semibold mb-4'>__________</h6>
           {error && (
             <div className="bg-red-200 text-red-800 p-3 mb-4 rounded">
               {error}
@@ -106,7 +106,7 @@ const About = () => {
                 value={formData.name}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className='text-base'>Mobile Number</label>
                 <input
@@ -130,7 +130,7 @@ const About = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className='text-base'>Gender</label>
                 <select
@@ -168,7 +168,7 @@ const About = () => {
                 value={formData.email}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className='text-base'>Date of Birth</label>
                 <input
