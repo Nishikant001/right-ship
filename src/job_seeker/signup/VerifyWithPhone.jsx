@@ -1,17 +1,13 @@
-// src/components/VerifyWithPhone.js
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import logo from '../../images/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
-const VerifyWithPhone = () => {
+const VerifyLogin = () => {
   const navigate = useNavigate();
   const [otp, setOtp] = useState('');
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
-  const dispatch = useDispatch();
   const otpStatus = useSelector((state) => state.otp.status);
   const otpError = useSelector((state) => state.otp.error);
   const contactInfo = useSelector((state) => state.contact.contactInfo);
@@ -35,95 +31,80 @@ const VerifyWithPhone = () => {
   }, [timer]);
 
   const handleSendOtp = () => {
-    // Call an API or handle OTP sending if needed
-    // If using Redux or another method to send OTP, dispatch it here
     setTimer(30);
     setCanResend(false);
-    // Navigate or handle resend logic
     navigate('/signup-number');
   };
 
   const handleVerifyOtp = async () => {
     try {
-      const response = await fetch('https://api.rightships.com/otp/verify_otp', {
+      const verifyResponse = await fetch('https://api.rightships.com/otp/verify_otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ mobile_no: contactInfo, otp }),
       });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
+
+      if (!verifyResponse.ok) {
+        const errorData = await verifyResponse.json();
         throw new Error(errorData.message || 'Failed to verify OTP');
       }
-  
-      const data = await response.json();
-      if (data.code === 200) {
-        // Assuming the response has employeeId
-        const employeeId = data.employeeId;
-  
-        // Now register the employee
-        const registrationResponse = await fetch('https://api.rightships.com/employee/register', {
+
+      const verifyData = await verifyResponse.json();
+      if (verifyData.code === 200) {
+        const loginResponse = await fetch('https://api.rightships.com/employee/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ mobile_no: contactInfo }),
         });
-  
-        if (!registrationResponse.ok) {
-          const registrationErrorData = await registrationResponse.json();
-          throw new Error(registrationErrorData.message || 'Failed to register employee');
+
+        if (!loginResponse.ok) {
+          const errorData = await loginResponse.json();
+          throw new Error(errorData.message || 'Failed to log in');
         }
-  
-        const registrationData = await registrationResponse.json();
-        if (registrationData.code === 200) {
-          toast.success('Number verified and employee registered successfully!');
-          
-          // Pass the employeeId and mobile_no to About component
-          navigate('/personalDetails', { state: { employeeId, mobile_no: contactInfo } });
-        } else {
-          throw new Error(registrationData.msg || 'Failed to register employee');
-        }
+
+        const loginData = await loginResponse.json();
+        navigate('/jobdashboard');
       } else {
-        throw new Error(data.msg || 'Failed to verify OTP');
+        throw new Error(verifyData.msg || 'Failed to verify OTP');
       }
     } catch (error) {
       console.error('Error:', error.message);
-      toast.error(`Error: ${error.message}`);
     }
   };
-  
+
   return (
     <>
-      <section className="flex flex-col items-center py-10 signup">
-        <div className="text-2xl font-bold mb-4">
-          <img src={logo} alt="Logo" height={70} width={70} />
+      <section className="flex flex-col items-center py-20 h-screen bg-gray-50">
+        <div className="mb-8">
+          <img src={logo} alt="Logo" className="h-24 w-20 mx-auto" />
         </div>
-        <div className="bg-white p-6 mt-3 rounded-lg shadow-2xl w-100 max-w-md">
-          <h2 className="text-center text-xl font-bold mb-4">Verify OTP</h2>
-          <p className="text-center text-sm mb-4">OTP sent to: {contactInfo}</p>
+        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+          <h2 className="text-center text-2xl font-semibold mb-6 text-gray-800">Verify OTP</h2>
+          <p className="text-center text-sm text-gray-600 mb-6">OTP sent to: {contactInfo}</p>
           <input
             type="text"
             placeholder="Enter OTP"
-            className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
+            className="w-full px-4 py-3 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
           />
           <button
             onClick={handleVerifyOtp}
-            className="w-full bg-indigo-900 text-white px-4 py-2 rounded"
+            className={`w-full py-3 rounded-md text-white font-medium ${otpStatus === 'loading' ? 'bg-indigo-700' : 'bg-indigo-900 hover:bg-indigo-700'} transition duration-300`}
             disabled={otpStatus === 'loading'}
           >
             {otpStatus === 'loading' ? 'Verifying...' : 'Verify OTP'}
           </button>
-          {otpStatus === 'failed' && <p className="text-red-600 mt-4">{otpError}</p>}
-          <p className="text-center mt-4">
+          {otpStatus === 'failed' && <p className="text-red-600 mt-4 text-center">{otpError}</p>}
+          <p className="text-center mt-4 text-sm text-gray-600">
             {canResend ? (
               <button
                 onClick={handleSendOtp}
-                className="text-blue-600 underline text-sm underline-offset-8"
+                className="text-indigo-600 underline hover:text-indigo-800"
               >
                 Resend OTP
               </button>
@@ -131,13 +112,13 @@ const VerifyWithPhone = () => {
               `Resend OTP in: ${formatTime(timer)}`
             )}
           </p>
-          <Link className="text-blue-600 mx-28 py-5 text-sm underline underline-offset-8" to="/singup-number">Change Number</Link>
+          <Link className="text-indigo-600 block text-center text-sm underline mt-6 hover:text-indigo-800" to="/login">
+            Change Number
+          </Link>
         </div>
       </section>
-     
-      <ToastContainer />
     </>
   );
 };
 
-export default VerifyWithPhone;
+export default VerifyLogin;
