@@ -1,52 +1,90 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateData } from '../../features/employeeRegistrationSlice';
+// import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+// import { updateData } from '../../features/employeeRegistrationSlice';
 import Background from "../../images/background.jpg";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate ,useLocation} from 'react-router-dom';
 
 const Experience = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+const state = location.state || {};
+const employeeId = state.employeeId || '';
 
-  const navigate=useNavigate()
-  const handleNext = () => {
-    dispatch(updateData(formData)); // Update the Redux store with current page data
-    navigate('/resume&profile');
-  };
-  const dispatch = useDispatch();
-  const { data } = useSelector(state => state.employee);
+  console.log('Location State:', location.state); // Add this line
+  console.log('Employee ID:', employeeId);
 
   const [formData, setFormData] = useState({
-    lastVesselType: data.lastVesselType || '',
-    presentRank: data.presentRank || '',
-    appliedRank: data.appliedRank || '',
-    totalSeaExperienceYears: data.totalSeaExperienceYears || '',
-    totalSeaExperienceMonths: data.totalSeaExperienceMonths || '',
-    totalRankExperienceYears: data.totalRankExperienceYears || '',
-    totalRankExperienceMonths: data.totalRankExperienceMonths || '',
-    cop: data.cop || '',
-    coc: data.coc || '',
-    watchKeeping: data.watchKeeping || ''
+    lastVesselType: '',
+    presentRank:  '',
+    appliedRank:  '',
+    totalSeaExperienceYears:  '',
+    totalSeaExperienceMonths: '',
+    totalRankExperienceYears: '',
+    totalRankExperienceMonths: '',
+    cop:  '',
+    coc:  '',
+    watchKeeping:  ''
   });
 
-  useEffect(() => {
-    // Update the form data with data from Redux store when the component mounts
-    setFormData({
-      lastVesselType: data.lastVesselType || '',
-      presentRank: data.presentRank || '',
-      appliedRank: data.appliedRank || '',
-      totalSeaExperienceYears: data.totalSeaExperienceYears || '',
-      totalSeaExperienceMonths: data.totalSeaExperienceMonths || '',
-      totalRankExperienceYears: data.totalRankExperienceYears || '',
-      totalRankExperienceMonths: data.totalRankExperienceMonths || '',
-      cop: data.cop || '',
-      coc: data.coc || '',
-      watchKeeping: data.watchKeeping || ''
-    });
-  }, [data]);
+  const [error, setError] = useState('');
+
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({ ...prevState, [name]: value }));
-    dispatch(updateData({ [name]: value }));
+    // dispatch(updateData({ [name]: value }));
+  };
+
+  const handleNext = async () => {
+    console.log('Submitting form data:', formData);
+    console.log('Employee ID:', employeeId);
+    // const employeeId = data.employeeId;
+
+    const requiredFields = ['lastVesselType', 'presentRank', 'appliedRank', 'totalSeaExperienceYears', 'totalSeaExperienceMonths', 'totalRankExperienceYears', 'totalRankExperienceMonths', 'cop', 'coc', 'watchKeeping'];
+    const missingFields = requiredFields.filter(field => !formData[field]);
+
+    if (missingFields.length > 0) {
+      setError(`Missing required fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    if (!employeeId) {
+      setError('Employee ID is required.');
+      console.log('Location State:', location.state);
+      return;
+    }
+
+    try {
+      const response = await axios.post('https://api.rightships.com/employee/update', {
+        employee_id: employeeId,
+        ...formData
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('Response:', response);
+
+      if (response.status === 200) {
+        console.log('Update successful:', response.data);
+        console.log('Navigating to Experience with Employee ID:', employeeId);
+        // navigate('/experinceDetails', { state: { employeeId } });
+        navigate('/resume&profile',{ state: { employeeId } });
+      } else {
+        console.error('Failed to update:', response);
+        setError('Failed to update employee details. Please try again.');
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        setError(`Error: ${error.response.data.message || 'An error occurred. Please try again.'}`);
+      } else {
+        console.error('Error:', error);
+        setError('An error occurred during update. Please try again.');
+      }
+    }
   };
 
   return (
@@ -56,6 +94,11 @@ const Experience = () => {
         <div className="container-fluid w-9/12">
           <h1 className="text-4xl font-semibold mt-14 mb-2">Your Experience</h1>
           <h6 className='text-lg font-semibold mb-4'>Manish Sir</h6>
+          {error && (
+            <div className="bg-red-200 text-red-800 p-3 mb-4 rounded">
+              {error}
+            </div>
+          )}
           <form className="space-y-6">
             <div className="grid grid-cols-1 gap-2">
               <label className='text-base'>Last Vessel Type</label>
@@ -159,17 +202,23 @@ const Experience = () => {
                   type="text"
                   name="watchKeeping"
                   value={formData.watchKeeping}
-                  placeholder="Select watching keeping"
+                  placeholder="Select watch keeping"
                   className="w-full border-2 border-gray-200 py-3 px-5 rounded-lg mt-1"
                   onChange={handleChange}
                 />
               </div>
             </div>
             <div className="flex justify-start space-x-4 mt-6">
-              <button className="bg-white text-customBlue border font-bold border-customBlue py-2 rounded w-24 text-center">
-                BACK
-              </button>
-              <button  className="bg-customBlue text-white font-bold py-2 rounded w-24 text-center">
+              <Link to='/personalDetails'>
+                <button className="bg-white text-customBlue border font-bold border-customBlue py-2 rounded w-24 text-center">
+                  BACK
+                </button>
+              </Link>
+              <button
+                type="button"
+                className="bg-customBlue text-white font-bold py-2 rounded w-24 text-center"
+                onClick={handleNext}
+              >
                 NEXT
               </button>
             </div>
@@ -181,6 +230,3 @@ const Experience = () => {
 };
 
 export default Experience;
-
-
-

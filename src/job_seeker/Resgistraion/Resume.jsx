@@ -1,13 +1,15 @@
-import React, { useState, useRef } from 'react';
-import { useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import Background from "../../images/background.jpg";
 import File from "../../images/File img.png";
 import ProfileImage from "../../images/upload.jpg";
 
 const Resume = () => {
   const navigate = useNavigate();
-  const { data, about, experience } = useSelector(state => state.employee); // Access additional data
+  const location = useLocation();
+  const state = location.state || {};
+  const employeeId = state.employeeId || ''; // Retrieve the employee ID from the state or fallback to an empty string
 
   const [profileFile, setProfileFile] = useState(null);
   const [resumeFile, setResumeFile] = useState(null);
@@ -17,6 +19,17 @@ const Resume = () => {
 
   const profileFileInputRef = useRef(null);
   const resumeFileInputRef = useRef(null);
+
+  useEffect(() => {
+    console.log('Location State:', location.state);
+    console.log('Employee ID:', employeeId);
+
+    if (!employeeId) {
+      setError('Employee ID is missing. Please navigate through the proper flow.');
+      // Optionally, you can redirect the user back to a previous page if no employee ID is present
+      // navigate('/previousPage');
+    }
+  }, [location.state, employeeId, navigate]);
 
   const handleProfileFileChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -38,56 +51,75 @@ const Resume = () => {
     resumeFileInputRef.current.click();
   };
 
-  const toBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+  const uploadFile = async (file, key) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await axios.post('https://api.rightships.com/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.status === 200) {
+        console.log(`${key} upload successful:`, response.data);
+        return response.data.filePath; // Assuming the API returns the file path
+      } else {
+        console.error(`Failed to upload ${key}:`, response);
+        setError(`Failed to upload ${key}. Please try again.`);
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error uploading ${key}:`, error);
+      setError(`Error uploading ${key}. Please try again.`);
+      return null;
+    }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    setError(null);
-    navigate('/profile')
+  const handleSubmit = async () => {
+    if (!employeeId) {
+      setError('Employee ID is required.');
+      return;
+    }
 
     try {
-      const profileBase64 = profileFile ? await toBase64(profileFile) : null;
-      const resumeBase64 = resumeFile ? await toBase64(resumeFile) : null;
+      setLoading(true);
+      setError(null);
 
+      // Upload profile picture and resume
+      const profileFilePath = profileFile ? await uploadFile(profileFile, 'profile picture') : null;
+      const resumeFilePath = resumeFile ? await uploadFile(resumeFile, 'resume') : null;
+
+      // Prepare payload for update API
       const payload = {
-        name: data.name,
-        email: data.email,
-        mobile_no: data.mobile_no,
-        about,        // Include about data
-        experience,   // Include experience data
-        profilePicture: profileBase64,
-        resume: resumeBase64,
+        employee_id: employeeId,
+        profilePicture: profileFilePath,
+        resume: resumeFilePath,
       };
 
-      const response = await fetch('https://api.rightships.com/employee/register', {
-        method: 'POST',
+      const response = await axios.post('https://api.rightships.com/employee/update', payload, {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
       });
 
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log('Employee registered successfully:', responseData);
+      if (response.status === 200) {
+        console.log('Update successful:', response.data);
         setSuccess(true);
         navigate('/login');
       } else {
-        const errorText = await response.text();
-        setError('Registration failed');
-        console.error('Failed to register employee:', errorText);
+        console.error('Failed to update:', response);
+        setError('Failed to update employee details. Please try again.');
       }
     } catch (error) {
-      setError(error.message || 'Error registering employee');
-      console.error('Error registering employee:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        setError(`Error: ${error.response.data.message || 'An error occurred. Please try again.'}`);
+      } else {
+        console.error('Error:', error);
+        setError('An error occurred during update. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -160,8 +192,8 @@ const Resume = () => {
               </button>
             </div>
           </div>
-          {success && <p className="text-green-500">Registration Successful!</p>}
-          {error && <p className="text-red-500">Registration Failed: {error}</p>}
+          {success && <p className="text-green-500">Update Successful!</p>}
+          {error && <p className="text-red-500">Update Failed: {error}</p>}
         </div>
       </div>
     </div>

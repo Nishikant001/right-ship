@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import Background from "../../images/background.jpg";
 
@@ -59,11 +59,14 @@ const About = () => {
         }
       });
   
-      console.log('Response:', response);
+      console.log('Response:', response.data);
+      
   
       if (response.status === 200) {
         console.log('Update successful:', response.data);
-        navigate('/experienceDetails');
+        console.log('Navigating to Experience with Employee ID:', employeeId);
+        navigate('/experinceDetails', { state: { employeeId } });
+        
       } else {
         console.error('Failed to update:', response);
         setError('Failed to update employee details. Please try again.');
@@ -188,9 +191,11 @@ const About = () => {
               </div>
             </div>
             <div className="flex justify-start">
+             
               <button type='button' className="bg-customBlue text-white font-bold py-2.5 rounded w-24 text-center" onClick={handleNext}>
                 Next
               </button>
+            
             </div>
           </form>
         </div>
