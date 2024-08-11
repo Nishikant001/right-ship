@@ -1,71 +1,223 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { FaEdit } from 'react-icons/fa';
+import axios from 'axios';
 
 function InfoSection() {
-  return (
-    <div className=" p-4  space-y-1 overflow-scroll">
-      <div className="p-4 bg-white border-2">
-        <h3 className="text-lg font-semibold">Last Vessel Type</h3>
-        <div className="mt-2 text-black"><b>Ship Name</b></div>
-      </div>
-      <div className="p-4 bg-white border-2">
-        <h3 className="text-lg font-semibold">Vessel Applied For</h3>
-        <div className="mt-2 text-black"><b>Ship Name</b></div>
-      </div>
-      <div className="p-4 bg-white border-2">
-        <h3 className="text-lg font-semibold">Date of Availability</h3>
-        <div className="mt-2 text-black"><b>23 Aug, 2024</b></div>
-      </div>
-      <div className="p-4 bg-white border-2">
-        <h3 className="text-lg font-semibold">Contact Detail</h3>
-        <div className="mt-2 text-black grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-  <p className='text-sm'>Email ID: <b>ancreation4004@gmail.com</b></p>
-  <p className='text-sm'>WhatsApp Number: <b>+91838474756</b></p>
-  <p className='text-sm'>Date of Birth: <br/><b>17 April, 2002</b></p>
-  <p className='text-sm'>Age: <br/><b>20 yrs</b></p>
-  <p className='text-sm'>Gender:<br/> <b>Male</b></p>
-</div>
+  const [editSection, setEditSection] = useState(null);
+  const [sectionData, setSectionData] = useState({
+    lastVesselType: '',
+    vesselAppliedFor: '',
+    dateOfAvailability: '',
+    contactDetail: {
+      email: '',
+      whatsapp: '',
+      dob: '',
+      age: '',
+      gender: '',
+    },
+    experience: {
+      seaExperience: '',
+      lastRankExperience: '',
+      presentRank: '',
+      lastRank: '',
+    },
+    licenseHolding: {
+      coc: '',
+      cop: '',
+      watchKeeping: '',
+    },
+    address: {
+      address1: '',
+      address2: '',
+      state: '',
+      pincode: '',
+      nationality: '',
+      city: '',
+      country: '',
+    },
+    others: {
+      height: '',
+      bmi: '',
+      weight: '',
+      sidCard: '',
+      lowerRank: '',
+    },
+  });
 
-      </div>
-      <div className="p-4 bg-white border-2">
-        <h3 className="text-lg font-semibold">Experience</h3>
-        <div className="mt-2 text-black grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <p className='text-sm'>Total Sea Experience:<br/><b> 2 yrs, 3 months</b></p>
-          <p className='text-sm'>Total Last Rank Experience:<br/><b> 2 yrs, 3 months</b></p>
-          <p className='text-sm'>Present Rank:<br/><b> No</b></p>
-          <p className='text-sm'>Last Rank:<br/><b>No</b></p>
+  const handleEditClick = (section) => {
+    setEditSection(section);
+  };
+
+  const handleSaveClick = () => {
+    updateUserData();
+    setEditSection(null);
+  };
+
+  const handleChange = (section, key, value) => {
+    setSectionData({
+      ...sectionData,
+      [section]: {
+        ...sectionData[section],
+        [key]: value,
+      },
+    });
+  };
+
+  const updateUserData = () => {
+    const payload = {
+      employee_id: '669b88908c9761528b0cfbb6', // replace with actual employee_id
+      name: sectionData.contactDetail.email, // replace or add other relevant data here
+      // Add other fields as required by your API
+    };
+
+    axios.post('https://api.rightships.com/employee/update', payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': '/',
+      },
+    })
+    .then((response) => {
+      console.log('Data updated successfully:', response.data);
+    })
+    .catch((error) => {
+      console.error('Error updating data:', error);
+    });
+  };
+
+  const renderEditableField = (section, key, value) => (
+    editSection === section ? (
+      <input
+        type="text"
+        className="border p-1 rounded"
+        value={value}
+        onChange={(e) => handleChange(section, key, e.target.value)}
+      />
+    ) : (
+      <b>{value}</b>
+    )
+  );
+
+  return (
+    <div className="flex h-screen">
+      <div className="flex-1 overflow-scroll h-screen p-4 space-y-4" style={{height:"62em"}}>
+        <div className="p-4 bg-white border-2 rounded-lg shadow relative">
+          <h3 className="text-lg font-semibold flex justify-between">
+            Last Vessel Type
+            <FaEdit className="cursor-pointer" onClick={() => handleEditClick('lastVesselType')} />
+          </h3>
+          <div className="mt-2 text-black">
+            {renderEditableField('lastVesselType', 'lastVesselType', sectionData.lastVesselType)}
+          </div>
         </div>
-      </div>
-      <div className="p-4 bg-white border-2">
-        <h3 className="text-lg font-semibold">License Holding</h3>
-        <div className="mt-2 text-black grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <p className='text-sm'>COC: <br/><b> ancreation4004@gmail.com</b></p>
-          <p className='text-sm'>COP: <br/><b> ancreation4004@gmail.com</b></p>
-          <p className='text-sm'>Watch Keeping: <br/><b> ancreation4004@gmail.com</b></p>
+
+        <div className="p-4 bg-white border-2 rounded-lg shadow relative">
+          <h3 className="text-lg font-semibold flex justify-between">
+            Vessel Applied For
+            <FaEdit className="cursor-pointer" onClick={() => handleEditClick('vesselAppliedFor')} />
+          </h3>
+          <div className="mt-2 text-black">
+            {renderEditableField('vesselAppliedFor', 'vesselAppliedFor', sectionData.vesselAppliedFor)}
+          </div>
         </div>
-      </div>
-      <div className="p-4 bg-white border-2 ">
-        <h3 className="text-lg font-semibold">Address</h3>
-        <div className="mt-2 text-black grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <p className='text-sm'>Address:<br/> <b>XXXXXXXXXX</b></p>
-          <p className='text-sm'>Address 2:<br/> <b>XXXXXXXXXX</b></p>
-          <p className='text-sm'>State:<br/> <b>XXXXXXXXXX</b></p>
-          <p className='text-sm'>Pincode:<br/> <b>XXXXXXXXXX</b></p>
-          <p className='text-sm'>Nationality:<br/> <b>XXXXXXXXXX</b></p>
-          <p className='text-sm'>City:<br/> <b>XXXXXXXXXX</b></p>
-          <p className='text-sm'>Country:<br/> <b>XXXXXXXXXX</b></p>
+
+        <div className="p-4 bg-white border-2 rounded-lg shadow relative">
+          <h3 className="text-lg font-semibold flex justify-between">
+            Date of Availability
+            <FaEdit className="cursor-pointer" onClick={() => handleEditClick('dateOfAvailability')} />
+          </h3>
+          <div className="mt-2 text-black">
+            {renderEditableField('dateOfAvailability', 'dateOfAvailability', sectionData.dateOfAvailability)}
+          </div>
         </div>
-      </div>
-      <div className="p-4 bg-white border-2">
-        <h3 className="text-lg font-semibold">Others</h3>
-        <div className="mt-2 text-black flex gap-10">
-          <p>Height:<br/> <b>Yes</b></p>
-          <p>BMI:<br/><b> 9.2</b></p>
-          <p>Weight (KG):<br/> <b>Yes</b></p>
-          <p>SID CARD:<br/><b> 9.2</b></p>
-          <p>Willing to accept lower rank:<br/> <b>Yes</b></p>
-          
+
+        <div className="p-4 bg-white border-2 rounded-lg shadow relative">
+          <h3 className="text-lg font-semibold flex justify-between">
+            Contact Detail
+            <FaEdit className="cursor-pointer" onClick={() => handleEditClick('contactDetail')} />
+          </h3>
+          <div className="mt-2 text-black grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.keys(sectionData.contactDetail).map((key) => (
+              <p key={key} className="text-sm">
+                {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}: <br />
+                {renderEditableField('contactDetail', key, sectionData.contactDetail[key])}
+              </p>
+            ))}
+          </div>
         </div>
+
+        <div className="p-4 bg-white border-2 rounded-lg shadow relative">
+          <h3 className="text-lg font-semibold flex justify-between">
+            Experience
+            <FaEdit className="cursor-pointer" onClick={() => handleEditClick('experience')} />
+          </h3>
+          <div className="mt-2 text-black grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.keys(sectionData.experience).map((key) => (
+              <p key={key} className="text-sm">
+                {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}: <br />
+                {renderEditableField('experience', key, sectionData.experience[key])}
+              </p>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-4 bg-white border-2 rounded-lg shadow relative">
+          <h3 className="text-lg font-semibold flex justify-between">
+            License Holding
+            <FaEdit className="cursor-pointer" onClick={() => handleEditClick('licenseHolding')} />
+          </h3>
+          <div className="mt-2 text-black grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.keys(sectionData.licenseHolding).map((key) => (
+              <p key={key} className="text-sm">
+                {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}: <br />
+                {renderEditableField('licenseHolding', key, sectionData.licenseHolding[key])}
+              </p>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-4 bg-white border-2 rounded-lg shadow relative">
+          <h3 className="text-lg font-semibold flex justify-between">
+            Address
+            <FaEdit className="cursor-pointer" onClick={() => handleEditClick('address')} />
+          </h3>
+          <div className="mt-2 text-black grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.keys(sectionData.address).map((key) => (
+              <p key={key} className="text-sm">
+                {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}: <br />
+                {renderEditableField('address', key, sectionData.address[key])}
+              </p>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-4 bg-white border-2 rounded-lg shadow relative">
+          <h3 className="text-lg font-semibold flex justify-between">
+            Others
+            <FaEdit className="cursor-pointer" onClick={() => handleEditClick('others')} />
+          </h3>
+          <div className="mt-2 text-black flex flex-wrap gap-10">
+            {Object.keys(sectionData.others).map((key) => (
+              <p key={key} className="text-sm">
+                {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}: <br />
+                {renderEditableField('others', key, sectionData.others[key])}
+              </p>
+            ))}
+          </div>
+        </div>
+
+        {editSection && (
+          <div className="text-right">
+            <button
+              onClick={handleSaveClick}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg"
+            >
+              Save
+            </button>
+          </div>
+        )}
       </div>
+
+      
     </div>
   );
 }
