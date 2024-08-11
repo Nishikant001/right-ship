@@ -3,7 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { sendOtp } from '../../features/otpSlice';
 import { setContactInfo } from '../../features/contactSlice';
 import logo from "../../images/logo.png";
+import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
 
@@ -14,13 +16,19 @@ const Login = () => {
   const otpError = useSelector((state) => state.otp.error);
 
   const handleSendOtp = () => {
+    if (!phoneNumber.trim()) {
+      toast.error("Phone number field cannot be empty!");
+      return;
+    }
     dispatch(sendOtp(phoneNumber));
     dispatch(setContactInfo(phoneNumber));
+    toast.success("OTP sent successfully")
     navigate('/login-verify');
   };
 
   return (
     <section className="flex flex-col items-center py-20 h-screen bg-gray-100">
+      <ToastContainer/>
       <div className="mb-4">
         <img src={logo} alt="Logo" className="h-24 w-20" />
       </div>

@@ -123,14 +123,13 @@ const Header3 = () => {
           isOffCanvasOpen ? 'translate-x-0' : 'translate-x-full'
         } transition-transform duration-300 ease-in-out z-40`}
       >
-        <div className="px-4 flex flex-col space-y-4">
+        <div className="p-4 flex flex-col space-y-4">
           <button onClick={toggleOffCanvas} className="text-black self-end absolute top-7 right-5">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
           <Link to="/" className="flex items-center space-x-2 font-bold">
-            <img src={Logo} alt="Logo" height={40} width={40} />
             <span className="text-gray-800">RIGHTSHIP</span>
           </Link>
           <Link to="/jobdashboard" className="text-black font-bold hover:text-customBlue">Jobs</Link>

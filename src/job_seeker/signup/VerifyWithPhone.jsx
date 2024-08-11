@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import logo from '../../images/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
+import { ToastContainer ,toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const VerifyLogin = () => {
   const navigate = useNavigate();
@@ -38,47 +40,60 @@ const VerifyLogin = () => {
 
   const handleVerifyOtp = async () => {
     try {
-      const verifyResponse = await fetch('https://api.rightships.com/otp/verify_otp', {
+      const response = await fetch('https://api.rightships.com/otp/verify_otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ mobile_no: contactInfo, otp }),
       });
-
-      if (!verifyResponse.ok) {
-        const errorData = await verifyResponse.json();
+  
+      if (!response.ok) {
+        const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to verify OTP');
       }
-
-      const verifyData = await verifyResponse.json();
-      if (verifyData.code === 200) {
-        const loginResponse = await fetch('https://api.rightships.com/employee/login', {
+  
+      const data = await response.json();
+      if (data.code === 200) {
+        // Assuming the response has employeeId
+        const employeeId = data.employee_id;
+  
+        // Now register the employee
+        const registrationResponse = await fetch('https://api.rightships.com/employee/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ mobile_no: contactInfo }),
         });
-
-        if (!loginResponse.ok) {
-          const errorData = await loginResponse.json();
-          throw new Error(errorData.message || 'Failed to log in');
+  
+        if (!registrationResponse.ok) {
+          const registrationErrorData = await registrationResponse.json();
+          throw new Error(registrationErrorData.message || 'Failed to register employee');
         }
-
-        const loginData = await loginResponse.json();
-        navigate('/jobdashboard');
+  
+        const registrationData = await registrationResponse.json();
+        if (registrationData.code === 200) {
+          toast.success('Number verified and employee registered successfully!');
+          
+          // Pass the employeeId and mobile_no to About component
+          navigate('/personalDetails', { state: { employeeId:data.employee._id, mobile_no: contactInfo } });
+        } else {
+          throw new Error(registrationData.msg || 'Failed to register employee');
+        }
       } else {
-        throw new Error(verifyData.msg || 'Failed to verify OTP');
+        throw new Error(data.msg || 'Failed to verify OTP');
       }
     } catch (error) {
       console.error('Error:', error.message);
+      toast.error(`Error: ${error.message}`);
     }
   };
 
   return (
     <>
       <section className="flex flex-col items-center py-20 h-screen bg-gray-100">
+        <ToastContainer/>
         <div className="mb-4">
           <img src={logo} alt="Logo" className="h-24 w-20 mx-auto" />
         </div>
