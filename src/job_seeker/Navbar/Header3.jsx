@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const Header3 = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const userDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
   const [isVisible, setIsVisible] = useState(true);
@@ -19,6 +20,10 @@ const Header3 = () => {
 
   const handleNotificationDropdownClick = () => {
     setNotificationDropdownOpen(!notificationDropdownOpen);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   useEffect(() => {
@@ -57,11 +62,81 @@ const Header3 = () => {
   }, [lastScrollY]);
 
   return (
-    <header className={`bg-white border-b py-5 px-8 border-gray-200 sticky top-0 z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
-      <ToastContainer />
-      <nav className=" mx-auto flex justify-between items-center h-6">
-        <div className="flex items-center h-full">
-          <Link to="/" className='flex'>
+    <>
+      <header className={`bg-white border-b py-5 px-8 border-gray-200 sticky top-0 z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+        <ToastContainer />
+        <nav className="flex justify-between items-center">
+          <div className="flex items-center">
+            <button onClick={toggleSidebar} className="text-black md:hidden focus:outline-none">
+              {isSidebarOpen ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-16 6h16" />
+                </svg>
+              )}
+            </button>
+            <Link to="/" className='flex'>
+              <img src={Logo} alt="Logo" height={40} width={40} />
+              <a href="#" className="font-bold text-gray-800 mt-2 px-4">RIGHTSHIP</a>
+            </Link>
+          </div>
+          <div className="hidden md:flex items-center space-x-8">
+            <Link to="/jobdashboard">
+              <a href="#" className="text-black font-bold hover:text-customBlue hover:font-bold mx-4">Jobs</a>
+            </Link>
+            <Link to="/companies">
+              <a href="#" className="text-black font-bold hover:text-customBlue hover:font-bold mx-4">Companies</a>
+            </Link>
+          </div>
+          <div className="hidden md:flex items-center space-x-8">
+            <a href="#help-support" className="text-black flex items-center font-bold"> <CircleHelp size={20} /> &nbsp; Help & Support &nbsp;</a>
+            <div className="relative" ref={notificationDropdownRef}>
+              <button onClick={handleNotificationDropdownClick} className="py-1 text-black-600 flex rounded font-bold">
+                <Bell size={20} className='mx-2 mt-0.5' /> Notification <ChevronDown className='mx-2' />
+              </button>
+              {notificationDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
+                  <Link to="/notifications" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 font-semibold">View All Notifications</Link>
+                  <Link to="/settings" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 font-semibold">Notification Settings</Link>
+                </div>
+              )}
+            </div>
+            <div className="relative" ref={userDropdownRef}>
+              <button onClick={handleUserDropdownClick} className="py-1 text-black-600 flex rounded font-bold">
+                <CircleUserRound size={20} className='mx-2 mt-0.5' /> User <ChevronDown className='mx-2' />
+              </button>
+              {userDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg pt-1">
+                  <Link to="/profile" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex font-semibold"><MessageSquare size={20} className='mt-1 me-1' /> Profile</Link>
+                  <Link to="/myjobs" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex font-semibold"><MessageSquare size={20} className='mt-1 me-1' /> My Jobs</Link>
+                  <Link to="/settings" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex font-semibold"><MessageSquare size={20} className='mt-1 me-1' /> Settings</Link>
+                  <Link to="/" className="px-4 py-2 mt-1 text-gray-800 hover:bg-gray-100 flex justify-center border border-t font-bold">Sign Out</Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      {/* Off-canvas Menu */}
+      <div
+        className={`fixed top-0 z-50 right-0 w-64 h-full bg-white shadow-lg border-l border-gray-200 transform ${
+          isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+        } transition-transform duration-300 ease-in-out`}
+      >
+        <div className="p-4 flex flex-col space-y-4 relative">
+          <button
+            onClick={toggleSidebar}
+            className="absolute top-4 right-4 text-black focus:outline-none"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <Link to="/" className='flex items-center'>
             <img src={Logo} alt="Logo" height={40} width={40} />
             <a href="#" className="font-bold text-gray-800 mt-2 px-4">RIGHTSHIP</a>
           </Link>
@@ -71,38 +146,42 @@ const Header3 = () => {
           <Link to="/companies">
             <a href="#" className="text-black font-bold hover:text-customBlue hover:font-bold mx-4">Companies</a>
           </Link>
-        </div>
-        <div className="relative flex items-center space-x-8">
-          <div className="flex items-center space-x-8">
-            <a href="#help-support" className="text-black flex items-center font-bold"> <CircleHelp size={20}/>&nbsp; Help & Support &nbsp;</a>
-            <div className="relative" ref={notificationDropdownRef}>
-              <button onClick={handleNotificationDropdownClick} className=" py-1 text-black-600 flex rounded font-bold">
-                <Bell size={20} className='mx-2 mt-0.5'/> Notification <ChevronDown className='mx-2'/>
-              </button>
-              {notificationDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
-                  <Link to="/notifications" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 font-semibold">View All Notifications</Link>
-                  <Link to="/settings" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 font-semibold">Notification Settings</Link>
-                </div>
-              )}
-            </div>
+          <a href="#help-support" className="text-black flex items-center font-bold"> <CircleHelp size={20} /> &nbsp; Help & Support &nbsp;</a>
+          <div className="relative" ref={notificationDropdownRef}>
+            <button onClick={handleNotificationDropdownClick} className="py-1 text-black-600 flex rounded font-bold">
+              <Bell size={20} className='mx-2 mt-0.5' /> Notification <ChevronDown className='mx-2' />
+            </button>
+            {notificationDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
+                <Link to="/notifications" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 font-semibold">View All Notifications</Link>
+                <Link to="/settings" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 font-semibold">Notification Settings</Link>
+              </div>
+            )}
           </div>
           <div className="relative" ref={userDropdownRef}>
-            <button onClick={handleUserDropdownClick} className=" py-1 text-black-600 flex rounded font-bold">
-              <CircleUserRound size={20} className='mx-2 mt-0.5'/> User <ChevronDown  className='mx-2'/>
+            <button onClick={handleUserDropdownClick} className="py-1 text-black-600 flex rounded font-bold">
+              <CircleUserRound size={20} className='mx-2 mt-0.5' /> User <ChevronDown className='mx-2' />
             </button>
             {userDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg pt-1">
-                <Link to="/profile" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex font-semibold"><MessageSquare size={20} className='mt-1 me-1'/>Profile</Link>
-                <Link to="/myjobs" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex font-semibold"><MessageSquare size={20} className='mt-1 me-1'/>My Jobs</Link>
-                <Link to="/settings" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex font-semibold"><MessageSquare size={20} className='mt-1 me-1'/>Settings</Link>
-                <Link to="/" className="px-4 py-2 mt-1 text-gray-800 hover:bg-gray-100 flex  justify-center border border-t font-bold">Sign Out</Link>
+                <Link to="/profile" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex font-semibold"><MessageSquare size={20} className='mt-1 me-1' /> Profile</Link>
+                <Link to="/myjobs" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex font-semibold"><MessageSquare size={20} className='mt-1 me-1' /> My Jobs</Link>
+                <Link to="/settings" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex font-semibold"><MessageSquare size={20} className='mt-1 me-1' /> Settings</Link>
+                <Link to="/" className="px-4 py-2 mt-1 text-gray-800 hover:bg-gray-100 flex justify-center border border-t font-bold">Sign Out</Link>
               </div>
             )}
           </div>
         </div>
-      </nav>
-    </header>
+      </div>
+
+      {/* Overlay */}
+      {isSidebarOpen && (
+        <div
+          onClick={toggleSidebar}
+          className="fixed inset-0 bg-black opacity-50"
+        ></div>
+      )}
+    </>
   );
 };
 
