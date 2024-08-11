@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Logo from '../../images/logo.png';
 import { Link } from 'react-router-dom';
 
 const Navbar = () => {
@@ -9,7 +10,17 @@ const Navbar = () => {
     <>
       <nav className="flex items-center justify-between p-4 bg-white text-black border-b-2">
         <div className="flex items-center space-x-4 px-10">
-          <span className="font-semibold"><a href="#">Rightship</a></span>
+          <Link to="/" className='flex items-center'>
+            <img src={Logo} alt="Logo" height={40} width={40} />
+            <span className="font-bold text-gray-800 mt-2 px-4">RIGHTSHIP</span>
+          </Link>
+
+
+
+          {/* ${isOffCanvasOpen ? 'hidden' : 'md:flex'} */}
+
+
+          
           <div className="hidden md:flex space-x-4">
             <span><a href="/myjobs">Jobs</a></span>
             <span><a href="#">Companies</a></span>
@@ -71,7 +82,12 @@ const Navbar = () => {
             </svg>
           </button>
 
-          <a href="#" className="block font-semibold">Rightship</a>
+          
+
+          <Link to="/" className='flex items-center'>
+            <img src={Logo} alt="Logo" height={40} width={40} />
+            <span className="font-bold text-gray-800 mt-2 px-4">RIGHTSHIP</span>
+          </Link>
           <a href="/myjobs" className="block">Jobs</a>
           <a href="#" className="block">Companies</a>
           <a href='/login'><button className="text-blue-700 border p-2 px-6 hover:bg-indigo-900 hover:text-white rounded">Login</button></a>
