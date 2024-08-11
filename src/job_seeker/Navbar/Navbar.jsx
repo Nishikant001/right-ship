@@ -19,8 +19,8 @@ const Navbar = () => {
           </div>
         </div>
         <div className="hidden md:flex items-center space-x-4">
-        <a href='/login'> <button className="text-blue-700 border p-2 px-6 hover:bg-blue-800 hover:text-white rounded">Login</button></a>
-          <a href='/singup-number'> <button className="bg-blue-800 text-white px-4 py-2 rounded">Register</button></a>
+        <a href='/login'> <button className="text-customBlue border border-customBlue font-semibold p-2 px-6 hover:bg-customBlue hover:text-white rounded">Login</button></a>
+          <a href='/signup-number'> <button className="bg-customBlue font-semibold text-white px-4 py-2 rounded">Register</button></a>
           <div className="relative">
             <button
               className="flex items-center space-x-2"

@@ -91,13 +91,13 @@ const VerifyLogin = () => {
           <input
             type="text"
             placeholder="Enter OTP"
-            className="w-full px-4 py-4 mb-4 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+            className="w-full px-4 py-4 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-customBlue"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
           />
           <button
             onClick={handleVerifyOtp}
-            className={`w-full py-4 rounded-md text-white font-medium ${otpStatus === 'loading' ? 'bg-indigo-700' : 'bg-indigo-900 hover:bg-indigo-700'} transition duration-300`}
+            className={`w-full py-4 rounded-md text-white font-medium ${otpStatus === 'loading' ? 'bg-customBlue' : 'bg-customBlue hover:bg-customBlue2'} transition duration-300`}
             disabled={otpStatus === 'loading'}
           >
             {otpStatus === 'loading' ? 'Verifying...' : 'Verify OTP'}
@@ -107,7 +107,7 @@ const VerifyLogin = () => {
             {canResend ? (
               <button
                 onClick={handleSendOtp}
-                className="text-indigo-600 underline text-sm"
+                className="text-blue-700 underline text-sm"
               >
                 Resend OTP
               </button>
@@ -115,7 +115,7 @@ const VerifyLogin = () => {
               `Resend OTP in: ${formatTime(timer)}`
             )}
           </p>
-          <Link className="text-indigo-600 block text-center text-sm underline mt-4" to="/login">Change Number</Link>
+          <Link className="text-blue-700 block text-center text-sm underline mt-4" to="/login">Change Number</Link>
         </div>
       </section>
       <footer className="bg-white py-2"></footer>

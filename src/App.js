@@ -111,7 +111,7 @@ const App = () => {
         />
         <Route path='/' element={<DefaultLayout2><LandingPage/></DefaultLayout2>} />
         <Route path='/settings' element={<DefaultLayout3><Setting /></DefaultLayout3>} />
-        <Route path='/singup-number' element={<DefaultLayout2><Signup /></DefaultLayout2>} />
+        <Route path='/signup-number' element={<DefaultLayout2><Signup /></DefaultLayout2>} />
         <Route path='/signup-email' element={<DefaultLayout2><SignupWithEmail/></DefaultLayout2>} />
         <Route path='/verify-phone' element={<DefaultLayout2><VerifyWithPhone/></DefaultLayout2>} />
         <Route path='/login' element={<DefaultLayout2><JobLogin/></DefaultLayout2>} />

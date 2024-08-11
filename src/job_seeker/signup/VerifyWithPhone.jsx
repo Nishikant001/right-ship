@@ -78,8 +78,8 @@ const VerifyLogin = () => {
 
   return (
     <>
-      <section className="flex flex-col items-center py-20 h-screen bg-gray-50">
-        <div className="mb-8">
+      <section className="flex flex-col items-center py-20 h-screen bg-gray-100">
+        <div className="mb-4">
           <img src={logo} alt="Logo" className="h-24 w-20 mx-auto" />
         </div>
         <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
@@ -88,13 +88,13 @@ const VerifyLogin = () => {
           <input
             type="text"
             placeholder="Enter OTP"
-            className="w-full px-4 py-3 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-4 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-customBlue"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
           />
           <button
             onClick={handleVerifyOtp}
-            className={`w-full py-3 rounded-md text-white font-medium ${otpStatus === 'loading' ? 'bg-indigo-700' : 'bg-indigo-900 hover:bg-indigo-700'} transition duration-300`}
+            className={`w-full py-4 rounded-md text-white font-medium ${otpStatus === 'loading' ? 'bg-customBlue' : 'bg-customBlue hover:bg-customBlue2'} transition duration-300`}
             disabled={otpStatus === 'loading'}
           >
             {otpStatus === 'loading' ? 'Verifying...' : 'Verify OTP'}
@@ -104,7 +104,7 @@ const VerifyLogin = () => {
             {canResend ? (
               <button
                 onClick={handleSendOtp}
-                className="text-indigo-600 underline hover:text-indigo-800"
+                className="text-blue-600 underline hover:text-customBlue2 text-md"
               >
                 Resend OTP
               </button>
@@ -112,7 +112,7 @@ const VerifyLogin = () => {
               `Resend OTP in: ${formatTime(timer)}`
             )}
           </p>
-          <Link className="text-indigo-600 block text-center text-sm underline mt-6 hover:text-indigo-800" to="/login">
+          <Link className="text-blue-600 block text-center text-md underline mt-6 hover:text-customBlue2" to="/signup-number">
             Change Number
           </Link>
         </div>
