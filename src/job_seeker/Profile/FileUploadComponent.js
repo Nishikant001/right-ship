@@ -1,8 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaRegEdit } from "react-icons/fa";
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 function FileUploadComponent() {
   const [file, setFile] = useState(null);
+  const location = useLocation();
+  const employeeId = location.state?.employeeId;
+  const contactInfo = useSelector((state) => state.contact.contactInfo);
+
+  useEffect(() => {
+    const fetchResume = async () => {
+      try {
+        const response = await axios.post('https://api.rightships.com/user/details', {
+          mobile_no: contactInfo,
+          user_type: 'employee', // Ensure this matches the API's required payload
+        });
+
+        console.log('API Response:', response);
+
+        const data = response.data;
+        console.log('Response Data:', data);
+
+        if (data && (data.resume || data.resume_url)) {
+          const resumeUrl = data.resume || data.resume_url;
+          setFile({
+            name: resumeUrl.split('/').pop(),
+            type: resumeUrl.endsWith('.pdf') ? 'application/pdf' : 'application/msword',
+            url: resumeUrl,
+          });
+        } else {
+          console.warn('Resume field not found in response data.');
+        }
+      } catch (error) {
+        console.error('Error fetching resume:', error);
+      }
+    };
+
+    if (contactInfo) {
+      fetchResume();
+    }
+  }, [contactInfo]);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];

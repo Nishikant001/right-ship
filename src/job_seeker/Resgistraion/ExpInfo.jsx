@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 // import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 // import { updateData } from '../../features/employeeRegistrationSlice';
@@ -10,6 +11,7 @@ const Experience = () => {
   const location = useLocation();
 const state = location.state || {};
 const employeeId = state.employeeId || '';
+const contactInfo = useSelector((state) => state.contact.contactInfo);
 
   console.log('Location State:', location.state); // Add this line
   console.log('Employee ID:', employeeId);
@@ -73,7 +75,7 @@ const employeeId = state.employeeId || '';
         console.log('Navigating with employeeId:', employeeId);
 
         // navigate('/experinceDetails', { state: { employeeId } });
-        navigate('/resume&profile',{ state: { employeeId } });
+        navigate('/resume&profile',{ state: { employeeId,mobile_no: contactInfo } });
       } else {
         console.error('Failed to update:', response);
         setError('Failed to update employee details. Please try again.');

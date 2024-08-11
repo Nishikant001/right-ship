@@ -4,13 +4,14 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import Background from "../../images/background.jpg";
 import File from "../../images/File img.png";
 import ProfileImage from "../../images/upload.jpg";
-
+import imageCompression from 'browser-image-compression';
+import { useSelector } from 'react-redux';
 const Resume = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state || {};
   const employeeId = state.employeeId || ''; // Retrieve the employee ID from the state or fallback to an empty string
-
+  const contactInfo = useSelector((state) => state.contact.contactInfo);
   const [profileFile, setProfileFile] = useState(null);
   const [resumeFile, setResumeFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -31,11 +32,25 @@ const Resume = () => {
     }
   }, [location.state, employeeId, navigate]);
 
-  const handleProfileFileChange = (event) => {
+  const handleProfileFileChange = async(event) => {
+    const options = {
+      maxSizeMB: 5, // Maximum file size in MB
+      
+    };
     const selectedFile = event.target.files[0];
     setProfileFile(selectedFile);
     console.log('Profile file uploaded:', selectedFile);
+    try {
+      const compressedFile = await imageCompression(selectedFile, options);
+      setProfileFile(compressedFile);
+      console.log('Profile file uploaded:', compressedFile);
+    } catch (error) {
+      console.error('Error during image compression:', error);
+      setError('Failed to compress image. Please try again.');
+    }
   };
+
+  
 
   const handleResumeFileChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -50,21 +65,23 @@ const Resume = () => {
   const triggerResumeFileUpload = () => {
     resumeFileInputRef.current.click();
   };
-
   const uploadFile = async (file, key) => {
     try {
       const formData = new FormData();
       formData.append('file', file);
-
+  
       const response = await axios.post('https://api.rightships.com/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+  
+      console.log(`Response for ${key} upload:`, response.data); // Log the full response
+  
       if (response.status === 200) {
+        // Use 'file_url' from the response data
         console.log(`${key} upload successful:`, response.data);
-        return response.data.filePath; // Assuming the API returns the file path
+        return response.data.file_url; // Return the correct property
       } else {
         console.error(`Failed to upload ${key}:`, response);
         setError(`Failed to upload ${key}. Please try again.`);
@@ -76,38 +93,45 @@ const Resume = () => {
       return null;
     }
   };
+  
+  
 
   const handleSubmit = async () => {
     if (!employeeId) {
       setError('Employee ID is required.');
       return;
     }
-
+  
     try {
       setLoading(true);
       setError(null);
-
+  
       // Upload profile picture and resume
       const profileFilePath = profileFile ? await uploadFile(profileFile, 'profile picture') : null;
       const resumeFilePath = resumeFile ? await uploadFile(resumeFile, 'resume') : null;
-
+  
+      console.log('Profile File Path:', profileFilePath); // Log the file paths
+      console.log('Resume File Path:', resumeFilePath);
+  
       // Prepare payload for update API
       const payload = {
         employee_id: employeeId,
-        profilePicture: profileFilePath,
+        profile_photo: profileFilePath,
         resume: resumeFilePath,
       };
-
+  
       const response = await axios.post('https://api.rightships.com/employee/update', payload, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
-
+  
+      console.log('Update Response:', response.data);
+  
       if (response.status === 200) {
         console.log('Update successful:', response.data);
         setSuccess(true);
-        navigate('/profile',{state:{ employeeId }});
+        navigate('/profile',{state:{ employeeId,mobile_no: contactInfo }});
       } else {
         console.error('Failed to update:', response);
         setError('Failed to update employee details. Please try again.');
@@ -124,7 +148,7 @@ const Resume = () => {
       setLoading(false);
     }
   };
-
+   
   return (
     <div className="flex h-screen">
       <div className="hidden md:block w-2/5 h-screen bg-cover bg-center" style={{ backgroundImage: `url(${Background})` }}></div>

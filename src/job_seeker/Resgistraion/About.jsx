@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import Background from "../../images/background.jpg";
+import { useSelector } from 'react-redux';
 
 const About = () => {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ const About = () => {
   const state = location.state || {}; // Retrieve from state
   const mobile_no = state.mobile_no || '';
   const employeeId = state.employeeId || '';
+  const contactInfo = useSelector((state) => state.contact.contactInfo);
 
   console.log('Location State:', location.state); // Add this line
   console.log('Employee ID:', employeeId); // Add this line
@@ -65,7 +67,7 @@ const About = () => {
       if (response.status === 200) {
         console.log('Update successful:', response.data);
         console.log('Navigating to Experience with Employee ID:', employeeId);
-        navigate('/experinceDetails', { state: { employeeId } });
+        navigate('/experinceDetails', { state: { employeeId, mobile_no: contactInfo } });
         
       } else {
         console.error('Failed to update:', response);

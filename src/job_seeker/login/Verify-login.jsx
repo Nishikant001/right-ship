@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import logo from '../../images/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
+// import { useSelector } from 'react-redux';
 
 const VerifyLogin = () => {
   const navigate = useNavigate();
@@ -71,7 +72,7 @@ const VerifyLogin = () => {
 
         const loginData = await loginResponse.json();
         console.log('Login successful:', loginData);
-        navigate('/jobdashboard');
+        navigate('/profile', {state:{mobile_no: contactInfo }});
       } else {
         throw new Error(verifyData.msg || 'Failed to verify OTP');
       }
