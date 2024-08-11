@@ -2,7 +2,7 @@ import React from 'react';
 
 const SearchBar = () => (
   <div className="my-12 text-center">
-    <h2 className="text-3xl font-semibold mb-2 text-gray-800">Find Your Dream Job Now</h2>
+    <h2 className="text-4xl font-semibold mb-2 text-gray-800">Find Your Dream Job Now</h2>
     <p className="mb-6 text-gray-600">Over 500,000 jobs for you to explore</p>
     <div className="flex justify-center">
       <input
