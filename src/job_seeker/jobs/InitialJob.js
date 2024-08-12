@@ -1,80 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bookmark } from 'lucide-react';
-
-const initialJobsData = {
-  savedJobs: [
-    {
-      id: 1,
-      companyName: 'Company Name',
-      rpslNo: 'RPSL NO',
-      hiringFor: 'Offshore vessel - AHT',
-      openPositions: ['2nd Officer', '3rd Officer', '3rd Engineer'],
-      applied: false,
-    },
-    {
-      id: 2,
-      companyName: 'Company Name',
-      rpslNo: 'RPSL NO',
-      hiringFor: 'Offshore vessel - AHT',
-      openPositions: ['2nd Officer', '3rd Officer', '3rd Engineer'],
-      applied: false,
-    },
-    {
-      id: 3,
-      companyName: 'Company Name',
-      rpslNo: 'RPSL NO',
-      hiringFor: 'Offshore vessel - AHT',
-      openPositions: ['2nd Officer', '3rd Officer', '3rd Engineer'],
-      applied: false,
-    },
-    {
-      id: 4,
-      companyName: 'Company Name',
-      rpslNo: 'RPSL NO',
-      hiringFor: 'Offshore vessel - AHT',
-      openPositions: ['2nd Officer', '3rd Officer', '3rd Engineer'],
-      applied: false,
-    },
-  ],
-  appliedJobs: [],
-};
+import { useSelector, useDispatch } from 'react-redux';
+import { removeJob, unapplyJob, applyJob, bookmarkJob } from '../../features/jobSlice';
 
 const MyJobs = () => {
-  const [jobsData, setJobsData] = useState(initialJobsData);
-  const [activeTab, setActiveTab] = useState('savedJobs');
+  const savedJobs = useSelector(state => state.job.savedJobs);
+  const appliedJobs = useSelector(state => state.job.appliedJobs);
+  const [activeTab, setActiveTab] = useState('');
 
-  const toggleApply = (jobId) => {
-    setJobsData((prevJobsData) => {
-      const savedJobs = [...prevJobsData.savedJobs];
-      const appliedJobs = [...prevJobsData.appliedJobs];
-      const jobIndex = savedJobs.findIndex((job) => job.id === jobId);
+  const dispatch = useDispatch();
 
-      if (jobIndex !== -1) {
-        const job = savedJobs[jobIndex];
-        job.applied = !job.applied;
+  // Load active tab from localStorage when component mounts
+  useEffect(() => {
+    const storedTab = localStorage.getItem('activeTab') || 'savedJobs';
+    setActiveTab(storedTab);
+  }, []);
 
-        if (job.applied) {
-          appliedJobs.push(job);
-        } else {
-          const appliedJobIndex = appliedJobs.findIndex((j) => j.id === jobId);
-          if (appliedJobIndex !== -1) {
-            appliedJobs.splice(appliedJobIndex, 1);
-          }
-        }
+  // Store active tab in localStorage whenever it changes
+  useEffect(() => {
+    if (activeTab) {
+      localStorage.setItem('activeTab', activeTab);
+    }
+  }, [activeTab]);
 
-        savedJobs[jobIndex] = job;
-      }
-
-      return { savedJobs, appliedJobs };
-    });
+  const toggleApply = (job) => {
+    if (appliedJobs.some(appliedJob => appliedJob.id === job.id)) {
+      dispatch(unapplyJob(job.id)); // Unapply action
+    } else {
+      dispatch(applyJob(job)); // Apply action
+    }
   };
 
-  const removeJob = (jobId) => {
-    setJobsData((prevJobsData) => {
-      const savedJobs = prevJobsData.savedJobs.filter((job) => job.id !== jobId);
-      const appliedJobs = prevJobsData.appliedJobs.filter((job) => job.id !== jobId);
-      return { savedJobs, appliedJobs };
-    });
+  const toggleBookmark = (job) => {
+    if (savedJobs.some(savedJob => savedJob.id === job.id)) {
+      dispatch(removeJob(job.id)); // This removes the job only from savedJobs
+    } else {
+      dispatch(bookmarkJob(job)); // This adds the job to savedJobs
+    }
   };
 
   return (
@@ -89,7 +51,7 @@ const MyJobs = () => {
             }`}
             onClick={() => setActiveTab('savedJobs')}
           >
-            Saved Jobs ({jobsData.savedJobs.length})
+            Saved Jobs ({savedJobs.length})
           </button>
           <button
             className={`px-4 py-2 font-medium ${
@@ -97,13 +59,13 @@ const MyJobs = () => {
             }`}
             onClick={() => setActiveTab('appliedJobs')}
           >
-            Applied Jobs ({jobsData.appliedJobs.length})
+            Applied Jobs ({appliedJobs.length})
           </button>
         </div>
         <div className="w-11/12 border mx-auto border-blue-300 mb-4"></div>
         <div className='max-w-4xl mx-auto'>
           {activeTab === 'savedJobs' &&
-            jobsData.savedJobs.map((job) => (
+            savedJobs.map((job) => (
               <div key={job.id} className="flex flex-col md:flex-row justify-between p-4 border rounded-lg mb-4">
                 <div>
                   <p>{job.companyName} | {job.rpslNo}</p>
@@ -115,18 +77,20 @@ const MyJobs = () => {
                 <div className="flex mt-2 md:mt-0 items-center space-x-2">
                   <button
                     className={`px-4 py-2 ${
-                      job.applied ? 'border-2 border-customBlue text-customBlue font-semibold rounded-md' : 'border-2 border-customBlue text-white bg-customBlue font-semibold rounded-md'
+                      appliedJobs.some(appliedJob => appliedJob.id === job.id) ? 'border-2 border-customBlue text-customBlue font-semibold rounded-md' : 'border-2 border-customBlue text-white bg-customBlue font-semibold rounded-md'
                     }`}
-                    onClick={() => toggleApply(job.id)}
+                    onClick={() => toggleApply(job)}
                   >
-                    {job.applied ? 'Unapply' : 'Apply Job'}
+                    {appliedJobs.some(appliedJob => appliedJob.id === job.id) ? 'Unapply' : 'Apply Job'}
                   </button>
-                  <Bookmark className="w-6 h-6 cursor-pointer" color='#1F5882' fill='#1F5882' onClick={() => removeJob(job.id)} />
+                  <button onClick={() => toggleBookmark(job)}>
+                    <Bookmark className="w-6 h-6 cursor-pointer" color='#1F5882' fill={savedJobs.some(savedJob => savedJob.id === job.id) ? '#1F5882' : 'none'} />
+                  </button>
                 </div>
               </div>
             ))}
           {activeTab === 'appliedJobs' &&
-            jobsData.appliedJobs.map((job) => (
+            appliedJobs.map((job) => (
               <div key={job.id} className="flex justify-between items-center p-4 border rounded-lg mb-4">
                 <div>
                   <p>{job.companyName} | {job.rpslNo}</p>
@@ -138,11 +102,13 @@ const MyJobs = () => {
                 <div className="flex items-center space-x-2">
                   <button
                     className="px-4 py-2 border-2 border-customBlue text-customBlue font-semibold rounded-md"
-                    onClick={() => toggleApply(job.id)}
+                    onClick={() => toggleApply(job)}
                   >
                     Unapply
                   </button>
-                  <Bookmark className="w-6 h-6 cursor-pointer" color='#1F5882' fill='#1F5882' onClick={() => removeJob(job.id)} />
+                  <button onClick={() => toggleBookmark(job)}>
+                    <Bookmark className="w-6 h-6 cursor-pointer" color='#1F5882' fill={savedJobs.some(savedJob => savedJob.id === job.id) ? '#1F5882' : 'none'} />
+                  </button>
                 </div>
               </div>
             ))}
