@@ -13,6 +13,7 @@ function InfoSection() {
     lastVesselType: '',
     vesselAppliedFor: '',
     dateOfAvailability: '',
+    name: '', // Include name in sectionData
     contactDetail: {
       email: '',
       whatsappNumber: '',
@@ -59,11 +60,9 @@ function InfoSection() {
         }
       }
     };
-  
+
     fetchData();
   }, [contactInfo, employeeId]);
-  
-// Depend on contactInfo and employeeId
 
   const handleEditClick = (section) => {
     setEditSection(section);
@@ -92,14 +91,18 @@ function InfoSection() {
       });
     }
   };
-  
-  
 
   const updateUserData = () => {
     if (employeeId) {
       const payload = {
         employee_id: employeeId, // Use the employeeId from location state
-        ...sectionData,
+        name: sectionData.name, // Include the name field
+        lastVesselType: sectionData.lastVesselType,
+        appliedRank: sectionData.vesselAppliedFor,
+        availability: sectionData.dateOfAvailability,
+        contactDetail: sectionData.contactDetail,
+        experience: sectionData.experience,
+        licenseHolding: sectionData.licenseHolding,
       };
 
       axios
@@ -131,7 +134,7 @@ function InfoSection() {
       <b>{displayValue}</b>
     );
   };
-  
+
   return (
     <div className="flex h-screen">
       <div className="flex-1 overflow-scroll p-4 space-y-4">

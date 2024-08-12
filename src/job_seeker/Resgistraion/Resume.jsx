@@ -73,6 +73,7 @@ const Resume = () => {
       const response = await axios.post('https://api.rightships.com/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'Origin': 'http://API.rightships.com'
         },
       });
   
