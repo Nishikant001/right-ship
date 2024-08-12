@@ -5,12 +5,8 @@ import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 function ProfileCard() {
-  const [profileImage, setProfileImage] = useState(localStorage.getItem('profileImage') || "https://i2.pickpik.com/photos/711/14/431/smile-profile-face-male-preview.jpg");
-  const [profileData, setProfileData] = useState({
-    name: localStorage.getItem('profileName') || '',
-    rank: localStorage.getItem('profileRank') || '',
-    
-  });
+  const [profileImage, setProfileImage] = useState( "https://i2.pickpik.com/photos/711/14/431/smile-profile-face-male-preview.jpg");
+  const [profileData, setProfileData] = useState('');
 
   const location = useLocation();
   const employeeId = location.state?.employeeId;
@@ -23,25 +19,23 @@ function ProfileCard() {
           mobile_no: contactInfo,
           user_type: 'employee',
         });
-
-        if (response.data) {
-          const { 
-            profile_photo, name, 
-            presentRank } = response.data;
-          const finalProfileImage = 
-          profile_photo;
-
-          setProfileImage(finalProfileImage);
-          setProfileData({ name, 
-            presentRank });
-
-          // Store data in local storage
-          localStorage.setItem('profileImage', finalProfileImage);
-          localStorage.setItem('profileName', name);
-          localStorage.setItem('profileRank', 
-            presentRank);
-         
+        if (!response.ok) {
+          throw new Error(`Failed to fetch user details: ${response.statusText}`);
+          
         }
+        const result = await fetchProfileData.json();
+        console.log(result)
+        const profile_photo=result.data?.profile_photo
+        console.log(profile_photo)
+        setProfileImage(profile_photo)
+
+      
+
+        
+
+        
+
+        
       } catch (error) {
         console.error('Error fetching profile data:', error);
       }
@@ -57,24 +51,8 @@ function ProfileCard() {
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
-
-      try {
-        const response = await axios.post('https://api.rightships.com/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-
-        if (response.data && response.data.imageUrl) {
-          const newProfileImage = response.data.imageUrl;
-          setProfileImage(newProfileImage);
-          localStorage.setItem('profileImage', newProfileImage);
-        }
-      } catch (error) {
-        console.error('Error uploading the image:', error);
-      }
     }
-  };
+  }
 
   return (
     <div className="bg-white p-4 border-b-2 shadow-lg flex flex-col items-center text-center">

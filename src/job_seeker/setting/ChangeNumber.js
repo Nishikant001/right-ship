@@ -1,21 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendOtp } from '../../features/otpSlice';
 import { setContactInfo } from '../../features/contactSlice';
 import Modal from 'react-modal';
 import VerifyNumber from './VerifyNumber';
 import { useNavigate } from 'react-router-dom';
-// import './changenumber.css'
+// import { useDispatch, useSelector } from 'react-redux';
+// import { useNavigate } from 'react-router-dom';
 
 Modal.setAppElement('#root'); // Required for accessibility, make sure your root element id is 'root'
 
 const ChangeNumber = () => {
-  const navigate=useNavigate()
+  const contactInfo = useSelector((state) => state.contact.contactInfo);
+  const email = useSelector((state) => state.contact.email);
+  const employeeId = useSelector((state) => state.employee.employee_id);
+  const navigate = useNavigate();
   const [number, setNumber] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [contactPlaceholder, setContactPlaceholder] = useState('+91 6372778345');
+
   const dispatch = useDispatch();
   const otpStatus = useSelector((state) => state.otp.status);
   const otpError = useSelector((state) => state.otp.error);
+
+  useEffect(() => {
+    // Fetch user data from API
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('https://api.rightships.com/user/details', {
+          method: 'POST',
+          headers: {
+            'Accept': '*/*',
+            'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            mobile_no: contactInfo, // You might need to dynamically fetch or pass this value
+            user_type: 'employee',
+          }),
+        });
+        console.log(response.data)
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+
+        const data = await response.json();
+        // Set placeholders based on the response
+        setContactPlaceholder(data.mobile_no || '+91 6372778345');
+        
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleNumberChange = (e) => {
     setNumber(e.target.value);
@@ -24,7 +64,6 @@ const ChangeNumber = () => {
   const handleSendOtp = () => {
     dispatch(sendOtp(number));
     dispatch(setContactInfo(number));
-    // navigate('/verifynumber')
     setIsModalOpen(true); // Open the modal
   };
 
@@ -38,10 +77,11 @@ const ChangeNumber = () => {
       <input
         type="text"
         value={number}
-        placeholder='+91 6372778345'
+        placeholder={contactPlaceholder}
         onChange={handleNumberChange}
         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
+    
       <button
         onClick={handleSendOtp}
         className="w-full px-4 py-2 font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"

@@ -1,7 +1,6 @@
-// src/components/VerifyNumber.js
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const VerifyNumber = ({ closeModal }) => {
   const navigate = useNavigate();
@@ -11,6 +10,7 @@ const VerifyNumber = ({ closeModal }) => {
   const otpStatus = useSelector((state) => state.otp.status);
   const otpError = useSelector((state) => state.otp.error);
   const contactInfo = useSelector((state) => state.contact.contactInfo);
+  const employeeId = useSelector((state) => state.employee.employee_id); // Get employee_id from Redux
   const dispatch = useDispatch();
 
   const formatTime = (seconds) => {
@@ -56,20 +56,22 @@ const VerifyNumber = ({ closeModal }) => {
       const verifyData = await verifyResponse.json();
       if (verifyData.code === 200) {
         console.log('OTP verified successfully:', verifyData);
+        const payload = {
+          employee_id: employeeId
+        };
+        console.log('Payload:', payload);
+        
 
         // Call update API after successful OTP verification
-        const updateResponse = await fetch('https://api.rightships.com/employee/update', {
+        const updateResponse = await fetch('https://api.rightships.com/employee/update',payload, {
           method: 'POST',
           headers: {
             'Accept': '*/*',
             'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
             'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            employee_id: '669b88908c9761528b0cfbb6', // Replace with the actual employee ID
-            name: 'Aniket', // Replace with the actual name to be updated
-          }),
+          }
         });
+        console.log(updateResponse.data)
 
         if (!updateResponse.ok) {
           const errorData = await updateResponse.json();
@@ -120,7 +122,6 @@ const VerifyNumber = ({ closeModal }) => {
             `Resend OTP in: ${formatTime(timer)}`
           )}
         </p>
-    
       </div>
     </div>
   );
