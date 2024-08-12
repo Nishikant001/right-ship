@@ -82,7 +82,7 @@ const Header3 = () => {
             </Link>
             <div className={`hidden lg:flex items-center space-x-6 ml-8 ${isOffCanvasOpen ? 'hidden' : ''}`}>
               <Link to="/jobdashboard" className="text-black font-bold hover:text-customBlue">Jobs</Link>
-              <Link to="/companies" className="text-black font-bold hover:text-customBlue">Companies</Link>
+              {/* <Link to="/companies" className="text-black font-bold hover:text-customBlue">Companies</Link> */}
             </div>
           </div>
           <div className={`hidden lg:flex items-center space-x-6 ${isOffCanvasOpen ? 'hidden' : ''}`}>
@@ -144,7 +144,7 @@ const Header3 = () => {
             <span className="text-gray-800">RIGHTSHIP</span>
           </Link>
           <Link to="/jobdashboard" className="text-black font-bold hover:text-customBlue">Jobs</Link>
-          <Link to="/companies" className="text-black font-bold hover:text-customBlue">Companies</Link>
+          {/* <Link to="/companies" className="text-black font-bold hover:text-customBlue">Companies</Link> */}
           <a href="#help-support" className="text-black flex items-center font-bold">
             <CircleHelp size={20} className="mr-2" /> Help & Support
           </a>
