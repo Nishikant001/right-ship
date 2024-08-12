@@ -289,7 +289,7 @@ const JobDashboard = () => {
               </div>
             )}
           </div>
-          <div className='w-full md:max-w-xs px-3 hidden bg-white overflow-y-auto' style={{ height: 'calc(110vh - 100px)' }}></div>
+          <div className='w-full md:max-w-xs px-3 hidden md:block bg-white overflow-y-auto' style={{ height: 'calc(110vh - 100px)' }}></div>
         </div>
       </div>
 

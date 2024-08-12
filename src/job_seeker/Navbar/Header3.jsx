@@ -11,8 +11,6 @@ const Header3 = () => {
   const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
   const userDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   const handleUserDropdownClick = () => {
     setUserDropdownOpen(!userDropdownOpen);
@@ -42,23 +40,6 @@ const Header3 = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [lastScrollY]);
-
   const handleLogout = () => {
     // Clear all data from local storage
     localStorage.clear();
@@ -72,7 +53,7 @@ const Header3 = () => {
 
   return (
     <>
-      <header className={`bg-white border-b py-4 px-8 border-gray-200 sticky top-0 z-30 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+      <header className="bg-white border-b py-4 px-8 border-gray-200 sticky top-0 z-30">
         <ToastContainer />
         <nav className="flex items-center justify-between">
           <div className="flex items-center">
@@ -115,7 +96,7 @@ const Header3 = () => {
                   <Link to="/settings" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
                     <MessageSquare size={20} className="mr-2" /> Settings
                   </Link>
-                  <Link to="/" className="px-4 py-2 mt-1 text-gray-800 hover:bg-gray-100 flex justify-center border-t font-bold">Sign Out</Link>
+                  <Link to="/" onClick={handleLogout} className="px-4 py-2 mt-1 text-gray-800 hover:bg-gray-100 flex justify-center border-t font-bold">Sign Out</Link>
                 </div>
               )}
             </div>
