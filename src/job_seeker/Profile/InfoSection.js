@@ -126,7 +126,7 @@ function InfoSection() {
           vesselAppliedFor: 'Vessel Applied For',
           dateOfAvailability: 'Date of Availability',
         }).map(([key, title]) => (
-          <div key={key} className="p-4 bg-white border-2 rounded-lg shadow relative">
+          <div key={key} className="p-4 bg-white border-1 border-[#D6D6D6] px-12 py-10 relative">
             <h3 className="text-lg font-semibold flex justify-between">
               {title}
               <FaEdit className="cursor-pointer" onClick={() => handleEditClick(key)} />
@@ -138,7 +138,7 @@ function InfoSection() {
         ))}
 
         {['contactDetail', 'experience', 'licenseHolding'].map((section) => (
-          <div key={section} className="p-4 bg-white border-2 rounded-lg shadow relative">
+          <div key={section} className="p-4 bg-white border-1 border-[#D6D6D6] px-12 py-10 relative">
             <h3 className="text-lg font-semibold flex justify-between">
               {section.charAt(0).toUpperCase() + section.slice(1).replace(/([A-Z])/g, ' $1')}
               <FaEdit className="cursor-pointer" onClick={() => handleEditClick(section)} />
