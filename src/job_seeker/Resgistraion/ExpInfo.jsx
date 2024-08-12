@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+// import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import Background from "../../images/background.jpg";
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -8,6 +10,7 @@ const Experience = () => {
   const location = useLocation();
   const state = location.state || {};
   const employeeId = state.employeeId || '';
+  const contactInfo = useSelector((state) => state.contact.contactInfo);
 
   console.log('Location State:', location.state);
   console.log('Employee ID:', employeeId);
@@ -112,7 +115,7 @@ const Experience = () => {
         console.log('Update successful:', response.data);
         console.log('Navigating to Experience with Employee ID:', employeeId);
         // navigate('/experinceDetails', { state: { employeeId } });
-        navigate('/resume&profile',{ state: { employeeId } });
+        navigate('/resume&profile',{ state: { employeeId,mobile_no: contactInfo } });
       } else {
         console.error('Failed to update:', response);
         setError('Failed to update employee details. Please try again.');
