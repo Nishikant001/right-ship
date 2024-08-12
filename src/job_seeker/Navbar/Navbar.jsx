@@ -17,7 +17,7 @@ const Navbar = () => {
           {/* Desktop Links */}
           <div className="hidden md:flex space-x-4">
             <span><a href="/myjobs">Jobs</a></span>
-            <span><a href="#">Companies</a></span>
+            {/* <span><a href="#">Companies</a></span> */}
           </div>
         </div>
         <div className="hidden md:flex items-center space-x-4">
@@ -82,7 +82,7 @@ const Navbar = () => {
             <span className="font-bold text-gray-800 px-4">RIGHTSHIP</span>
           </Link>
           <a href="/myjobs" className="block">Jobs</a>
-          <a href="#" className="block">Companies</a>
+          {/* <a href="#" className="block">Companies</a> */}
           <a href='/login'><button className="text-customBlue border border-customBlue font-semibold p-2 px-6 hover:bg-customBlue hover:text-white rounded">Login</button></a>
           <a href='/signup-number'><button className="bg-customBlue hover:bg-customBlue2 font-semibold text-white px-4 py-2 rounded">Register</button></a>
           <div className="relative">
