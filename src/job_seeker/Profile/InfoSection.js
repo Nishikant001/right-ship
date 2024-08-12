@@ -34,13 +34,12 @@ function InfoSection() {
   });
 
   useEffect(() => {
-    // Fetch data from API
     const fetchData = async () => {
       if (contactInfo && employeeId) {
         const payload = {
           mobile_no: contactInfo,
           user_type: 'employee',
-          employee_id: employeeId, // Include employeeId in the payload
+          employee_id: employeeId,
         };
         try {
           const response = await axios.post(
@@ -53,15 +52,18 @@ function InfoSection() {
               },
             }
           );
+          console.log('API Response:', response.data);
           setSectionData(response.data);
         } catch (error) {
           console.error('Error fetching data:', error);
         }
       }
     };
-
+  
     fetchData();
-  }, [contactInfo, employeeId]); // Depend on contactInfo and employeeId
+  }, [contactInfo, employeeId]);
+  
+// Depend on contactInfo and employeeId
 
   const handleEditClick = (section) => {
     setEditSection(section);
@@ -73,14 +75,25 @@ function InfoSection() {
   };
 
   const handleChange = (section, key, value) => {
-    setSectionData({
-      ...sectionData,
-      [section]: {
-        ...sectionData[section],
-        [key]: value,
-      },
-    });
+    // If section is a string, directly update the value
+    if (typeof sectionData[section] === 'string') {
+      setSectionData({
+        ...sectionData,
+        [section]: value,
+      });
+    } else {
+      // If section is an object, update the nested key
+      setSectionData({
+        ...sectionData,
+        [section]: {
+          ...sectionData[section],
+          [key]: value,
+        },
+      });
+    }
   };
+  
+  
 
   const updateUserData = () => {
     if (employeeId) {
@@ -105,19 +118,20 @@ function InfoSection() {
     }
   };
 
-  const renderEditableField = (section, key, value) => (
-    editSection === section ? (
+  const renderEditableField = (section, key, value) => {
+    const displayValue = typeof value === 'string' ? value : JSON.stringify(value);
+    return editSection === section ? (
       <input
         type="text"
         className="border p-1 rounded"
-        value={value}
+        value={displayValue}
         onChange={(e) => handleChange(section, key, e.target.value)}
       />
     ) : (
-      <b>{value}</b>
-    )
-  );
-
+      <b>{displayValue}</b>
+    );
+  };
+  
   return (
     <div className="flex h-screen">
       <div className="flex-1 overflow-scroll p-4 space-y-4">
