@@ -40,7 +40,7 @@ function ProfileCard() {
         <img
           src={profileImage}
           alt="Profile"
-          className="w-24 h-24 md:w-28 md:h-28 rounded-full border-2 border-gray-300"
+          className="w-24 h-24 md:w-28 md:h-28 rounded-full border-2 border-gray-300 object-cover"
         />
         <div
           className="absolute bottom-0 right-0 w-8 h-8 bg-customBlue rounded-full flex items-center justify-center cursor-pointer"
