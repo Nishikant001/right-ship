@@ -53,7 +53,7 @@ const Header3 = () => {
 
   return (
     <>
-      <header className="bg-white border-b py-4 px-8 border-gray-200 sticky top-0 z-30">
+      <header className="bg-white border-b py-4 px-8 border-gray-200 sticky top-0 z-0">
         <ToastContainer />
         <nav className="flex items-center justify-between">
           <div className="flex items-center">

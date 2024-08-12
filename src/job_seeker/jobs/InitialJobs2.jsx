@@ -297,7 +297,7 @@ const JobDashboard = () => {
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
-        className="bg-white p-8 border border-gray-300 rounded-lg shadow-lg max-w-lg mx-auto mt-20 overflow-y-auto max-h-[80vh]" 
+        className="bg-white p-8 border border-gray-300 rounded-lg shadow-lg w-full mx-auto overflow-y-auto h-screen z-50" 
         contentLabel="Job Details"
         ariaHideApp={false}
       >
