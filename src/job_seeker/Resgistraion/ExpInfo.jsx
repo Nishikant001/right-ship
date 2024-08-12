@@ -2,47 +2,88 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 // import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-// import { updateData } from '../../features/employeeRegistrationSlice';
 import Background from "../../images/background.jpg";
-import { Link, useNavigate ,useLocation} from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Experience = () => {
   const navigate = useNavigate();
   const location = useLocation();
-const state = location.state || {};
-const employeeId = state.employeeId || '';
-const contactInfo = useSelector((state) => state.contact.contactInfo);
+  const state = location.state || {};
+  const employeeId = state.employeeId || '';
 
-  console.log('Location State:', location.state); // Add this line
+  console.log('Location State:', location.state);
   console.log('Employee ID:', employeeId);
 
   const [formData, setFormData] = useState({
     lastVesselType: '',
-    presentRank:  '',
-    appliedRank:  '',
-    totalSeaExperienceYears:  '',
+    presentRank: '',
+    appliedRank: '',
+    totalSeaExperienceYears: '',
     totalSeaExperienceMonths: '',
     totalRankExperienceYears: '',
     totalRankExperienceMonths: '',
-    cop:  '',
-    coc:  '',
-    watchKeeping:  ''
+    cop: '',
+    coc: '',
+    watchKeeping: ''
   });
 
+  const [copOptions, setCopOptions] = useState([]);
+  const [cocOptions, setCocOptions] = useState([]);
+  const [shipOptions, setShipOptions] = useState([]);
+  const [watchKeepingOptions, setWatchKeepingOptions] = useState([]);
+  const [rankOptions, setRankOptions] = useState([]);
   const [error, setError] = useState('');
 
-  
+  useEffect(() => {
+    const fetchAttributes = async () => {
+      try {
+        const response = await axios.post('https://api.rightships.com/attributes/get', {}, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': '*/*',
+            'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
+          }
+        });
+
+        if (response.data && response.data.code === 200) {
+          const attributes = response.data.data;
+
+          const copAttribute = attributes.find(attr => attr.name.toLowerCase() === 'cop');
+          const cocAttribute = attributes.find(attr => attr.name.toLowerCase() === 'coc');
+          const shipAttribute = attributes.find(attr => attr.name.toLowerCase() === 'ships');
+          const watchKeepingAttribute = attributes.find(attr => attr.name.toLowerCase() === 'watch keeping');
+          const rankAttribute = attributes.find(attr => attr.name.toLowerCase() === 'rank');
+
+          const copData = copAttribute ? copAttribute.values : [];
+          const cocData = cocAttribute ? cocAttribute.values.sort((a, b) => a.localeCompare(b)) : [];
+          const shipData = shipAttribute ? shipAttribute.values.sort((a, b) => a.localeCompare(b)) : []; // Sorting ship data
+          const watchKeepingData = watchKeepingAttribute ? watchKeepingAttribute.values : [];
+          const rankData = rankAttribute ? rankAttribute.values.sort((a, b) => a.localeCompare(b)) : [];
+
+          setCopOptions(copData);
+          setCocOptions(cocData);
+          setShipOptions(shipData); // Set ship options for Last Vessel Type
+          setWatchKeepingOptions(watchKeepingData);
+          setRankOptions(rankData);
+        } else {
+          console.error('Failed to fetch attributes:', response.data.msg);
+        }
+      } catch (error) {
+        console.error('Failed to fetch attributes:', error);
+      }
+    };
+
+    fetchAttributes();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({ ...prevState, [name]: value }));
-    // dispatch(updateData({ [name]: value }));
   };
 
   const handleNext = async () => {
     console.log('Submitting form data:', formData);
     console.log('Employee ID:', employeeId);
-    // const employeeId = data.employeeId;
 
     const requiredFields = ['lastVesselType', 'presentRank', 'appliedRank', 'totalSeaExperienceYears', 'totalSeaExperienceMonths', 'totalRankExperienceYears', 'totalRankExperienceMonths', 'cop', 'coc', 'watchKeeping'];
     const missingFields = requiredFields.filter(field => !formData[field]);
@@ -71,9 +112,7 @@ const contactInfo = useSelector((state) => state.contact.contactInfo);
 
       if (response.status === 200) {
         console.log('Update successful:', response.data);
-        // console.log('Navigating to Experience with Employee ID:', employeeId);
-        console.log('Navigating with employeeId:', employeeId);
-
+        console.log('Navigating to Experience with Employee ID:', employeeId);
         // navigate('/experinceDetails', { state: { employeeId } });
         navigate('/resume&profile',{ state: { employeeId,mobile_no: contactInfo } });
       } else {
@@ -92,12 +131,13 @@ const contactInfo = useSelector((state) => state.contact.contactInfo);
   };
 
   return (
-    <div className="flex h-screen">
-      <div className="hidden md:block w-2/5 h-screen bg-cover bg-center" style={{ backgroundImage: `url(${Background})` }}></div>
+    <div className="flex flex-col md:flex-row h-screen">
+      <div className="hidden md:block md:w-2/5 h-screen bg-cover bg-center" style={{ backgroundImage: `url(${Background})` }}></div>
       <div className="w-full md:w-3/5 h-screen overflow-y-auto bg-white flex justify-center">
-        <div className="container-fluid w-9/12">
-          <h1 className="text-4xl font-semibold mt-14 mb-2">Your Experience</h1>
-          <h6 className='text-lg font-semibold mb-4'>Manish Sir</h6>
+
+        <div className="container w-full md:w-4/5  p-6">
+          <h1 className="text-2xl md:text-4xl font-semibold mt-md-8 mb-9">Your Experience</h1>
+          {/* <h6 className='text-lg font-semibold mb-4'>Manish Sir</h6> */}
           {error && (
             <div className="bg-red-200 text-red-800 p-3 mb-4 rounded">
               {error}
@@ -106,39 +146,60 @@ const contactInfo = useSelector((state) => state.contact.contactInfo);
           <form className="space-y-6">
             <div className="grid grid-cols-1 gap-2">
               <label className='text-base'>Last Vessel Type</label>
-              <input
-                type="text"
+              <select
                 name="lastVesselType"
                 value={formData.lastVesselType}
-                placeholder="Enter your last vessel type"
-                className="w-full border-2 border-gray-200 py-3 px-5 rounded-lg"
+                className="w-full border-2 border-gray-200 py-3 px-5 rounded-lg mt-1"
                 onChange={handleChange}
-              />
+              >
+                <option value="">Select Last Vessel Type</option>
+                {shipOptions.map((option, index) => (
+                  <option key={index} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </div>
-            <div className="grid grid-cols-2 gap-3 mt-3">
-              <input
-                type="text"
-                name="presentRank"
-                value={formData.presentRank}
-                placeholder="Enter your present rank"
-                className="w-full border-2 border-gray-200 py-3 px-5 rounded-lg"
-                onChange={handleChange}
-              />
-              <input
-                type="text"
-                name="appliedRank"
-                value={formData.appliedRank}
-                placeholder="Enter your applied rank"
-                className="w-full border-2 border-gray-200 py-3 px-5 rounded-lg"
-                onChange={handleChange}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+              <div>
+                <label className="text-base">Present Rank</label>
+                <select
+                  name="presentRank"
+                  value={formData.presentRank}
+                  className="w-full border-2 border-gray-200 py-3 px-5 rounded-lg mt-1"
+                  onChange={handleChange}
+                >
+                  <option value="">Select Present Rank</option>
+                  {rankOptions.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-base">Applied Rank</label>
+                <select
+                  name="appliedRank"
+                  value={formData.appliedRank}
+                  className="w-full border-2 border-gray-200 py-3 px-5 rounded-lg mt-1"
+                  onChange={handleChange}
+                >
+                  <option value="">Select Applied Rank</option>
+                  {rankOptions.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
               <div>
                 <label className="text-base">Total Sea Experience</label>
-                <div className="flex flex-row mt-2">
+                <div className="flex flex-row mt-2 space-x-3">
                   <input
-                    type="text"
+                    type="number"
                     name="totalSeaExperienceYears"
                     value={formData.totalSeaExperienceYears}
                     placeholder="Years"
@@ -146,20 +207,20 @@ const contactInfo = useSelector((state) => state.contact.contactInfo);
                     onChange={handleChange}
                   />
                   <input
-                    type="text"
+                    type="number"
                     name="totalSeaExperienceMonths"
                     value={formData.totalSeaExperienceMonths}
                     placeholder="Months"
-                    className="w-full border-2 border-gray-200 py-3 px-5 mx-3 rounded-lg"
+                    className="w-full border-2 border-gray-200 py-3 px-5 rounded-lg"
                     onChange={handleChange}
                   />
                 </div>
               </div>
               <div>
                 <label className="text-base">Total Rank Experience</label>
-                <div className="flex flex-row mt-2">
+                <div className="flex flex-row mt-2 space-x-3">
                   <input
-                    type="text"
+                    type="number"
                     name="totalRankExperienceYears"
                     value={formData.totalRankExperienceYears}
                     placeholder="Years"
@@ -167,52 +228,67 @@ const contactInfo = useSelector((state) => state.contact.contactInfo);
                     onChange={handleChange}
                   />
                   <input
-                    type="text"
+                    type="number"
                     name="totalRankExperienceMonths"
                     value={formData.totalRankExperienceMonths}
                     placeholder="Months"
-                    className="w-full border-2 border-gray-200 py-3 px-5 mx-3 rounded-lg"
+                    className="w-full border-2 border-gray-200 py-3 px-5 rounded-lg"
                     onChange={handleChange}
                   />
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-3 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
               <div>
                 <label className="text-base">COP</label>
-                <input
-                  type="text"
+                <select
                   name="cop"
                   value={formData.cop}
-                  placeholder="Select COP"
                   className="w-full border-2 border-gray-200 py-3 px-5 rounded-lg mt-1"
                   onChange={handleChange}
-                />
+                >
+                  <option value="">Select COP</option>
+                  {copOptions.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="text-base">COC</label>
-                <input
-                  type="text"
+                <select
                   name="coc"
                   value={formData.coc}
-                  placeholder="Select COC"
                   className="w-full border-2 border-gray-200 py-3 px-5 rounded-lg mt-1"
                   onChange={handleChange}
-                />
+                >
+                  <option value="">Select COC</option>
+                  {cocOptions.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="text-base">Watch Keeping</label>
-                <input
-                  type="text"
+                <select
                   name="watchKeeping"
                   value={formData.watchKeeping}
-                  placeholder="Select watch keeping"
                   className="w-full border-2 border-gray-200 py-3 px-5 rounded-lg mt-1"
                   onChange={handleChange}
-                />
+                >
+                  <option value="">Select Watch Keeping</option>
+                  {watchKeepingOptions.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
-            <div className="flex justify-start space-x-4 mt-6">
+            <div className="flex justify-between space-x-4 mt-6">
               <Link to='/personalDetails'>
                 <button className="bg-white text-customBlue border font-bold border-customBlue py-2 rounded w-24 text-center">
                   BACK
@@ -227,7 +303,10 @@ const contactInfo = useSelector((state) => state.contact.contactInfo);
               </button>
             </div>
           </form>
+          <div className="py-9"></div>
         </div>
+
+
       </div>
     </div>
   );
