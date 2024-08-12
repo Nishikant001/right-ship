@@ -48,7 +48,7 @@ const Header3 = () => {
     // history.push('/login');
     
     // Optional: prevent user from navigating back to previous pages
-    window.location.reload(); // Reload the page to clear history state
+    // window.location.reload(); // Reload the page to clear history state
   };
 
   return (
