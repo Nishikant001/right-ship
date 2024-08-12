@@ -10,6 +10,7 @@ const Experience = () => {
   const location = useLocation();
   const state = location.state || {};
   const employeeId = state.employeeId || '';
+  const contactInfo = useSelector((state) => state.contact.contactInfo);
 
   console.log('Location State:', location.state);
   console.log('Employee ID:', employeeId);
