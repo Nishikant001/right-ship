@@ -97,18 +97,6 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/companyLogin"
-          element={
-            loggedIn ? (
-              <DefaultLayout>
-                <EmployeerDashboard />
-              </DefaultLayout>
-            ) : (
-              <RegistrationForm />
-            )
-          }
-        />
         <Route path='/' element={<DefaultLayout2><LandingPage/></DefaultLayout2>} />
         <Route path='/settings' element={<DefaultLayout3><Setting /></DefaultLayout3>} />
         <Route path='/signup-number' element={<DefaultLayout2><Signup /></DefaultLayout2>} />
