@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from './Loader';
+import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const CompanyLogin = () => {
+  const navigate=useNavigate()
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -25,6 +27,8 @@ const Login = () => {
       if (response.ok) {
         if (data.code === 200) {
           handleOtp();
+          navigate('/company_otpVerify')
+          
         } else if (data.code === 404) {
           toast.error('User Not Found');
         } else if (data.code === 500) {
@@ -117,4 +121,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default CompanyLogin;

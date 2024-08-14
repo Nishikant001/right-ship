@@ -35,7 +35,7 @@ const Navbar = () => {
             </button>
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg">
-                <a href="/companyLogin" className="block px-4 py-2 hover:bg-gray-200">For Company</a>
+                <a href="/companyRegistration" className="block px-4 py-2 hover:bg-gray-200">For Company</a>
                 <a href="#" className="block px-4 py-2 hover:bg-gray-200">For Admin</a>
               </div>
             )}
@@ -97,7 +97,7 @@ const Navbar = () => {
             </button>
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg">
-                <a href="/companyLogin" className="block px-4 py-2 hover:bg-gray-200">For Company</a>
+                <a href="/companyRegistration" className="block px-4 py-2 hover:bg-gray-200">For Company</a>
                 <a href="#" className="block px-4 py-2 hover:bg-gray-200">For Admin</a>
               </div>
             )}

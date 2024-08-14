@@ -140,8 +140,8 @@ const RegistrationForm = () => {
             <Link><p className="text-black font-bold hover:text-customBlue hover:font-bold mx-4">Companies</p></Link>
           </div>
           <div className="flex space-x-2">
-            <button className="px-3 py-1 text-customBlue border border-blue-600 rounded hover:bg-blue-50">Login</button>
-            <button className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700">Register</button>
+           <Link to='/company_login'><button className="px-3 py-1 text-customBlue border border-blue-600 rounded hover:bg-blue-50">Login</button></Link> 
+           <Link to='/companyRegistration'> <button className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700">Register</button></Link> 
             <div className="relative" ref={dropdownRef}>
               <button onClick={handleDropdownClick} className="px-3 py-1 text-black-600  rounded hover:bg-blue-50">
                 For employers

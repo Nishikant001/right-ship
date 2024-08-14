@@ -13,7 +13,7 @@ import ManageUsers from './company/ManageUsers';
 import Candidates from './company/Candidates';
 import CandidatesDetails from './company/CandidatesDetails';
 import JobDescription from './company/JobDescription';
-import Login from './company/Login';
+import CompanyLogin from './company/Login';
 import OtpVerify from './company/Otpverify';
 import RegistrationForm from './company/RegistrationForm';
 import Mailsendpopup from './company/helper/mailsendpopup';
@@ -98,7 +98,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route
-          path="/companyLogin"
+          path="/companyRegistration"
           element={
             loggedIn ? (
               <DefaultLayout>
@@ -109,6 +109,7 @@ const App = () => {
             )
           }
         />
+
         <Route path='/' element={<DefaultLayout2><LandingPage/></DefaultLayout2>} />
         <Route path='/settings' element={<DefaultLayout3><Setting /></DefaultLayout3>} />
         <Route path='/signup-number' element={<DefaultLayout2><Signup /></DefaultLayout2>} />
@@ -123,10 +124,10 @@ const App = () => {
         <Route path='/myjobs' element={<DefaultLayout3><MyJobs /></DefaultLayout3>} />
         <Route path='/jobdashboard' element={<DefaultLayout3><JobDashboard /></DefaultLayout3>} />
         <Route path='/settings' element={<DefaultLayout3><Setting /></DefaultLayout3>} />
-        <Route path='/updateEmail' element={<DefaultLayout3><ChangeMail /></DefaultLayout3>} />
-        <Route path='/updateNumber' element={<DefaultLayout3><ChangeNumber /></DefaultLayout3>} />
-        <Route path='/verify-updateEmail' element={<DefaultLayout3><VerifyMail /></DefaultLayout3>} />
-        <Route path='/verify-updateNumber' element={<DefaultLayout3><VerifyNumber /></DefaultLayout3>} />
+        {/* <Route path='/updateEmail' element={<DefaultLayout3><ChangeMail /></DefaultLayout3>} /> */}
+        {/* <Route path='/updateNumber' element={<DefaultLayout3><ChangeNumber /></DefaultLayout3>} /> */}
+        {/* <Route path='/verify-updateEmail' element={<DefaultLayout3><VerifyMail /></DefaultLayout3>} /> */}
+        {/* <Route path='/verify-updateNumber' element={<DefaultLayout3><VerifyNumber /></DefaultLayout3>} /> */}
         <Route path="/employeer-dashboard" element={<DefaultLayout><EmployeerDashboard /></DefaultLayout>} />
         <Route path="/preview-edit-job-detail" element={<DefaultLayout><EmployerDetails /></DefaultLayout>} />
         <Route path="/emp" element={<DefaultLayout><Empteam /></DefaultLayout>} />
@@ -139,9 +140,12 @@ const App = () => {
         <Route path="/edit-job-details" element={<DefaultLayout><EmployerDetails /></DefaultLayout>} />
         <Route path="/manage-users" element={<DefaultLayout><ManageUsers /></DefaultLayout>} />
         <Route path="/support" element={<DefaultLayout><Supports /></DefaultLayout>} />
-        <Route path="/companylogin" element={<Login />} /> 
+        <Route path="/companylogin" element={<CompanyLogin />} /> 
         <Route path="/otpverify" element={<OtpVerify />} />
         <Route path="/Jobsdesc" element={<DefaultLayout><JobDescription /></DefaultLayout>} />
+        <Route path="/company_login" element={<CompanyLogin />} />
+        <Route path="/company_otpVerify" element={<OtpVerify/>} />
+        
         
       </Routes>
       <ToastContainer/>
