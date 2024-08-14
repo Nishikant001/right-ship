@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bookmark } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeJob, unapplyJob, applyJob, bookmarkJob } from '../../features/jobSlice';
+import { removeJob, unapplyJob, applyJob, bookmarkJob, sendApplicationToCompany } from '../../features/jobSlice';
 
 const MyJobs = () => {
   const savedJobs = useSelector(state => state.job.savedJobs);
@@ -28,6 +28,7 @@ const MyJobs = () => {
       dispatch(unapplyJob(job.id)); // Unapply action
     } else {
       dispatch(applyJob(job)); // Apply action
+      dispatch(sendApplicationToCompany(job)); // Notify the company
     }
   };
 
@@ -116,6 +117,7 @@ const MyJobs = () => {
       </div>
     </div>
   );
+  
 };
 
 export default MyJobs;

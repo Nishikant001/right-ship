@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bookmark } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { applyJob, bookmarkJob, unapplyJob, removeJob } from '../../features/jobSlice';
+import { applyJob, bookmarkJob, unapplyJob, removeJob, sendApplicationToCompany } from '../../features/jobSlice'; // Ensure sendApplicationToCompany is imported
 import Modal from 'react-modal';
 
 const initialJobsData = {
@@ -14,6 +14,8 @@ const JobDashboard = () => {
   const dispatch = useDispatch();
   const savedJobs = useSelector(state => state.job.savedJobs);
   const appliedJobs = useSelector(state => state.job.appliedJobs);
+  
+  // Define state for jobs data and selected job
   const [jobsData, setJobsData] = useState(initialJobsData);
   const [selectedJob, setSelectedJob] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -93,6 +95,7 @@ const JobDashboard = () => {
         if (job.applied) {
           appliedJobs.push(job);
           dispatch(applyJob(job));
+          dispatch(sendApplicationToCompany(job)); // Notify the company
         } else {
           const appliedJobIndex = appliedJobs.findIndex(j => j.id === jobId);
           if (appliedJobIndex !== -1) {
@@ -148,10 +151,8 @@ const JobDashboard = () => {
 
   const handleJobClick = (job) => {
     if (window.innerWidth >= 1024) {
-      // On large and extra-large screens, hide the details when clicking the job div
       setSelectedJob(selectedJob?.id === job.id ? null : job);
     } else {
-      // On smaller screens, open the modal
       setSelectedJob(job);
       setIsModalOpen(true);
     }
@@ -181,9 +182,9 @@ const JobDashboard = () => {
           <button className="bg-customBlue rounded-e-md text-white p-2">Search</button>
         </div>
       </div>
-      <div className="min-h-screen bg-gray-200 p-3">
-        <div className="flex flex-col md:flex-row">
-          <div className="w-full md:max-w-md pr-3 h-screen overflow-y-scroll" style={{ height: 'calc(110vh - 100px)' }}>
+      <div className="min-h-screen bg-gray-200 p-3 z-50">
+        <div className="flex flex-col md:flex-row z-50">
+          <div className="w-full md:max-w-md pr-3 h-screen overflow-y-scroll z-50" style={{ height: 'calc(110vh - 100px)' }}>
             {filteredJobs.map(job => (
               <div
                 key={job.id}
@@ -216,7 +217,7 @@ const JobDashboard = () => {
               </div>
             ))}
           </div>
-          <div className="w-full md:max-w-3xl px-3 hidden lg:block overflow-y-scroll"  style={{ height: 'calc(110vh - 100px)' }}> {/* Hidden on mobile/tablet */}
+          <div className="w-full md:max-w-3xl px-3 hidden lg:block overflow-y-scroll"  style={{ height: 'calc(110vh - 100px)' }}>
             {selectedJob && (
               <div className="bg-white p-8 border border-gray-300 rounded-lg shadow-lg">
                 <div className="flex flex-col mb-6">
@@ -286,10 +287,10 @@ const JobDashboard = () => {
                   <p className="font-semibold text-xl">Description</p>
                   <p className="text-sm mt-2">{selectedJob.description}</p>
                 </div>
+                <button className="mt-4 px-4 py-2 border border-customBlue bg-customBlue text-white hover:bg-white hover:text-customBlue rounded-md" onClick={closeModal}>Close</button>
               </div>
             )}
           </div>
-          <div className='w-full md:max-w-xs px-3 hidden md:block bg-white overflow-y-auto' style={{ height: 'calc(110vh - 100px)' }}></div>
         </div>
       </div>
 

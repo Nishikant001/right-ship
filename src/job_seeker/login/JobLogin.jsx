@@ -18,8 +18,8 @@ const Login = () => {
   const handleSendOtp = () => {
     if (!phoneNumber.trim()) {
       toast.error("Phone number field cannot be empty!");
-      return;
-    }
+      return;}
+
     dispatch(sendOtp(phoneNumber));
     dispatch(setContactInfo(phoneNumber));
     toast.success("OTP sent successfully")

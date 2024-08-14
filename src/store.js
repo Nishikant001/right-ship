@@ -7,11 +7,13 @@ import jobReducer from './features/jobSlice';  // Import the job slice
 
 const store = configureStore({
   reducer: {
+
     emp: empslice,
     otp: otpReducer,
     contact: contactReducer,
     employee: employeeRegistrationReducer,
     job: jobReducer,  // Add job reducer to the store
+    // auth: authReducer,
   },
 });
 
