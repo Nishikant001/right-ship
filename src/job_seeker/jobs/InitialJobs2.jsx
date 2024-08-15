@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bookmark } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { applyJob, bookmarkJob, unapplyJob, removeJob, sendApplicationToCompany } from '../../features/jobSlice'; // Ensure sendApplicationToCompany is imported
+import { applyJob, bookmarkJob, unapplyJob, removeJob, sendApplicationToCompany, updateCompanyData } from '../../features/jobSlice';
 import Modal from 'react-modal';
 
 const initialJobsData = {
@@ -15,7 +15,6 @@ const JobDashboard = () => {
   const savedJobs = useSelector(state => state.job.savedJobs);
   const appliedJobs = useSelector(state => state.job.appliedJobs);
   
-  // Define state for jobs data and selected job
   const [jobsData, setJobsData] = useState(initialJobsData);
   const [selectedJob, setSelectedJob] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,6 +56,7 @@ const JobDashboard = () => {
 
         const formattedData = data.slice(0, 40).map(job => ({
           id: job.application_id || 'undefined-id',
+          companyId: job.company_id || 'undefined-company-id', // Ensure company ID is captured
           companyName: job.company_name || '',
           rpslNo: job.rspl_no || '',
           hiringFor: job.hiring_for || '',
@@ -96,12 +96,14 @@ const JobDashboard = () => {
           appliedJobs.push(job);
           dispatch(applyJob(job));
           dispatch(sendApplicationToCompany(job)); // Notify the company
+          dispatch(updateCompanyData(job.companyId)); // Optional: Update company data if needed
         } else {
           const appliedJobIndex = appliedJobs.findIndex(j => j.id === jobId);
           if (appliedJobIndex !== -1) {
             appliedJobs.splice(appliedJobIndex, 1);
           }
           dispatch(unapplyJob(job.id));
+          // Optionally, handle unapply logic if needed
         }
 
         localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
@@ -184,7 +186,7 @@ const JobDashboard = () => {
       </div>
       <div className="min-h-screen bg-gray-200 p-3 z-50">
         <div className="flex flex-col md:flex-row z-50">
-          <div className="w-full md:max-w-md pr-3 h-screen overflow-y-scroll z-50" style={{ height: 'calc(110vh - 100px)' }}>
+          <div className="w-full pr-3 h-screen overflow-y-auto xl:max-w-md lg:max-w-xs md:max-w-lg" style={{ height: 'calc(110vh - 100px)' }}>
             {filteredJobs.map(job => (
               <div
                 key={job.id}
@@ -217,7 +219,7 @@ const JobDashboard = () => {
               </div>
             ))}
           </div>
-          <div className="w-full md:max-w-3xl px-3 hidden lg:block overflow-y-scroll"  style={{ height: 'calc(110vh - 100px)' }}>
+          <div className="w-full px-3 lg:block overflow-y-auto xl:max-w-4xl lg:max-w-4xl hidden"  style={{ height: 'calc(110vh - 100px)' }}>
             {selectedJob && (
               <div className="bg-white p-8 border border-gray-300 rounded-lg shadow-lg">
                 <div className="flex flex-col mb-6">
@@ -291,6 +293,7 @@ const JobDashboard = () => {
               </div>
             )}
           </div>
+          <div className='w-full bg-white xl:max-w-60 lg:max-w-48 md:max-w-64 md:block hidden' style={{ height: 'calc(110vh - 100px)' }}></div>
         </div>
       </div>
 

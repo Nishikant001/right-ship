@@ -12,19 +12,49 @@ export const sendApplicationToCompany = createAsyncThunk(
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          company_id: job.companyId, // Replace with actual company ID
+          company_id: job.companyId, // Ensure this ID is correct
           rspl_no: job.rpslNo,
           company_name: job.companyName,
           hiring_for: job.hiringFor,
           open_positions: job.openPositions,
           description: job.description,
-          mobile_no: job.contact.number,
-          email: job.contact.email,
+          mobile_no: job.contact.number, // Employee's contact details
+          email: job.contact.email,     // Employee's email
         }),
       });
 
       if (!response.ok) {
         throw new Error('Failed to send application to company');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Thunk to update company data when a job is applied/unapplied (if required)
+export const updateCompanyData = createAsyncThunk(
+  'job/updateCompanyData',
+  async (companyId, { rejectWithValue }) => {
+    try {
+      const response = await fetch('https://api.rightships.com/company/update', {
+        method: 'POST',
+        headers: {
+          'Accept': '*/*',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          company_id: companyId, // Use actual company ID
+          company_name: 'Cloudbelly', // Replace with dynamic values as needed
+          address: 'Mumbai',          // Replace with dynamic values as needed
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update company data');
       }
 
       const data = await response.json();
@@ -71,11 +101,16 @@ const jobSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(sendApplicationToCompany.fulfilled, (state, action) => {
-      // Handle any additional logic if needed after the application is successfully sent
       console.log('Application sent to company successfully:', action.payload);
     });
     builder.addCase(sendApplicationToCompany.rejected, (state, action) => {
       console.error('Failed to send application to company:', action.payload);
+    });
+    builder.addCase(updateCompanyData.fulfilled, (state, action) => {
+      console.log('Company data updated successfully:', action.payload);
+    });
+    builder.addCase(updateCompanyData.rejected, (state, action) => {
+      console.error('Failed to update company data:', action.payload);
     });
   },
 });
