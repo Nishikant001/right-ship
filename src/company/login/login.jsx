@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import MobileNumberForm from './mobileNumberForm';
 import OtpVerificationForm from './verifyNumber';
 
-const EmployeeOtpAuth = () => {
+const CompanyOtpAuth = () => {
     const [mobileNumber, setMobileNumber] = useState('');
     const [otpRequested, setOtpRequested] = useState(false);
 
@@ -24,4 +24,4 @@ const EmployeeOtpAuth = () => {
     );
 };
 
-export default EmployeeOtpAuth;
+export default CompanyOtpAuth;

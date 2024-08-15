@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import logo from '../../images/logo.png';
-import { login } from '../../features/authSlice';
+import { loginCompany } from '../../features/authSlice';
 
 const OtpVerificationForm = ({ mobileNumber }) => {
     
@@ -25,7 +25,7 @@ const OtpVerificationForm = ({ mobileNumber }) => {
             if (response.data.code === 200) {
                 setOtpStatus('success');
                 // Call the login thunk after OTP verification
-                dispatch(login({ mobile_no: mobileNumber }));
+                dispatch(loginCompany({ mobile_no: mobileNumber }));
             } else {
                 setOtpStatus('failed');
                 setOtpError('Invalid OTP. Please try again.');

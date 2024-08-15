@@ -1,117 +1,103 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+// src/features/authSlice.js
 
-// Initial state for authentication
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+
 const initialState = {
-  user: null,
-  token: null,
-  isLoading: false,
-  isAuthenticated: false,
+  user: JSON.parse(localStorage.getItem('user')) || null,
+  token: localStorage.getItem('token') || null,
+  loading: false,
   error: null,
 };
 
-// Thunks for asynchronous actions
-
-// Send OTP
-export const sendOtp = createAsyncThunk(
-  'auth/sendOtp',
-  async ({ mobile_no }, { rejectWithValue }) => {
+export const login = createAsyncThunk(
+  'auth/login',
+  async (credentials, { rejectWithValue }) => {
     try {
-      const response = await fetch('https://api.rightships.com/otp/send_otp', {
-        method: 'POST',
-        headers: {
-          'Accept': '*/*',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ mobile_no }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send OTP');
-      }
-
-      const data = await response.json();
-      return data;
+      const response = await axios.post('https://api.rightships.com/employee/login', credentials);
+      const { _id, name, profile_photo, mobile_no, email, presentRank } = response.data.employee;
+      const user = { _id, name, profile_photo, mobile_no, email, role: "employee" };
+      return { user, token: response.data.token };
     } catch (error) {
-      return rejectWithValue(error.message);
+      const message = error.response?.data?.message || 'An unexpected error occurred';
+      return rejectWithValue(message);
     }
   }
 );
 
-// Verify OTP
-export const verifyOtp = createAsyncThunk(
-  'auth/verifyOtp',
-  async ({ mobile_no, otp }, { rejectWithValue }) => {
+export const loginCompany = createAsyncThunk(
+  'auth/login/company',
+  async (credentials, { rejectWithValue }) => {
     try {
-      const response = await fetch('https://api.rightships.com/otp/verify_otp', {
-        method: 'POST',
-        headers: {
-          'Accept': '*/*',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ mobile_no, otp }),
-      });
-
-      if (!response.ok) {
-        throw new Error('OTP verification failed');
-      }
-
-      const data = await response.json();
-      return data;
+      const response = await axios.post('https://api.rightships.com/company/login', credentials);
+      const { _id, company_id, mobile_no } = response.data.data;
+      const user = { _id, company_id, mobile_no, role: "company" };
+      return { user, token: response.data.token };
     } catch (error) {
-      return rejectWithValue(error.message);
+      const message = error.response?.data?.message || 'An unexpected error occurred';
+      return rejectWithValue(message);
     }
   }
 );
 
-// Create the auth slice
+export const logout = createAsyncThunk('auth/logout', async (_, { dispatch }) => {
+  // Clear the user's data locally
+  localStorage.removeItem('user');
+  localStorage.removeItem('token');
+  dispatch(authSlice.actions.logout());  // Dispatch the logout action to clear the Redux state
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
     logout: (state) => {
       state.user = null;
       state.token = null;
-      state.isAuthenticated = false;
-      state.error = null;
-    },
-    clearError: (state) => {
-      state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Send OTP Cases
-      .addCase(sendOtp.pending, (state) => {
-        state.isLoading = true;
+      .addCase(login.pending, (state) => {
+        state.loading = true;
         state.error = null;
       })
-      .addCase(sendOtp.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.error = null;
-      })
-      .addCase(sendOtp.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload || 'Failed to send OTP';
-      })
-      // Verify OTP Cases
-      .addCase(verifyOtp.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(verifyOtp.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.isAuthenticated = true;
+      .addCase(login.fulfilled, (state, action) => {
+        state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
+
+        // Store user and token in localStorage
+        localStorage.setItem('user', JSON.stringify(action.payload.user));
+        localStorage.setItem('token', action.payload.token);
+      })
+      .addCase(login.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(loginCompany.pending, (state) => {
+        state.loading = true;
         state.error = null;
       })
-      .addCase(verifyOtp.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload || 'OTP verification failed';
+      .addCase(loginCompany.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+
+        // Store user and token in localStorage
+        localStorage.setItem('user', JSON.stringify(action.payload.user));
+        localStorage.setItem('token', action.payload.token);
+      })
+      .addCase(loginCompany.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
-// Export actions and reducer
-export const { logout, clearError } = authSlice.actions;
+export const { clearError } = authSlice.actions;
+
 export default authSlice.reducer;

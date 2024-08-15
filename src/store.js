@@ -4,6 +4,7 @@ import otpReducer from './features/otpSlice';
 import contactReducer from './features/contactSlice';
 import employeeRegistrationReducer from './features/employeeRegistrationSlice';
 import jobReducer from './features/jobSlice';  // Import the job slice
+import authReducer from './features/authSlice';
 
 const store = configureStore({
   reducer: {
@@ -13,7 +14,7 @@ const store = configureStore({
     contact: contactReducer,
     employee: employeeRegistrationReducer,
     job: jobReducer,  // Add job reducer to the store
-    // auth: authReducer,
+    auth: authReducer,
   },
 });
 

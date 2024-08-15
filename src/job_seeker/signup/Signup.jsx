@@ -7,7 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 
 
-const Signup = () => {
+const EmployeeSignup = () => {
   const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState('');
   const dispatch = useDispatch();
@@ -55,4 +55,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default EmployeeSignup;
