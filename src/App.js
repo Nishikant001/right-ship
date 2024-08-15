@@ -18,7 +18,8 @@ import EmployeeOtpAuth from './job_seeker/login/login';
 import EmployeeSignup from './job_seeker/signup/Signup';
 import JobDashboard from './job_seeker/jobs/InitialJobs2';
 import Main from './job_seeker/Profile/Main';
-
+import CreateJobStepForm from './company/job/createJob/step';
+import JobPostList from './company/job/jobPostList';
 
 
 const App = () => {
@@ -50,6 +51,8 @@ const App = () => {
         {/* Rolebase */}
         <Route element={ user ?  <EmployeeLayout/> : <Navigate to="/" /> }>   
           <Route path="/profile" element={<Main />} />
+          <Route path="/create/job" element={<CreateJobStepForm/>} />
+          <Route path="/post/job" element={<JobPostList/>} />
         </Route>
       </Routes>
     </BrowserRouter>
