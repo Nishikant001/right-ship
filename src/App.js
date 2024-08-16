@@ -49,8 +49,7 @@ const App = () => {
         <Route element={ <DefaultLayout />} >
           <Route path="/" element={<HomePage />} />
           <Route path="/jobs" element={<JobDashboard />} />
-        </Route>
-        
+        </Route>
         {/* Rolebase */}
         <Route element={ user ? <EmployeeLayout/> : <Navigate to="/" /> }>   
           <Route path="/profile" element={<Main />} />

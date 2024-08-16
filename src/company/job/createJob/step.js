@@ -34,7 +34,7 @@ const CreateJobStepForm = () => {
           const attributes = response.data.data;
           const shipAttribute = attributes.find(attr => attr.name.toLowerCase() === 'ships');
           const rankAttribute = attributes.find(attr => attr.name.toLowerCase() === 'rank');
-          const benifitAttribute = attributes.find(attr => attr.name.toLowerCase() === 'benifit');
+          const benifitAttribute = attributes.find(attr => attr.name.toLowerCase() === 'benifits');
 
           const shipData = shipAttribute ? shipAttribute.values.sort((a, b) => a.localeCompare(b)) : [];
           const rankData = rankAttribute ? rankAttribute.values.sort((a, b) => a.localeCompare(b)) : [];
@@ -129,7 +129,7 @@ const CreateJobStepForm = () => {
         <StepTwo
           nextStep={nextStep}
           prevStep={prevStep}
-          benifits={benifitOptions}
+          benefits={benifitOptions}
           formData={formData}
           handleInputChange={handleInputChange}
         />
