@@ -22,6 +22,8 @@ import CreateJobStepForm from './company/job/createJob/step';
 import JobPostList from './company/job/jobPostList';
 import CandidatesTable from './company/candidates/candidateList';
 import CandidateDetail from './company/candidates/candidateDetail';
+import JobDetail from './company/job/jobdetail';
+import CompanyManageUsers from './company/ManageUsers';
 
 
 const App = () => {
@@ -57,8 +59,10 @@ const App = () => {
           <Route path="/profile" element={<Main />} />
           <Route path="/create/job" element={<CreateJobStepForm/>} />
           <Route path="/post/job" element={<JobPostList/>} />
+          <Route path="/post/job/detail/:id" element={<JobDetail />} />
           <Route path="/job/candidates" element={<CandidatesTable/>} />
           <Route path="/job/candidates/detail/:candidateId" element={<CandidateDetail/>} />
+          <Route path="/manage/company/team" element={<CompanyManageUsers/>} />
         </Route>
       </Routes>
     </BrowserRouter>

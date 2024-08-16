@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import React from 'react';
 
-const ManageUsers = () => {
+
+import { useSelector, useDispatch } from 'react-redux';
+
+const CompanyManageUsers = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,7 +19,8 @@ const ManageUsers = () => {
   const [editMode, setEditMode] = useState(false);
   const [editTeamId, setEditTeamId] = useState(null);
 
-  const company_id = localStorage.getItem("company_id");
+  const user = useSelector((state) => state.auth.user);
+  const company_id = user.company_id
 
   useEffect(() => {
     const fetchData = async () => {
@@ -300,4 +304,4 @@ const ManageUsers = () => {
   );
 };
 
-export default ManageUsers;
+export default CompanyManageUsers;

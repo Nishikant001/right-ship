@@ -17,7 +17,7 @@ const CompanyLayout = ({ children }) => {
       {/* Main Content */}
       <div className="flex-1 ml-64">
         {/* Top Navbar */}
-        <header className=" fixed top-0 left-64 right-0 h-16 flex items-center px-6 bg-white border-b-2">
+        <header className=" fixed top-0 left-64 right-0 h-16 px-6 bg-white border-b-2">
           <Navbar />
         </header>
 

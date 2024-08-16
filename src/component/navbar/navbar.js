@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import DefaultNavbar from './defaultNavbar';
 import CompanyNavbar from './companyNavbar';
 import EmployeeNavbar from './employeeNavbar';
+import Header from '../../company/Header';
 
 
 const Navbar = ({}) => {
@@ -18,7 +19,8 @@ const Navbar = ({}) => {
         }
     
         if (user.role === 'company') {
-          return <CompanyNavbar />;
+          return <Header />;
+          // return <CompanyNavbar />;
         }
     
         if (user.role === 'employee') {

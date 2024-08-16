@@ -21,7 +21,7 @@ const CompanySidebar = () => {
         </Link>
       </li>
       <li>
-        <Link to="/candidates" className="flex items-center px-4 py-2 hover:bg-gray-700 rounded">
+        <Link to="/job/candidates" className="flex items-center px-4 py-2 hover:bg-gray-700 rounded">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8m4 5v-1a1 1 0 011-1h6a1 1 0 011 1v1m-3-3a2 2 0 100-4 2 2 0 000 4z" />
           </svg>
@@ -29,21 +29,21 @@ const CompanySidebar = () => {
         </Link>
       </li>
       <li>
-        <Link to="/manage-user" className="flex items-center px-4 py-2 hover:bg-gray-700 rounded">
+        <Link to="/manage/company/team" className="flex items-center px-4 py-2 hover:bg-gray-700 rounded">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3M13 9l3 3-3 3" />
           </svg>
           Manage User
         </Link>
       </li>
-      <li>
+      {/* <li>
         <Link to="/support" className="flex items-center px-4 py-2 hover:bg-gray-700 rounded">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
           </svg>
           Support
         </Link>
-      </li>
+      </li> */}
       <li>
         <Link to="/settings" className="flex items-center px-4 py-2 hover:bg-gray-700 rounded">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
