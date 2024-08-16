@@ -20,6 +20,8 @@ import JobDashboard from './job_seeker/jobs/InitialJobs2';
 import Main from './job_seeker/Profile/Main';
 import CreateJobStepForm from './company/job/createJob/step';
 import JobPostList from './company/job/jobPostList';
+import CandidatesTable from './company/candidates/candidateList';
+import CandidateDetail from './company/candidates/candidateDetail';
 
 
 const App = () => {
@@ -55,6 +57,8 @@ const App = () => {
           <Route path="/profile" element={<Main />} />
           <Route path="/create/job" element={<CreateJobStepForm/>} />
           <Route path="/post/job" element={<JobPostList/>} />
+          <Route path="/job/candidates" element={<CandidatesTable/>} />
+          <Route path="/job/candidates/detail/:candidateId" element={<CandidateDetail/>} />
         </Route>
       </Routes>
     </BrowserRouter>
