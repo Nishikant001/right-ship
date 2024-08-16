@@ -59,6 +59,12 @@ const CompanyManageUsers = () => {
   }, [searchQuery, data]);
 
   const handleAddUserClick = () => {
+
+    if (data.length >= 5) {
+      alert('You can only create a maximum of 5 teams.');
+      return;
+    }
+    
     setShowPopup(true);
     setEditMode(false);
     setFormData({
@@ -75,6 +81,8 @@ const CompanyManageUsers = () => {
   };
 
   const handleFormSubmit = async (e) => {
+
+    
     e.preventDefault();
     try {
       const endpoint = editMode ? 'https://api.rightships.com/company/team/edit' : 'https://api.rightships.com/company/team/add';
