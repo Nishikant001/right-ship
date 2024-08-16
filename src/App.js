@@ -46,8 +46,10 @@ const App = () => {
           <Route path="*" element={<NotFoundPage />} />
         </Route>
         {/* Global Route */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/jobs" element={<JobDashboard />} />
+        <Route element={ <DefaultLayout />} >
+          <Route path="/" element={<HomePage />} />
+          <Route path="/jobs" element={<JobDashboard />} />
+        </Route>
         {/* Rolebase */}
         <Route element={ user ? <CompanyLayout/> : <Navigate to="/" /> }>   
           <Route path="/profile" element={<Main />} />
