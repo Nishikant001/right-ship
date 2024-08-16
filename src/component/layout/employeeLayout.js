@@ -1,12 +1,12 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import Navbar from '../navbar/navbar';
+import EmployeeNavbar from '../navbar/employeeNavbar';
 
 const EmployeeLayout = ({ children }) => {
   return (
     <div>
       <header>
-      <Navbar/>
+      <EmployeeNavbar/>
       </header>
       <main>
       { children ? children :<Outlet /> }
