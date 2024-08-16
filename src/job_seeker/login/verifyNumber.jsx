@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; 
 import { useDispatch, useSelector } from 'react-redux';
 import logo from '../../images/logo.png';
 import { login } from '../../features/authSlice';
 
 const OtpVerificationForm = ({ mobileNumber }) => {
-    
     const [otp, setOtp] = useState('');
     const [otpStatus, setOtpStatus] = useState('idle');
     const [otpError, setOtpError] = useState('');
-    const [timer, setTimer] = useState(60); // Timer for resend OTP
+    const [timer, setTimer] = useState(60); 
     const [canResend, setCanResend] = useState(false);
 
     const dispatch = useDispatch();
+    const navigate = useNavigate(); 
     const authState = useSelector(state => state.auth);
     
     const handleVerifyOtp = async () => {
@@ -24,8 +24,8 @@ const OtpVerificationForm = ({ mobileNumber }) => {
             console.log(response.data);
             if (response.data.code === 200) {
                 setOtpStatus('success');
-                // Call the login thunk after OTP verification
-                dispatch(login({ mobile_no: mobileNumber }));
+                await dispatch(login({ mobile_no: mobileNumber }));
+                navigate('/profile', { replace: true });  // Use replace to prevent going back to login
             } else {
                 setOtpStatus('failed');
                 setOtpError('Invalid OTP. Please try again.');
@@ -43,7 +43,7 @@ const OtpVerificationForm = ({ mobileNumber }) => {
             if (response.data.success) {
                 setOtpStatus('success');
                 setCanResend(false);
-                setTimer(60); // Reset timer
+                setTimer(60); 
             } else {
                 setOtpStatus('failed');
                 setOtpError('Failed to resend OTP. Please try again.');
@@ -54,7 +54,7 @@ const OtpVerificationForm = ({ mobileNumber }) => {
         }
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         let interval;
         if (timer > 0) {
             interval = setInterval(() => setTimer((prevTimer) => prevTimer - 1), 1000);

@@ -1,19 +1,18 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { CircleUserRound, CircleHelp, ChevronDown, Bell, MessageSquare, BriefcaseBusiness, Settings, LogOut, UserRoundCog } from 'lucide-react';
 import Logo from '../../images/logo.png';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const EmployeeNavabar = () => {
+const EmployeeNavbar = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
   const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [isNotificationMenuOpen, setIsNotificationMenuOpen] = useState(false);
-  
+
   const userDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   const handleUserDropdownClick = () => {
     setUserDropdownOpen(!userDropdownOpen);
@@ -25,14 +24,6 @@ const EmployeeNavabar = () => {
 
   const toggleOffCanvas = () => {
     setIsOffCanvasOpen(!isOffCanvasOpen);
-  };
-
-  const toggleUserMenu = () => {
-    setIsUserMenuOpen(!isUserMenuOpen);
-  };
-
-  const toggleNotificationMenu = () => {
-    setIsNotificationMenuOpen(!isNotificationMenuOpen);
   };
 
   useEffect(() => {
@@ -52,14 +43,9 @@ const EmployeeNavabar = () => {
   }, []);
 
   const handleLogout = () => {
-    // Clear all data from local storage
     localStorage.clear();
-    
-    // Redirect to login page
-    // history.push('/login');
-    
-    // Optional: prevent user from navigating back to previous pages
-    // window.location.reload(); // Reload the page to clear history state
+    navigate('/');
+    window.location.reload();
   };
 
   return (
@@ -72,12 +58,12 @@ const EmployeeNavabar = () => {
               <img src={Logo} alt="Logo" height={40} width={40} />
               <span className="font-bold text-gray-800 ml-4">RIGHTSHIP</span>
             </Link>
-            <div className={`hidden lg:flex items-center space-x-6 ml-8 ${isOffCanvasOpen ? 'hidden' : ''}`}>
-              <Link to="/jobdashboard" className="text-black font-bold hover:text-customBlue">Jobs</Link>
-              {/* <Link to="/companies" className="text-black font-bold hover:text-customBlue">Companies</Link> */}
+            <div className="hidden lg:flex items-center space-x-6 ml-8">
+              <Link to="/jobs" className="text-black font-bold hover:text-customBlue">Jobs</Link>
             </div>
           </div>
-          <div className={`hidden lg:flex items-center space-x-6 ${isOffCanvasOpen ? 'hidden' : ''}`}>
+          <div className='hidden sm:block'>
+            <div className=" flex items-center space-x-6">
             <a href="#help-support" className="text-black flex items-center font-bold">
               <CircleHelp size={20} className="mr-2" /> Help & Support
             </a>
@@ -101,7 +87,7 @@ const EmployeeNavabar = () => {
                   <Link to="/profile" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
                     <MessageSquare size={20} className="mr-2" /> Profile
                   </Link>
-                  <Link to="/myjobs" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
+                  <Link to="/my-jobs" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
                     <MessageSquare size={20} className="mr-2" /> My Jobs
                   </Link>
                   <Link to="/settings" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
@@ -111,8 +97,9 @@ const EmployeeNavabar = () => {
                 </div>
               )}
             </div>
+            </div>
           </div>
-          <button onClick={toggleOffCanvas} className="lg:hidden text-black focus:outline-none">
+          <button onClick={toggleOffCanvas} className="md:hidden text-black focus:outline-none">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-16 6h16" />
             </svg>
@@ -120,9 +107,8 @@ const EmployeeNavabar = () => {
         </nav>
       </header>
 
-      {/* Off-Canvas Sidebar */}
       <div
-        className={`fixed top-0 right-0 w-64 h-full bg-white shadow-lg border-l border-gray-200 transform ${
+        className={`lg:hidden fixed top-0 right-0 w-64 h-full bg-white shadow-lg border-l border-gray-200 transform ${
           isOffCanvasOpen ? 'translate-x-0' : 'translate-x-full'
         } transition-transform duration-300 ease-in-out z-40`}
       >
@@ -135,23 +121,21 @@ const EmployeeNavabar = () => {
           <Link to="/" className="flex px-6 py-3 border-b-2 font-bold">
             <span className="text-gray-800">MENU</span>
           </Link>
-          <Link to="/jobdashboard" className="text-black  pb-4 px-6 font-semibold border-b-2 hover:text-customBlue">Jobs</Link>
-          
-          {/* <Link to="/companies" className="text-black font-bold hover:text-customBlue">Companies</Link> */}
+          <Link to="/jobs" className="text-black pb-4 px-6 font-semibold border-b-2 hover:text-customBlue">Jobs</Link>
 
           <div className="pb-4 px-6 border-b-2">
             <button
-              onClick={toggleUserMenu}
+              onClick={handleUserDropdownClick}
               className="w-full text-left text-black font-bold flex items-center justify-between"
             >
               User <ChevronDown size={20} />
             </button>
-            {isUserMenuOpen && (
+            {userDropdownOpen && (
               <div className="mt-2 space-y-2">
                 <Link to="/profile" className="text-gray-800 hover:bg-gray-100 flex items-center font-semibold ps-3 py-2">
                   <CircleUserRound size={20} className="mr-2" /> Profile
                 </Link>
-                <Link to="/myjobs" className="text-gray-800 hover:bg-gray-100 flex items-center font-semibold ps-3 py-2">
+                <Link to="/my-jobs" className="text-gray-800 hover:bg-gray-100 flex items-center font-semibold ps-3 py-2">
                   <BriefcaseBusiness size={20} className="mr-2" /> My Jobs
                 </Link>
                 <Link to="/settings" className="text-gray-800 hover:bg-gray-100 flex items-center font-semibold ps-3 py-2">
@@ -166,12 +150,12 @@ const EmployeeNavabar = () => {
 
           <div className="pb-4 px-6 border-b-2">
             <button
-              onClick={toggleNotificationMenu}
+              onClick={handleNotificationDropdownClick}
               className="w-full text-left text-black font-bold flex items-center justify-between"
             >
               Notification <ChevronDown size={20} />
             </button>
-            {isNotificationMenuOpen && (
+            {notificationDropdownOpen && (
               <div className="mt-2 space-y-2">
                 <Link to="/notifications" className="text-gray-800 hover:bg-gray-100 flex items-center font-semibold ps-3 py-2">
                   <Bell size={20} className="mr-2" /> View All Notifications
@@ -189,7 +173,6 @@ const EmployeeNavabar = () => {
         </div>
       </div>
 
-      {/* Overlay to close off-canvas when clicking outside */}
       {isOffCanvasOpen && (
         <div
           onClick={toggleOffCanvas}
@@ -200,4 +183,4 @@ const EmployeeNavabar = () => {
   );
 };
 
-export default EmployeeNavabar;
+export default EmployeeNavbar;

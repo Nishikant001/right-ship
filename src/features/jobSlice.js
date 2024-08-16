@@ -1,69 +1,69 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// Thunk to send application to company
-export const sendApplicationToCompany = createAsyncThunk(
-  'job/sendApplicationToCompany',
-  async (job, { rejectWithValue }) => {
+// Thunk to apply a job
+export const applyJobToCompany = createAsyncThunk(
+  'job/applyJobToCompany',
+  async ({ jobId, companyId, employeeId }, { rejectWithValue }) => {
     try {
-      const response = await fetch('https://api.rightships.com/company/application/create', {
+      console.log('Applying for Job:', { jobId, companyId, employeeId });  // Debugging line
+      const response = await fetch('https://api.rightships.com/employee/apply_job', {
         method: 'POST',
         headers: {
           'Accept': '*/*',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          company_id: job.companyId, // Ensure this ID is correct
-          rspl_no: job.rpslNo,
-          company_name: job.companyName,
-          hiring_for: job.hiringFor,
-          open_positions: job.openPositions,
-          description: job.description,
-          mobile_no: job.contact.number, // Employee's contact details
-          email: job.contact.email,     // Employee's email
+          employee_id: employeeId,
+          application_id: jobId,
+          company_id: companyId,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send application to company');
+        throw new Error('Failed to apply for the job');
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
+      console.error('Apply Job Error:', error);  // Debugging line
       return rejectWithValue(error.message);
     }
   }
 );
 
-// Thunk to update company data when a job is applied/unapplied (if required)
-export const updateCompanyData = createAsyncThunk(
-  'job/updateCompanyData',
-  async (companyId, { rejectWithValue }) => {
+// Thunk to unapply a job
+export const unapplyJobFromCompany = createAsyncThunk(
+  'job/unapplyJobFromCompany',
+  async ({ jobId, companyId, employeeId }, { rejectWithValue }) => {
     try {
-      const response = await fetch('https://api.rightships.com/company/update', {
+      console.log('Unapplying from Job:', { jobId, companyId, employeeId });  // Debugging line
+      const response = await fetch('https://api.rightships.com/employee/unapply', {
         method: 'POST',
         headers: {
           'Accept': '*/*',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          company_id: companyId, // Use actual company ID
-          company_name: 'Cloudbelly', // Replace with dynamic values as needed
-          address: 'Mumbai',          // Replace with dynamic values as needed
+          employee_id: employeeId,
+          application_id: jobId,
+          company_id: companyId,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update company data');
+        throw new Error('Failed to unapply for the job');
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
+      console.error('Unapply Job Error:', error);  // Debugging line
       return rejectWithValue(error.message);
     }
   }
 );
+
 
 const initialState = {
   savedJobs: JSON.parse(localStorage.getItem('savedJobs')) || [],
@@ -81,6 +81,11 @@ const jobSlice = createSlice({
         localStorage.setItem('appliedJobs', JSON.stringify(state.appliedJobs));
       }
     },
+    unapplyJob: (state, action) => {
+      const jobId = action.payload;
+      state.appliedJobs = state.appliedJobs.filter(job => job.id !== jobId);
+      localStorage.setItem('appliedJobs', JSON.stringify(state.appliedJobs));
+    },
     bookmarkJob: (state, action) => {
       const job = action.payload;
       if (!state.savedJobs.some(savedJob => savedJob.id === job.id)) {
@@ -93,28 +98,23 @@ const jobSlice = createSlice({
       state.savedJobs = state.savedJobs.filter(job => job.id !== jobId);
       localStorage.setItem('savedJobs', JSON.stringify(state.savedJobs));
     },
-    unapplyJob: (state, action) => {
-      const jobId = action.payload;
-      state.appliedJobs = state.appliedJobs.filter(job => job.id !== jobId);
-      localStorage.setItem('appliedJobs', JSON.stringify(state.appliedJobs));
-    },
   },
   extraReducers: (builder) => {
-    builder.addCase(sendApplicationToCompany.fulfilled, (state, action) => {
-      console.log('Application sent to company successfully:', action.payload);
+    builder.addCase(applyJobToCompany.fulfilled, (state, action) => {
+      console.log('Job applied successfully:', action.payload);
     });
-    builder.addCase(sendApplicationToCompany.rejected, (state, action) => {
-      console.error('Failed to send application to company:', action.payload);
+    builder.addCase(applyJobToCompany.rejected, (state, action) => {
+      console.error('Failed to apply job:', action.payload);
     });
-    builder.addCase(updateCompanyData.fulfilled, (state, action) => {
-      console.log('Company data updated successfully:', action.payload);
+    builder.addCase(unapplyJobFromCompany.fulfilled, (state, action) => {
+      console.log('Job unapplied successfully:', action.payload);
     });
-    builder.addCase(updateCompanyData.rejected, (state, action) => {
-      console.error('Failed to update company data:', action.payload);
+    builder.addCase(unapplyJobFromCompany.rejected, (state, action) => {
+      console.error('Failed to unapply job:', action.payload);
     });
   },
 });
 
-export const { applyJob, bookmarkJob, removeJob, unapplyJob } = jobSlice.actions;
+export const { applyJob, unapplyJob, bookmarkJob, removeJob } = jobSlice.actions;
 
 export default jobSlice.reducer;

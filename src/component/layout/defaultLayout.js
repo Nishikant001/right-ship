@@ -1,12 +1,12 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import Navbar from '../navbar/navbar';
+import DefaultNavbar from '../navbar/defaultNavbar';
 
 const DefaultLayout = ({ children }) => {
   return (
     <div>
       <header>
-      <Navbar/>
+      <DefaultNavbar/>
       </header>
       <main>
         { children ? children :<Outlet /> }

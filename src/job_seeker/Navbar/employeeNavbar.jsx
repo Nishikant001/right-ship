@@ -5,7 +5,7 @@
 // import { ToastContainer } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 
-// const EmpNavabar = () => {
+// const EmpNavbar = () => {
 //   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 //   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
 //   const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
@@ -200,4 +200,4 @@
 //   );
 // };
 
-// export default EmpNavabar;
+// export default EmpNavbar;

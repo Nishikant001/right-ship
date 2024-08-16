@@ -70,6 +70,8 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
 
+        console.log('User logged in:', action.payload.user);  // Debugging line
+
         // Store user and token in localStorage
         localStorage.setItem('user', JSON.stringify(action.payload.user));
         localStorage.setItem('token', action.payload.token);
@@ -86,6 +88,8 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
+
+        console.log('Company logged in:', action.payload.user);  // Debugging line
 
         // Store user and token in localStorage
         localStorage.setItem('user', JSON.stringify(action.payload.user));
