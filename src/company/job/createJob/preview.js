@@ -1,40 +1,51 @@
+// Preview.js
 import React from 'react';
+import {
+  FormContainer,
+  Title,
+  Section,
+  SectionTitle,
+  ButtonGroup,
+  Button
+} from '../../../style';
 
 const Preview = ({ formData, prevStep, handlePublish }) => {
   return (
-    <div>
-      <h2>Preview Job Details</h2>
-      <div>
-        <h3>Ships:</h3>
+    <FormContainer>
+      <Title>Preview Job Details</Title>
+      <Section>
+        <SectionTitle>Ships:</SectionTitle>
         <ul>
           {formData.ships.map((ship, index) => (
             <li key={index}>{ship}</li>
           ))}
         </ul>
-      </div>
-      <div>
-        <h3>Ranks:</h3>
+      </Section>
+      <Section>
+        <SectionTitle>Ranks:</SectionTitle>
         <ul>
           {formData.ranks.map((rank, index) => (
             <li key={index}>{rank}</li>
           ))}
         </ul>
-      </div>
-      <div>
-        <h3>Benefits:</h3>
+      </Section>
+      <Section>
+        <SectionTitle>Benefits:</SectionTitle>
         <ul>
           {formData.benefits.map((benefit, index) => (
             <li key={index}>{benefit}</li>
           ))}
         </ul>
-      </div>
-      <div>
-        <h3>Job Description:</h3>
+      </Section>
+      <Section>
+        <SectionTitle>Job Description:</SectionTitle>
         <p>{formData.jobDescription}</p>
-      </div>
-      <button onClick={prevStep}>Edit</button>
-      <button onClick={handlePublish}>Publish</button>
-    </div>
+      </Section>
+      <ButtonGroup>
+        <Button onClick={prevStep}>Edit</Button>
+        <Button onClick={handlePublish}>Publish</Button>
+      </ButtonGroup>
+    </FormContainer>
   );
 };
 
