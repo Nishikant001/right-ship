@@ -10,8 +10,7 @@ const JobDetail = () => {
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-
-
+    
     const user = useSelector(state => state.auth.user);
 
     useEffect(() => {
