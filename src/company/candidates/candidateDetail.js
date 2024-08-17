@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import axios from 'axios';
+
 const dummyCandidate = {
   id: 1,
   name: 'John Doe',
@@ -40,22 +42,30 @@ const CandidateDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const data = {
+    employee_id: candidateId
+  };
+
   useEffect(() => {
     const fetchCandidate = async () => {
+      setLoading(true);
       try {
-        const response = await fetch(`/api/candidates/${candidateId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch candidate details');
-        }
-        const data = await response.json();
-        setCandidate(data);
+        // Ensure you pass the data object correctly as the second parameter
+        const response = await axios.post('https://api.rightships.com/employee/get', data, {});
+  
+        console.log(response.data);
+        // Directly use the data from the response, as Axios handles JSON parsing
+        setCandidate(response.data.data);
       } catch (err) {
+        // Handle errors more accurately here
+        console.error('Error fetching candidate details:', err);
         setError(err.message);
-        setCandidate(dummyCandidate);
+        setCandidate(dummyCandidate); // Fallback to dummy data on error
       } finally {
         setLoading(false);
       }
     };
+  
     fetchCandidate();
   }, [candidateId]);
 
@@ -76,11 +86,13 @@ const CandidateDetail = () => {
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="md:flex">
           <div className="md:flex-shrink-0">
-            <img
-              className="h-48 w-full object-cover md:w-48"
-              src={candidate.profileImage || 'https://via.placeholder.com/150'}
-              alt={candidate.name}
-            />
+          <img
+          loading="lazy"
+          className="h-48 w-full object-cover md:w-48"
+          src={candidate.profileImage || 'https://via.placeholder.com/150'}
+          alt={candidate.name}
+        />
+          
           </div>
           <div className="p-8">
             <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
@@ -137,6 +149,7 @@ const CandidateDetail = () => {
       {error && <p className="text-red-500 mt-4 text-center">Error: {error} (Showing dummy data)</p>}
     </div>
   );
+
 };
 
 const InfoCard = ({ title, children }) => (

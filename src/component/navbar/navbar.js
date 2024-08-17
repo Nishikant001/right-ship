@@ -4,6 +4,7 @@ import DefaultNavbar from './defaultNavbar';
 import CompanyNavbar from './companyNavbar';
 import EmployeeNavbar from './employeeNavbar';
 
+
 const Navbar = () => {
   const user = useSelector(state => state.auth.user);
 

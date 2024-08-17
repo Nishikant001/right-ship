@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import axios from 'axios';
 
 import StepOne from './stepOne';
@@ -17,6 +19,8 @@ const CreateJobStepForm = () => {
     jobDescription: '',
   });
 
+  const navigate = useNavigate();
+  
   const user = useSelector(state => state.auth.user);
 
   const [shipOptions, setShipOptions] = useState([]);
@@ -77,20 +81,18 @@ const CreateJobStepForm = () => {
         email: null
       };
 
-      console.log(requestData);
+
 
       // Make the API request
       const response = await axios.post('https://api.rightships.com/company/application/create', requestData, {
-        headers: {
-          'Accept': '*/*',
-          'Content-Type': 'application/json',
-        }
+      
       });
 
       // Handle the response
       if (response.status === 200) {
         console.log('Job successfully published:', response.data);
         alert('Job successfully published!');
+        navigate('/post/job', { state: { message: 'Job successfully created!' } }); 
       } else {
         console.error('Failed to publish job:', response.data);
         alert('Failed to publish job.');

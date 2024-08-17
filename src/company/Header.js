@@ -3,7 +3,7 @@ import { CircleUserRound, Bell, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom'
 const Header = () => {
   return (
-    <header className="bg-white border-b py-5 px-8 sticky top-0">
+    <header className="bg-white py-5 px-8 sticky top-0">
       <nav className="flex flex-row-reverse items-center text-sm font-bold">
         <div className="flex space-x-16">
           <a href="/support" className="text-black flex "> <CircleUserRound size={20}/>&nbsp; Help & Support &nbsp;</a>
