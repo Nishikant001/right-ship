@@ -3,7 +3,6 @@ import { FaRegEdit, FaEdit } from "react-icons/fa";
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import './EmployeeProfile.css'; // Assuming you will place the CSS in EmployeeProfile.css
 
 const EmployeeProfile = () => {
   const [profileImage, setProfileImage] = useState("https://i2.pickpik.com/photos/711/14/431/smile-profile-face-male-preview.jpg");
@@ -32,6 +31,22 @@ const EmployeeProfile = () => {
       cop: '',
       watchKeeping: '',
     },
+    address: {
+      address1: '',
+      address2: '',
+      state: '',
+      pincode: '',
+      nationality: '',
+      city: '',
+      country: '',
+    },
+    others: {
+      height: '',
+      bmi: '',
+      weight: '',
+      sidCard: '',
+      willingToAcceptLowerRank: '',
+    }
   });
 
   const location = useLocation();
@@ -45,26 +60,58 @@ const EmployeeProfile = () => {
           mobile_no: contactInfo,
           user_type: 'employee',
         });
-        const result = await response.json();
-        const profile_photo = result.data?.profile_photo;
-        setProfileImage(profile_photo);
+
+        const result = response.data;
+
+        // Set profile image, name, rank, and position
+        setProfileImage(result.data?.profile_photo || profileImage);
         setProfileData({
-          name: result.data?.name || 'Nishikant Sahoo',
-          rank: result.data?.rank || 'Present Rank',
-          position: result.data?.position || 'Chief Officer'
+          name: result.data?.name || '',
+          rank: result.data?.rank || '',
+          position: result.data?.position || ''
         });
 
-        const resume = result.data?.resume;
-        if (resume) {
-          const fileNameWithUnderscore = resume.split('/').pop(); 
-          const fileName = fileNameWithUnderscore.replace(/^_/, ''); 
-          setFile({
-            name: fileName,
-            url: resume,
-          });
-        }
+        // Set all other section data
+        setSectionData({
+          lastVesselType: result.data?.lastVesselType || '',
+          vesselAppliedFor: result.data?.vesselAppliedFor || '',
+          dateOfAvailability: result.data?.dateOfAvailability || '',
+          contactDetail: {
+            email: result.data?.contactDetail?.email || '',
+            whatsappNumber: result.data?.contactDetail?.whatsappNumber || '',
+            dob: result.data?.contactDetail?.dob || '',
+            age: result.data?.contactDetail?.age || '',
+            gender: result.data?.contactDetail?.gender || '',
+          },
+          experience: {
+            seaExperience: result.data?.experience?.seaExperience || '',
+            lastRankExperience: result.data?.experience?.lastRankExperience || '',
+            presentRank: result.data?.experience?.presentRank || '',
+            lastRank: result.data?.experience?.lastRank || '',
+          },
+          licenseHolding: {
+            coc: result.data?.licenseHolding?.coc || '',
+            cop: result.data?.licenseHolding?.cop || '',
+            watchKeeping: result.data?.licenseHolding?.watchKeeping || '',
+          },
+          address: {
+            address1: result.data?.address?.address1 || '',
+            address2: result.data?.address?.address2 || '',
+            state: result.data?.address?.state || '',
+            pincode: result.data?.address?.pincode || '',
+            nationality: result.data?.address?.nationality || '',
+            city: result.data?.address?.city || '',
+            country: result.data?.address?.country || '',
+          },
+          others: {
+            height: result.data?.others?.height || '',
+            bmi: result.data?.others?.bmi || '',
+            weight: result.data?.others?.weight || '',
+            sidCard: result.data?.others?.sidCard || '',
+            willingToAcceptLowerRank: result.data?.others?.willingToAcceptLowerRank || '',
+          }
+        });
 
-        setSectionData(result.data);
       } catch (error) {
         console.error('Error fetching profile data:', error);
       }
@@ -78,17 +125,63 @@ const EmployeeProfile = () => {
   const handleFileChange = async (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
-      setFile(selectedFile);
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      try {
+        const response = await axios.post('https://api.rightships.com/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        const fileUrl = response.data.file_url;
+        setFile({ name: selectedFile.name, url: fileUrl });
+
+        // Update the employee data with the new resume URL
+        await axios.post('https://api.rightships.com/employee/update', {
+          employee_id: employeeId,
+          resume: fileUrl,
+        });
+
+        console.log('Resume updated successfully');
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
     }
-  }
+  };
 
   const handleEditClick = (section) => {
     setEditSection(section);
   };
 
-  const handleSaveClick = () => {
-    updateUserData();
-    setEditSection(null);
+  const handleSaveClick = async () => {
+    try {
+      const payload = {
+        employee_id: employeeId,
+        name: sectionData.name,
+        lastVesselType: sectionData.lastVesselType,
+        appliedRank: sectionData.vesselAppliedFor,
+        availability: sectionData.dateOfAvailability,
+        contactDetail: sectionData.contactDetail,
+        experience: sectionData.experience,
+        licenseHolding: sectionData.licenseHolding,
+        address: sectionData.address,
+        others: sectionData.others,
+      };
+
+      await axios.post('https://api.rightships.com/employee/update', payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: '*/*',
+        },
+      });
+
+      console.log('Data updated successfully');
+      setEditSection(null);
+    } catch (error) {
+      console.error('Error updating data:', error);
+    }
   };
 
   const handleChange = (section, key, value) => {
@@ -108,35 +201,6 @@ const EmployeeProfile = () => {
     }
   };
 
-  const updateUserData = () => {
-    if (employeeId) {
-      const payload = {
-        employee_id: employeeId,
-        name: sectionData.name,
-        lastVesselType: sectionData.lastVesselType,
-        appliedRank: sectionData.vesselAppliedFor,
-        availability: sectionData.dateOfAvailability,
-        contactDetail: sectionData.contactDetail,
-        experience: sectionData.experience,
-        licenseHolding: sectionData.licenseHolding,
-      };
-
-      axios
-        .post('https://api.rightships.com/employee/update', payload, {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: '*/*',
-          },
-        })
-        .then((response) => {
-          console.log('Data updated successfully:', response.data);
-        })
-        .catch((error) => {
-          console.error('Error updating data:', error);
-        });
-    }
-  };
-
   const renderEditableField = (section, key, value) => {
     const displayValue = typeof value === 'string' ? value : JSON.stringify(value);
     return editSection === section ? (
@@ -153,7 +217,7 @@ const EmployeeProfile = () => {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-100 z-0">
-      <aside className="sticky top-2 right-0 w-full lg:w-1/3 p-4 bg-white shadow-md overflow-y-auto" style={{ height: "40em" }}>
+      <aside className="sticky top-2 right-0 w-full lg:w-1/3 p-4 bg-white shadow-md overflow-y-auto">
         <div className="bg-white p-4 border-b-2 shadow-lg flex flex-col items-center text-center">
           <div className="relative">
             <img
@@ -200,12 +264,12 @@ const EmployeeProfile = () => {
           </div>
         </div>
 
-        <div className='h-24 border bg-black'>
-          {/* Add your advertisement content here */}
-        </div>
+        <div className='h-24 border bg-gray-300 flex items-center justify-center'>
+          <span>Advertisement</span>
+          </div>
       </aside>
 
-      <main className="w-full lg:w-2/3 p-0 h-screen">
+      <div className="w-full lg:w-2/3 p-0 h-screen">
         <div className="flex-1 overflow-scroll p-4 space-y-4">
           {Object.entries({
             lastVesselType: 'Last Vessel Type',
@@ -223,7 +287,7 @@ const EmployeeProfile = () => {
             </div>
           ))}
 
-          {['contactDetail', 'experience', 'licenseHolding'].map((section) => (
+          {['contactDetail', 'experience', 'licenseHolding', 'address', 'others'].map((section) => (
             <div key={section} className="p-4 bg-white border-1 border-[#D6D6D6] px-12 py-10 relative">
               <h3 className="text-lg font-semibold flex justify-between">
                 {section.charAt(0).toUpperCase() + section.slice(1).replace(/([A-Z])/g, ' $1')}
@@ -251,7 +315,7 @@ const EmployeeProfile = () => {
             </div>
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
