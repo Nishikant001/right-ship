@@ -2,12 +2,13 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from '../navbar/navbar';
 import SideNavbar from '../navbar/sideNavbar/sideNavbar';
+import CompanyFooter from '../footer/CompanyFooter';
 
 const CompanyLayout = ({ children }) => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Side Navbar */}
-      <nav className="w-64 bg-gray-800 text-white fixed top-0 left-0 h-full">
+      <nav className="w-64 bg-customBlue text-white fixed top-0 left-0 h-full">
         <div className="p-4">
           <h1 className="text-2xl font-semibold">Dashboard</h1>
           <SideNavbar/>
@@ -30,7 +31,9 @@ const CompanyLayout = ({ children }) => {
             
           </div> 
         </main>
+        <CompanyFooter/>
       </div>
+    
     </div>
   );
 };

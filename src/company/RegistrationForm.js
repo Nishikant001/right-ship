@@ -132,7 +132,7 @@ const RegistrationForm = () => {
       <ToastContainer />
       {loading && <Loader />}
       {showPopup && <MailSendPopup/>}
-      <nav className="w-full bg-white border-b border-gray-300">
+      {/* <nav className="w-full bg-white border-b border-gray-300">
         <div className="max-w-6xl mx-auto flex justify-between items-center h-12">
           <div className="flex items-center h-full">
             <Link className="flex"><img src={Logo} alt="Logo" height={40} width={40} /> <p className="font-bold text-gray-800 mt-2 px-4">RIGHTSHIP</p></Link>
@@ -148,7 +148,7 @@ const RegistrationForm = () => {
               </button>
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
-                  {/* <a href="/admin_dashboard" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Admin</a> */}
+
                   <a href="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Company Login</a>
                   <a href="/" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Company Registration</a>
                 </div>
@@ -156,7 +156,7 @@ const RegistrationForm = () => {
             </div>
           </div>
         </div>
-      </nav>
+      </nav> */}
 
       {/* Form Container */}
       <div className="w-full max-w-4xl mt-6 bg-white border border-gray-400 rounded-lg shadow-md">
