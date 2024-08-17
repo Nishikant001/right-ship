@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaRegEdit, FaEdit } from "react-icons/fa";
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 const EmployeeProfile = () => {
@@ -11,7 +10,8 @@ const EmployeeProfile = () => {
   const [editSection, setEditSection] = useState(null);
   const [sectionData, setSectionData] = useState({
     lastVesselType: '',
-    vesselAppliedFor: '',
+    applyvessel: '', // Updated for vessel applied field
+    appliedRank: '', // Added applied rank
     dateOfAvailability: '',
     contactDetail: {
       email: '',
@@ -49,66 +49,65 @@ const EmployeeProfile = () => {
     }
   });
 
-  const location = useLocation();
-  const employeeId = location.state?.employeeId;
-  const contactInfo = useSelector((state) => state.contact.contactInfo);
+  const authState = useSelector((state) => state.auth);
+  const employeeId = authState?.user?._id;
 
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await axios.post('https://api.rightships.com/user/details', {
-          mobile_no: contactInfo,
-          user_type: 'employee',
+        const response = await axios.post('https://api.rightships.com/employee/get', {
+          employee_id: { $in: [employeeId] },
+          page: 1,
+          limit: 10
         });
 
-        const result = response.data;
+        const result = response.data.data[0];
 
-        // Set profile image, name, rank, and position
-        setProfileImage(result.data?.profile_photo || profileImage);
+        setProfileImage(result?.profile_photo || profileImage);
         setProfileData({
-          name: result.data?.name || '',
-          rank: result.data?.rank || '',
-          position: result.data?.position || ''
+          name: result?.name || '',
+          rank: result?.rank || '',
+          position: result?.position || ''
         });
 
-        // Set all other section data
         setSectionData({
-          lastVesselType: result.data?.lastVesselType || '',
-          vesselAppliedFor: result.data?.vesselAppliedFor || '',
-          dateOfAvailability: result.data?.dateOfAvailability || '',
+          lastVesselType: result?.lastVesselType || '',
+          applyvessel: result?.applyvessel || '', // Updated for vessel applied field
+          appliedRank: result?.appliedRank || '', // Updated for applied rank field
+          dateOfAvailability: result?.dateOfAvailability || '',
           contactDetail: {
-            email: result.data?.contactDetail?.email || '',
-            whatsappNumber: result.data?.contactDetail?.whatsappNumber || '',
-            dob: result.data?.contactDetail?.dob || '',
-            age: result.data?.contactDetail?.age || '',
-            gender: result.data?.contactDetail?.gender || '',
+            email: result?.contactDetail?.email || '',
+            whatsappNumber: result?.contactDetail?.whatsappNumber || '',
+            dob: result?.contactDetail?.dob || '',
+            age: result?.contactDetail?.age || '',
+            gender: result?.contactDetail?.gender || '',
           },
           experience: {
-            seaExperience: result.data?.experience?.seaExperience || '',
-            lastRankExperience: result.data?.experience?.lastRankExperience || '',
-            presentRank: result.data?.experience?.presentRank || '',
-            lastRank: result.data?.experience?.lastRank || '',
+            seaExperience: result?.experience?.seaExperience || '',
+            lastRankExperience: result?.experience?.lastRankExperience || '',
+            presentRank: result?.experience?.presentRank || '',
+            lastRank: result?.experience?.lastRank || '',
           },
           licenseHolding: {
-            coc: result.data?.licenseHolding?.coc || '',
-            cop: result.data?.licenseHolding?.cop || '',
-            watchKeeping: result.data?.licenseHolding?.watchKeeping || '',
+            coc: result?.licenseHolding?.coc || '',
+            cop: result?.licenseHolding?.cop || '',
+            watchKeeping: result?.licenseHolding?.watchKeeping || '',
           },
           address: {
-            address1: result.data?.address?.address1 || '',
-            address2: result.data?.address?.address2 || '',
-            state: result.data?.address?.state || '',
-            pincode: result.data?.address?.pincode || '',
-            nationality: result.data?.address?.nationality || '',
-            city: result.data?.address?.city || '',
-            country: result.data?.address?.country || '',
+            address1: result?.address?.address1 || '',
+            address2: result?.address?.address2 || '',
+            state: result?.address?.state || '',
+            pincode: result?.address?.pincode || '',
+            nationality: result?.address?.nationality || '',
+            city: result?.address?.city || '',
+            country: result?.address?.country || '',
           },
           others: {
-            height: result.data?.others?.height || '',
-            bmi: result.data?.others?.bmi || '',
-            weight: result.data?.others?.weight || '',
-            sidCard: result.data?.others?.sidCard || '',
-            willingToAcceptLowerRank: result.data?.others?.willingToAcceptLowerRank || '',
+            height: result?.others?.height || '',
+            bmi: result?.others?.bmi || '',
+            weight: result?.others?.weight || '',
+            sidCard: result?.others?.sidCard || '',
+            willingToAcceptLowerRank: result?.others?.willingToAcceptLowerRank || '',
           }
         });
 
@@ -117,14 +116,27 @@ const EmployeeProfile = () => {
       }
     };
 
-    if (contactInfo) {
+    if (employeeId) {
       fetchProfileData();
     }
-  }, [contactInfo]);
+  }, [employeeId]);
 
-  const handleFileChange = async (event) => {
+  const handleFileChange = async (event, type) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
+      const validProfileImageTypes = ['image/jpeg', 'image/png'];
+      const validResumeTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+      if (type === 'profile' && !validProfileImageTypes.includes(selectedFile.type)) {
+        alert('Invalid profile picture file type. Please upload a JPEG or PNG file.');
+        return;
+      }
+
+      if (type === 'resume' && !validResumeTypes.includes(selectedFile.type)) {
+        alert('Invalid resume file type. Please upload a PDF, DOC, or DOCX file.');
+        return;
+      }
+
       const formData = new FormData();
       formData.append('file', selectedFile);
 
@@ -138,15 +150,27 @@ const EmployeeProfile = () => {
         const fileUrl = response.data.file_url;
         setFile({ name: selectedFile.name, url: fileUrl });
 
-        // Update the employee data with the new resume URL
-        await axios.post('https://api.rightships.com/employee/update', {
+        const updatePayload = {
           employee_id: employeeId,
-          resume: fileUrl,
+        };
+
+        if (type === 'resume') {
+          updatePayload.resume = fileUrl;
+        } else if (type === 'profile') {
+          updatePayload.profile_photo = fileUrl;
+          setProfileImage(fileUrl);
+        }
+
+        await axios.post('https://api.rightships.com/employee/update', updatePayload, {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: '*/*',
+          },
         });
 
-        console.log('Resume updated successfully');
+        console.log(`${type} updated successfully`);
       } catch (error) {
-        console.error('Error uploading file:', error);
+        console.error(`Error uploading ${type}:`, error.response?.data || error.message);
       }
     }
   };
@@ -159,9 +183,9 @@ const EmployeeProfile = () => {
     try {
       const payload = {
         employee_id: employeeId,
-        name: sectionData.name,
         lastVesselType: sectionData.lastVesselType,
-        appliedRank: sectionData.vesselAppliedFor,
+        applyvessel: sectionData.applyvessel, // Updated for vessel applied field
+        appliedRank: sectionData.appliedRank, // Updated for applied rank field
         availability: sectionData.dateOfAvailability,
         contactDetail: sectionData.contactDetail,
         experience: sectionData.experience,
@@ -227,15 +251,16 @@ const EmployeeProfile = () => {
             />
             <div
               className="absolute bottom-0 right-0 w-8 h-8 bg-customBlue rounded-full flex items-center justify-center cursor-pointer"
-              onClick={() => document.getElementById('fileUpload').click()}
+              onClick={() => document.getElementById('profileUpload').click()}
             >
               <FaRegEdit className="text-white" />
             </div>
             <input
               type="file"
-              id="fileUpload"
+              id="profileUpload"
               className="hidden"
-              onChange={handleFileChange}
+              accept="image/jpeg, image/png"
+              onChange={(e) => handleFileChange(e, 'profile')}
             />
           </div>
           <h2 className="mt-4 text-lg font-semibold">{profileData.name}</h2>
@@ -256,7 +281,8 @@ const EmployeeProfile = () => {
               type="file"
               id="resumeUpload"
               className="hidden"
-              onChange={handleFileChange}
+              accept=".pdf, .doc, .docx"
+              onChange={(e) => handleFileChange(e, 'resume')}
             />
             <label htmlFor="resumeUpload" className="cursor-pointer text-black">
               <FaRegEdit className='text-xl md:text-2xl' />
@@ -266,14 +292,15 @@ const EmployeeProfile = () => {
 
         <div className='h-24 border bg-gray-300 flex items-center justify-center'>
           <span>Advertisement</span>
-          </div>
+        </div>
       </aside>
 
       <div className="w-full lg:w-2/3 p-0 h-screen">
         <div className="flex-1 overflow-scroll p-4 space-y-4">
           {Object.entries({
             lastVesselType: 'Last Vessel Type',
-            vesselAppliedFor: 'Vessel Applied For',
+            applyvessel: 'Vessel Applied For',  // Updated for vessel applied field
+            appliedRank: 'Applied Rank',  // Added applied rank field
             dateOfAvailability: 'Date of Availability',
           }).map(([key, title]) => (
             <div key={key} className="p-4 bg-white border-1 border-[#D6D6D6] px-12 py-10 relative">
@@ -321,3 +348,4 @@ const EmployeeProfile = () => {
 }
 
 export default EmployeeProfile;
+

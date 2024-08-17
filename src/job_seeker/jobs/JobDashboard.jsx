@@ -16,7 +16,6 @@ const JobDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // useEffect to handle debugging and other side-effects
   useEffect(() => {
     console.log('Auth State:', authState);
     if (!employeeId) {
