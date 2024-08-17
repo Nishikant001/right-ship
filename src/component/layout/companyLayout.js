@@ -23,13 +23,10 @@ const CompanyLayout = ({ children }) => {
         </header>
 
         {/* Content Area */}
-        <main className="mt-14 flex">
-          <div className="w-9/12 p-6">
+        <main className="mt-14">
+        
             {children ? children : <Outlet />}
-          </div> 
-          <div className="w-3/12 bg-white h-100">
-            
-          </div> 
+         
         </main>
         <CompanyFooter/>
       </div>

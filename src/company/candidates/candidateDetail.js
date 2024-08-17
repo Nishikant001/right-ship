@@ -52,10 +52,9 @@ const CandidateDetail = () => {
       try {
         // Ensure you pass the data object correctly as the second parameter
         const response = await axios.post('https://api.rightships.com/employee/get', data, {});
-  
-        console.log(response.data);
         // Directly use the data from the response, as Axios handles JSON parsing
-        setCandidate(response.data.data);
+        setCandidate(response.data.data[0]);
+        console.log(candidate, "====");
       } catch (err) {
         // Handle errors more accurately here
         console.error('Error fetching candidate details:', err);
@@ -82,7 +81,7 @@ const CandidateDetail = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+    <div className="max-w-7xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen ">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="md:flex">
           <div className="md:flex-shrink-0">

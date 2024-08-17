@@ -118,16 +118,23 @@ const CreateJobStepForm = () => {
   switch (step) {
     case 1:
       return (
-        <StepOne
-          nextStep={nextStep}
-          shipDatas={shipOptions}
-          rankDatas={rankOptions}
-          formData={formData}
-          handleInputChange={handleInputChange}
-        />
+        <div className='flex'>
+            <div className="w-9/12 p-6">
+              <StepOne
+                nextStep={nextStep}
+                shipDatas={shipOptions}
+                rankDatas={rankOptions}
+                formData={formData}
+                handleInputChange={handleInputChange}
+              />
+            </div> 
+            <div className="w-3/12 bg-white h-100"></div> 
+          </div>
       );
     case 2:
       return (
+        <div className='flex'>
+            <div className="w-9/12 p-6">
         <StepTwo
           nextStep={nextStep}
           prevStep={prevStep}
@@ -135,14 +142,22 @@ const CreateJobStepForm = () => {
           formData={formData}
           handleInputChange={handleInputChange}
         />
+          </div> 
+            <div className="w-3/12 bg-white h-100"></div> 
+          </div>
       );
     case 3:
       return (
+        <div className='flex'>
+            <div className="w-9/12 p-6">
         <Preview
           formData={formData}
           prevStep={prevStep}
           handlePublish={handlePublish}
         />
+        </div> 
+            <div className="w-3/12 bg-white h-100"></div> 
+          </div>
       );
     default:
       return <div>Invalid Step</div>;
