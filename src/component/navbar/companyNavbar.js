@@ -5,14 +5,24 @@ import { CgProfile } from "react-icons/cg";
 
 const CompanyNavbar = () => {
   return (
-<nav className="p-4 relative">
-  <div className="container mx-auto flex justify-center items-center">
-    <div className="flex space-x-4 flex-row absolute top-2 right-0 items-center">
+<nav className="">
+  <div className="container mx-auto flex justify-between items-center py-1">
+    
+    <div className="flex items-center">
+      <Link
+        to="/"
+        className="mt-2 mr-4 flex items-center"
+      >
+        <h1 className="text-2xl font-semibold">Dashboard</h1>
+      </Link>
+    </div>
+    
+    <div className="flex items-center space-x-4 mt-1">
       <Link
         to="/dashboard"
         className="text-black px-3 py-2 rounded flex items-center space-x-2 transition duration-200"
       >
-        <CgProfile size={20} /> {/* Increase the size as needed */}
+        <CgProfile size={20} /> {/* Adjust the size as needed */}
         <span>Help & Support</span>
       </Link>
       
@@ -20,17 +30,10 @@ const CompanyNavbar = () => {
         to="/logout"
         className="text-black border-l-2 px-4 py-2 flex items-center transition duration-200"
       >
-        <CgProfile size={24} /> {/* Increase the size as needed */}
+        <CgProfile size={24} /> {/* Adjust the size as needed */}
       </Link>
     </div>
-
-    {/* Right top logo */}
-    <Link
-      to="/"
-      className="absolute top-0 left-0 mt-2 mr-4 flex items-center"
-    >
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
-    </Link>
+    
   </div>
 </nav>
 
