@@ -1,12 +1,23 @@
 import React, { useState } from 'react';
-import { Link, useLocation  } from 'react-router-dom';
+import { Link, useLocation, useNavigate  } from 'react-router-dom';
+import { logout } from '../../../features/authSlice';
+import { useDispatch } from 'react-redux';
 
 const CompanySidebar = () => {
-  const location = useLocation();
 
+  const dispatch = useDispatch(); 
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState(location.pathname);
   const handleSetActive = (path) => {
     setActiveItem(path);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout()); // Dispatch the logout action
+ // Close the dropdown
+    navigate('/');
+
   };
 
   const linkClasses = (path) =>
@@ -62,12 +73,12 @@ const CompanySidebar = () => {
       </li>
    
       <li>
-        <Link to="/sign-out" className={`flex items-center px-4 py-3 hover:bg-customBlue3 rounded ${linkClasses('/sign-out')}`} onClick={()=>handleSetActive('/sign-out')}>
+        <button to="/sign-out" className={`w-full flex items-center px-4 py-3 hover:bg-customBlue3 rounded ${linkClasses('/sign-out')}`} onClick={handleLogout}>
         <svg width="800px" height="800px" viewBox="0 0 15 15" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className='h-4 w-4 mr-3 text-white'>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M1 1L8 1V2L2 2L2 13H8V14H1L1 1ZM10.8536 4.14645L14.1932 7.48614L10.8674 11.0891L10.1326 10.4109L12.358 8L4 8V7L12.2929 7L10.1464 4.85355L10.8536 4.14645Z" />
 </svg>
           Sign Out
-        </Link>
+        </button>
       </li>
       
     </ul>

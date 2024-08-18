@@ -44,7 +44,7 @@ export const logout = createAsyncThunk('auth/logout', async (_, { dispatch }) =>
   // Clear the user's data locally
   localStorage.removeItem('user');
   localStorage.removeItem('token');
-  dispatch(authSlice.actions.logout());  // Dispatch the logout action to clear the Redux state
+  return true; // Dispatch the logout action to clear the Redux state
 });
 
 const authSlice = createSlice({
