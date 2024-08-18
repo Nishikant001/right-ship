@@ -10,14 +10,14 @@ const CompanyLayout = ({ children }) => {
     <div className="flex h-screen bg-gray-100">
       {/* Side Navbar */}
       <nav className="w-64 bg-customBlue text-white fixed top-0 left-0 h-full">
-        <div className="p-4">
-          <div className='flex'>
-        
-        <img src={Logo} alt="Logo" className='text-white' height={38} width={38} />
-        <span className="font-bold text-white ml-2 mt-2">RIGHTSHIP</span>
+
+        <div className='flex px-4 pt-4'>
+          <img src={Logo} alt="Logo" className='text-white' height={38} width={38} />
+          <span className="font-bold text-white ml-2 mt-2">RIGHTSHIP</span>
         </div>
-          
-          <SideNavbar/>
+
+        <div className="p-4">
+          <SideNavbar />
         </div>
       </nav>
 
@@ -30,18 +30,15 @@ const CompanyLayout = ({ children }) => {
 
         {/* Content Area */}
         <main className="mt-14">
-        
-            {children ? children : <Outlet />}
-         
+
+          {children ? children : <Outlet />}
+
         </main>
-        <JobFooter/>
+        <CompanyFooter />
       </div>
-    
+
     </div>
   );
 };
 
 export default CompanyLayout;
-
-
-
