@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from '../navbar/navbar';
 import SideNavbar from '../navbar/sideNavbar/sideNavbar';
 import JobFooter from '../footer/JobFooter'
+import Logo from '../../images/logo.png'
 
 const CompanyLayout = ({ children }) => {
   return (
@@ -10,7 +11,12 @@ const CompanyLayout = ({ children }) => {
       {/* Side Navbar */}
       <nav className="w-64 bg-customBlue text-white fixed top-0 left-0 h-full">
         <div className="p-4">
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
+          <div className='flex'>
+        
+        <img src={Logo} alt="Logo" className='text-white' height={38} width={38} />
+        <span className="font-bold text-white ml-2 mt-2">RIGHTSHIP</span>
+        </div>
+          
           <SideNavbar/>
         </div>
       </nav>
