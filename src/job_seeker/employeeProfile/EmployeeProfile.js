@@ -186,13 +186,19 @@ const EmployeeProfile = () => {
 
   const handleSaveClick = async () => {
     try {
-      setSectionData((prevSectionData) => ({
-        ...prevSectionData,
-        [editSection]: {
-          ...prevSectionData[editSection],
-          ...editValue,
-        },
-      }));
+      if (typeof sectionData[editSection] === 'string') {
+        setSectionData({
+          ...sectionData,
+          [editSection]: editValue,
+        });
+      } else {
+        setSectionData({
+          ...sectionData,
+          [editSection]: {
+            ...editValue,
+          },
+        });
+      }
 
       const payload = {
         employee_id: employeeId,
@@ -230,14 +236,15 @@ const EmployeeProfile = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50 z-0">
-      <aside className="sticky top-0 w-full lg:w-1/3 p-6 bg-white shadow-lg lg:shadow-none">
-        <div className="bg-white p-6 border rounded-lg shadow-sm flex flex-col items-center text-center">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-100">
+      {/* Sidebar for Profile Info and Uploads */}
+      <aside className=" w-full lg:my-8 lg:ms-8 rounded-xl lg:w-1/3 p-8 bg-white shadow-lg flex flex-col space-y-8">
+        <div className="bg-white p-8 border rounded-xl shadow-md flex flex-col items-center text-center">
           <div className="relative">
             <img
               src={profileImage}
               alt="Profile"
-              className="w-28 h-28 rounded-full border-4 border-gray-200 object-cover shadow-md"
+              className="w-32 h-32 rounded-full border-4 border-gray-200 object-cover shadow-md"
             />
             <div
               className="absolute bottom-0 right-0 w-10 h-10 bg-customBlue rounded-full flex items-center justify-center cursor-pointer shadow"
@@ -253,20 +260,21 @@ const EmployeeProfile = () => {
               onChange={(e) => handleFileChange(e, 'profile')}
             />
           </div>
-          <h2 className="mt-4 text-2xl font-bold text-gray-700">{profileData.name}</h2>
-          <p className="text-gray-500 text-sm">{profileData.rank}</p>
-          <button className="mt-3 px-6 py-2 bg-customBlue text-white rounded-full shadow-md">
+          <h2 className="mt-4 text-2xl font-semibold text-black">{profileData.name}</h2>
+          <p className="text-gray-400 text-sm">{profileData.rank}</p>
+          <button className="mt-3 px-6 py-2 bg-customBlue text-white rounded-full shadow-md hover:bg-customBlue-dark">
             {profileData.position}
           </button>
         </div>
 
-        <div className="mt-6 bg-white p-6 border rounded-lg shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-600 mb-4">Upload Resume</h3>
+        <div className="bg-white p-8 border rounded-xl shadow-md">
+          <h3 className="text-lg font-semibold text-black mb-4">Upload Resume</h3>
+          <label htmlFor="resumeUpload" className="cursor-pointer text-gray-600 mb-2 hover:text-gray-900">
+            <FaRegEdit className="text-2xl" />
+          </label>
           <div className="flex items-center">
             {file && (
-              <div className="flex items-center mr-4">
-                <span className="text-gray-700">{file.name}</span>
-              </div>
+              <span className="text-gray-600">{file.name}</span>
             )}
             <input
               type="file"
@@ -275,46 +283,44 @@ const EmployeeProfile = () => {
               accept=".pdf, .doc, .docx"
               onChange={(e) => handleFileChange(e, 'resume')}
             />
-            <label htmlFor="resumeUpload" className="cursor-pointer text-gray-600 hover:text-gray-900">
-              <FaRegEdit className="text-2xl" />
-            </label>
           </div>
         </div>
 
-        <div className="mt-6 bg-gray-100 p-6 border rounded-lg shadow-sm flex items-center justify-center text-gray-500">
+        <div className="bg-gray-100 p-8 border rounded-xl shadow-md flex items-center justify-center text-gray-500">
           <span>Advertisement</span>
         </div>
       </aside>
 
-      <div className="w-full lg:w-2/3 p-6 space-y-6 overflow-y-auto">
+      {/* Main Content for Profile Details */}
+      <div className="w-full lg:w-2/3 p-8 space-y-8 overflow-y-auto bg-gray-100">
         {Object.entries({
           lastVesselType: 'Last Vessel Type',
           applyvessel: 'Vessel Applied For', 
           appliedRank: 'Applied Rank', 
           dateOfAvailability: 'Date of Availability',
         }).map(([key, title]) => (
-          <div key={key} className="bg-white p-6 border rounded-lg shadow-sm relative">
-            <h3 className="text-lg font-semibold text-gray-700 flex justify-between">
+          <div key={key} className="bg-white p-8 border rounded-xl shadow-md relative">
+            <h3 className="text-lg font-semibold text-black flex justify-between">
               {title}
               <FaEdit className="cursor-pointer text-gray-600 hover:text-gray-900" onClick={() => handleEditClick(key, sectionData[key])} />
             </h3>
             <div className="mt-2 text-gray-600">
-              <b>{sectionData[key]}</b>
+              <p>{sectionData[key]}</p>
             </div>
           </div>
         ))}
 
         {['contactDetail', 'experience', 'licenseHolding', 'address', 'others'].map((section) => (
-          <div key={section} className="bg-white p-6 border rounded-lg shadow-sm relative">
-            <h3 className="text-lg font-semibold text-gray-700 flex justify-between">
+          <div key={section} className="bg-white p-8 border rounded-xl shadow-md relative">
+            <h3 className="text-lg font-semibold text-black flex justify-between">
               {section.charAt(0).toUpperCase() + section.slice(1).replace(/([A-Z])/g, ' $1')}
               <FaEdit className="cursor-pointer text-gray-600 hover:text-gray-900" onClick={() => handleEditClick(section, sectionData[section])} />
             </h3>
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-600">
               {Object.keys(sectionData[section]).map((key) => (
                 <div key={key}>
-                  <p className="text-sm font-semibold">{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}:</p>
-                  <p className="mt-1">{sectionData[section][key]}</p>
+                  <p className="text-sm font-semibold text-black">{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}:</p>
+                  <p className="mt-1 text-gray-600">{sectionData[section][key]}</p>
                 </div>
               ))}
             </div>
@@ -328,19 +334,28 @@ const EmployeeProfile = () => {
           onSave={handleSaveClick}
           onClose={() => setModalOpen(false)}
         >
-          {Object.keys(sectionData[editSection] || {}).map((field) => (
-            <div key={field} className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
-              </label>
-              <input
-                type="text"
-                className="w-full border p-2 rounded"
-                value={editValue[field] || sectionData[editSection][field]}
-                onChange={(e) => handleChange(e, field)}
-              />
-            </div>
-          ))}
+          {typeof sectionData[editSection] === 'string' ? (
+            <input
+              type="text"
+              className="w-full border p-2 rounded"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+            />
+          ) : (
+            Object.keys(sectionData[editSection] || {}).map((field) => (
+              <div key={field} className="mb-4">
+                <label className="block text-sm font-medium text-black mb-1">
+                  {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
+                </label>
+                <input
+                  type="text"
+                  className="w-full border p-2 rounded"
+                  value={editValue[field] || sectionData[editSection][field]}
+                  onChange={(e) => handleChange(e, field)}
+                />
+              </div>
+            ))
+          )}
         </EditModal>
       </div>
     </div>
