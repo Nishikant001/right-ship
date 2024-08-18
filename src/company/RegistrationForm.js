@@ -132,7 +132,7 @@ const RegistrationForm = () => {
       <ToastContainer />
       {loading && <Loader />}
       {showPopup && <MailSendPopup/>}
-      {/* <nav className="w-full bg-white border-b border-gray-300">
+      <nav className="w-full bg-white border-b border-gray-300">
         <div className="max-w-6xl mx-auto flex justify-between items-center h-12">
           <div className="flex items-center h-full">
             <Link className="flex"><img src={Logo} alt="Logo" height={40} width={40} /> <p className="font-bold text-gray-800 mt-2 px-4">RIGHTSHIP</p></Link>
@@ -140,7 +140,7 @@ const RegistrationForm = () => {
             <Link><p className="text-black font-bold hover:text-customBlue hover:font-bold mx-4">Companies</p></Link>
           </div>
           <div className="flex space-x-2">
-            <button className="px-3 py-1 text-customBlue border border-blue-600 rounded hover:bg-blue-50">Login</button>
+           <Link to='/company/login'> <button className="px-3 py-1 text-customBlue border border-blue-600 rounded hover:bg-blue-50">Login</button></Link>
             <button className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700">Register</button>
             <div className="relative" ref={dropdownRef}>
               <button onClick={handleDropdownClick} className="px-3 py-1 text-black-600  rounded hover:bg-blue-50">
@@ -156,7 +156,7 @@ const RegistrationForm = () => {
             </div>
           </div>
         </div>
-      </nav> */}
+      </nav>
 
       {/* Form Container */}
       <div className="w-full max-w-4xl mt-6 bg-white border border-gray-400 rounded-lg shadow-md">

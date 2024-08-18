@@ -81,7 +81,7 @@ const OtpVerify = () => {
                     localStorage.setItem('user_id',result.data._id)
                     toast.success("OTP verify success");
                     setTimeout(() => {
-                      navigate('/employeer-dashboard');
+                      navigate('/manage/company/team');
                     }, 1000);
                 }else{
                   toast.error("Some internal problem");

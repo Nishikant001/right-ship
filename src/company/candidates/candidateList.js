@@ -10,7 +10,7 @@ const dummyCandidates = [
 ];
 
 const CandidatesTable = ({ jobId }) => {
-  const [candidates, setCandidates] = useState();
+  const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rankFilter, setRankFilter] = useState('');
@@ -209,8 +209,8 @@ const CandidatesTable = ({ jobId }) => {
                   <td className="py-4 px-6 text-gray-700">{candidate.presentRank}</td>
                   <td className="py-4 px-6 text-gray-700">{candidate.applyvessel}</td>
                   <td className="py-4 px-6 text-gray-700"> <ListView data={candidate.pastvesselExp} /></td>
-                  <td className="py-4 px-6 text-gray-700">{candidate.availability.split('T')[0]}</td>
-                  {/* <td className="py-4 px-6 text-gray-700">{candidate.appliedDate}</td> */}
+                  <td className="py-4 px-6 text-gray-700">{candidate.availability?.split('T')[0]}</td>
+                  
                 </tr>
               ))
             ) : (
