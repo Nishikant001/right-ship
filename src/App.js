@@ -27,6 +27,7 @@ import CandidatesTable from './company/candidates/candidateList';
 import CandidateDetail from './company/candidates/candidateDetail';
 import JobDetail from './company/job/jobdetail';
 import CompanyManageUsers from './company/ManageUsers';
+import CompanyProfile from './company/setting';
 
 const App = () => {
   const user = useSelector((state) => state.auth.user);
@@ -63,6 +64,8 @@ const App = () => {
             <Route path="/job/candidates" element={<CandidatesTable/>} />
             <Route path="/job/candidates/detail/:candidateId" element={<CandidateDetail/>} />
             <Route path="/manage/company/team" element={<CompanyManageUsers/>} />
+            <Route path="/setting" element={<CompanyProfile/>} />
+
           </Route>
         )}
       </Routes>
@@ -71,3 +74,4 @@ const App = () => {
 };
 
 export default App;
+

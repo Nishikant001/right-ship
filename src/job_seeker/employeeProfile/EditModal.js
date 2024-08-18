@@ -6,12 +6,12 @@ const EditModal = ({ isOpen, title, children, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white w-full max-w-lg p-6 rounded-lg shadow-lg overflow-auto max-h-[90vh]">
+      <div className="bg-white w-full max-w-lg p-6 rounded-lg shadow-lg">
         <div className="flex justify-between items-center border-b pb-2">
           <h3 className="text-lg font-semibold">{title}</h3>
           <FaTimes className="cursor-pointer" onClick={onClose} />
         </div>
-        <div className="mt-4 space-y-4">
+        <div className="mt-4">
           {children}
         </div>
         <div className="mt-6 flex justify-end space-x-2">
