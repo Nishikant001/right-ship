@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { FiEdit3, FiCheck, FiX } from 'react-icons/fi';
+import Swal from 'sweetalert2';
 
 const CompanyProfile = () => {
   const [company, setCompany] = useState(null);
@@ -44,19 +45,24 @@ const CompanyProfile = () => {
   };
 
   const handleSave = async () => {
+    delete editedCompany._id;
+    editedCompany.company_id = user.company_id;
+
     try {
       const response = await axios.post(
         'https://api.rightships.com/company/update',
-        editedCompany,
-        {
-          headers: {
-            Accept: '*/*',
-            'Content-Type': 'application/json',
-          },
-        }
+        editedCompany
       );
-      setCompany(response.data.data);
+      setCompany(editedCompany);
       setIsEditing(false);
+
+      // Show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Company updated successfully!',
+        showConfirmButton: false,
+        timer: 1500 // Disappears after 1.5 seconds
+      });
     } catch (error) {
       console.error('Error updating company data:', error);
     }
@@ -99,8 +105,8 @@ const CompanyProfile = () => {
   return (
     <div className="container mx-auto p-4 md:p-6 lg:p-8">
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 flex justify-between items-center">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Company Profile</h1>
+        <div className="bg-blue-600  p-6 flex justify-between items-center">
+          <h3 className="text-base sm:text-3xl font-bold text-white">Company Profile</h3>
           {!isEditing && (
             <button
               onClick={handleEdit}
@@ -149,13 +155,13 @@ const CompanyProfile = () => {
                 onClick={handleCancel}
                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none transition duration-300"
               >
-                <FiX size={20} /> Cancel
+                
               </button>
               <button
                 onClick={handleSave}
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none transition duration-300"
               >
-                <FiCheck size={20} /> Save
+                 Save
               </button>
             </div>
           )}
