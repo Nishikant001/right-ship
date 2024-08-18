@@ -16,6 +16,7 @@ import RegistrationForm from './company/registrationForm';
 import EmployeeOtpAuth from './job_seeker/login/login';
 import EmployeeSignup from './job_seeker/signup/Signup';
 import VerifySignupOtp from './job_seeker/signup/VerifyWithPhone'
+import EmployeeRegistration from './job_seeker/Registration/EmployeeRegistration';
 
 
 import JobDashboard from './job_seeker/jobs/JobDashboard';
@@ -46,7 +47,8 @@ const App = () => {
           <Route path="/company/register" element={<RegistrationForm />} />
           <Route path="/login" element={<EmployeeOtpAuth />} />
           <Route path="/register" element={<EmployeeSignup />} />
-          
+          <Route path="/verify-signup-otp" element={<VerifySignupOtp />} />
+          <Route path="/employee-registration" element={<EmployeeRegistration />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
 

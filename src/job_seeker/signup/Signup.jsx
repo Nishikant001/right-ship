@@ -6,7 +6,6 @@ import logo from "../../images/logo.png";
 import { ToastContainer, toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 
-
 const EmployeeSignup = () => {
   const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -14,19 +13,31 @@ const EmployeeSignup = () => {
   const otpStatus = useSelector((state) => state.otp.status);
   const otpError = useSelector((state) => state.otp.error);
 
+  // Validate the phone number format
+  const validatePhoneNumber = (number) => {
+    const phoneRegex = /^[0-9]{10}$/; // Assuming 10-digit phone numbers
+    return phoneRegex.test(number);
+  };
+
   const handleSendOtp = () => {
     if (!phoneNumber.trim()) {
       toast.error("Phone number field cannot be empty!");
-      return;
-    }
+      return;
+    }
+
+    if (!validatePhoneNumber(phoneNumber)) {
+      toast.error("Please enter a valid phone number!");
+      return;
+    }
+
     dispatch(sendOtp(phoneNumber));
     dispatch(setContactInfo(phoneNumber));
-    navigate('/verify-phone');
+    navigate('/verify-signup-otp'); // Navigate to the OTP verification page
   };
 
   return (
     <section className="flex flex-col items-center py-20 h-screen bg-gray-100">
-      <ToastContainer/>
+      <ToastContainer />
       <div className="mb-4">
         <img src={logo} alt="Logo" className="h-24 w-20" />
       </div>
