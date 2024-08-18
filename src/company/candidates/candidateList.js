@@ -3,12 +3,6 @@ import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-const dummyCandidates = [
-  { id: 1, name: 'John Doe', email: 'johndoe@example.com', rank: 'Captain', shipType: 'Cargo', appliedDate: '2022-01-01' },
-  { id: 2, name: 'Jane Smith', email: 'janesmith@example.com', rank: 'First Mate', shipType: 'Cargo', appliedDate: '2022-02-01' },
-  { id: 3, name: 'Alice Johnson', email: 'alicejohnson@example.com', rank: 'Engineer', shipType: 'Tanker', appliedDate: '2022-03-01' },
-];
-
 const CandidatesTable = ({ jobId }) => {
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,27 +10,39 @@ const CandidatesTable = ({ jobId }) => {
   const [rankFilter, setRankFilter] = useState('');
   const [shipTypeFilter, setShipTypeFilter] = useState('');
   const [sortByDate, setSortByDate] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [shipOptions, setShipOptions] = useState([]);
+  const [rankOptions, setRankOptions] = useState([]);
 
   const user = useSelector((state) => state.auth.user);
 
-  const fetchEmployeeDetails = useCallback(async (employeeIds) => {
+  const fetchEmployeeDetails = useCallback(async (employeeIds, page = 1, limit = 10) => {
     try {
       const requestData = {
         employee_id: { '$in': employeeIds },
-        page: 1,
-        limit: 10,
+        page,
+        limit,
       };
 
-      const response = await axios.post('https://api.rightships.com/employee/get', requestData, {
-        headers: {
-          'Accept': '*/*',
-          'Content-Type': 'application/json',
-          'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
-        },
-      });
+      if (rankFilter) {
+        requestData.appliedRank = rankFilter;
+      }
+
+      if (shipTypeFilter) {
+        requestData.applyvessel = shipTypeFilter;
+      }
+
+      const response = await axios.post('https://api.rightships.com/employee/get', requestData);
 
       if (response.data.code === 200) {
         setCandidates(response.data.data);
+
+        // Ensure totalPages is calculated only when response.data.total is available
+        const totalRecords = response.data.total || 0; // Fallback to 0 if undefined
+        const calculatedTotalPages = Math.ceil(totalRecords / limit);
+        setTotalPages(calculatedTotalPages > 0 ? calculatedTotalPages : 1); // Ensure totalPages is at least 1
+
         return response.data.data;
       } else {
         throw new Error('Failed to fetch employee details');
@@ -45,7 +51,7 @@ const CandidatesTable = ({ jobId }) => {
       console.error("Error fetching employee details:", error.message);
       throw error;
     }
-  }, []);
+  }, [rankFilter, shipTypeFilter]);
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -76,57 +82,40 @@ const CandidatesTable = ({ jobId }) => {
       setLoading(true);
       try {
         const employeeIds = await fetchPosts();
-        const employees = await fetchEmployeeDetails(employeeIds);
+        const employees = await fetchEmployeeDetails(employeeIds, currentPage);
         setCandidates(employees);
       } catch (err) {
         setError(err.message);
-        setCandidates(dummyCandidates);
+        setCandidates([]); // Set to empty array if there's an error
       } finally {
         setLoading(false);
       }
     };
 
     fetchInitialData();
-  }, [fetchPosts, fetchEmployeeDetails]);
+  }, [fetchPosts, fetchEmployeeDetails, currentPage]);
 
   const handleSortChange = () => {
     setSortByDate(!sortByDate);
   };
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
-
-  const [shipOptions, setShipOptions] = useState([]);
-
-  const [rankOptions, setRankOptions] = useState([]);
-
-
+  // Fetching attributes for ship types and ranks
   useEffect(() => {
     const fetchAttributes = async () => {
       try {
-        const response = await axios.post('https://api.rightships.com/attributes/get', {}, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': '*/*',
-            'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
-          }
-        });
-
+        const response = await axios.post('https://api.rightships.com/attributes/get', {});
         if (response.data && response.data.code === 200) {
           const attributes = response.data.data;
-
-
           const shipAttribute = attributes.find(attr => attr.name.toLowerCase() === 'ships');
-
           const rankAttribute = attributes.find(attr => attr.name.toLowerCase() === 'rank');
-
-
-          const shipData = shipAttribute ? shipAttribute.values.sort((a, b) => a.localeCompare(b)) : []; // Sorting ship data
-
+          const shipData = shipAttribute ? shipAttribute.values.sort((a, b) => a.localeCompare(b)) : [];
           const rankData = rankAttribute ? rankAttribute.values.sort((a, b) => a.localeCompare(b)) : [];
 
-
-          setShipOptions(shipData); // Set ship options for Last Vessel Type
-
+          setShipOptions(shipData);
           setRankOptions(rankData);
         } else {
           console.error('Failed to fetch attributes:', response.data.msg);
@@ -192,7 +181,6 @@ const CandidatesTable = ({ jobId }) => {
               <th className="py-3 px-6 bg-blue-600 text-white font-semibold text-sm text-left">Apply Vessel</th>
               <th className="py-3 px-6 bg-blue-600 text-white font-semibold text-sm text-left">Exp. Past Vessel</th>
               <th className="py-3 px-6 bg-blue-600 text-white font-semibold text-sm text-left">Date of Availability</th>
-              {/* <th className="py-3 px-6 bg-blue-600 text-white font-semibold text-sm text-left">Full Detail</th> */}
             </tr>
           </thead>
           <tbody>
@@ -201,16 +189,16 @@ const CandidatesTable = ({ jobId }) => {
                 <tr key={candidate.id} className="border-t">
                   <td className="py-4 px-6 text-gray-700">
                     <Link to={`/job/candidates/detail/${candidate._id}`} className="text-blue-600 hover:underline">
-                      <ListView data={[candidate.name, `DOB : ${candidate.dateOfBirth}`, `Gender : ${candidate.gender}`]} />
-
+                      <ListView data={[candidate.name, `DOB: ${candidate.dateOfBirth}`, `Gender: ${candidate.gender}`]} />
                     </Link>
                   </td>
                   <td className="py-4 px-6 text-gray-700">{candidate.appliedRank}</td>
                   <td className="py-4 px-6 text-gray-700">{candidate.presentRank}</td>
                   <td className="py-4 px-6 text-gray-700">{candidate.applyvessel}</td>
-                  <td className="py-4 px-6 text-gray-700"> <ListView data={candidate.pastvesselExp} /></td>
+                  <td className="py-4 px-6 text-gray-700">
+                    <ListView data={candidate.pastvesselExp} />
+                  </td>
                   <td className="py-4 px-6 text-gray-700">{candidate.availability?.split('T')[0]}</td>
-                  
                 </tr>
               ))
             ) : (
@@ -222,20 +210,61 @@ const CandidatesTable = ({ jobId }) => {
         </table>
       </div>
 
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+
       {error && <p className="text-red-500 mt-4">Error: {error}</p>}
     </div>
   );
 };
 
-const ListView = ({ data }) => {
+const ListView = ({ data = [] }) => {
+  if (!Array.isArray(data) || data.length === 0) {
+    return <p>No data available</p>;
+  }
+
   return (
     <div>
-
       <ul>
-        {data.map((vessel, index) => (
-          <li key={index}>{vessel}</li>
+        {data.map((item, index) => (
+          <li key={index}>{item}</li>
         ))}
       </ul>
+    </div>
+  );
+};
+
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      onPageChange(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      onPageChange(currentPage + 1);
+    }
+  };
+
+  return (
+    <div className="flex justify-center mt-4">
+      <button
+        onClick={handlePrevPage}
+        className="p-2 bg-gray-300 rounded-md mr-2"
+        disabled={currentPage === 1}
+      >
+        Previous
+      </button>
+      <span className="p-2 text-gray-700">
+        Page {currentPage} of {totalPages || 1} {/* Fallback to 1 if totalPages is NaN */}
+      </span>
+      <button
+        onClick={handleNextPage}
+        className="p-2 bg-gray-300 rounded-md ml-2"
+        disabled={currentPage === totalPages}
+      >
+        Next
+      </button>
     </div>
   );
 };
