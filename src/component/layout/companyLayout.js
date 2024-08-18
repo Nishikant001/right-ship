@@ -34,7 +34,7 @@ const CompanyLayout = ({ children }) => {
           {children ? children : <Outlet />}
 
         </main>
-        <CompanyFooter />
+        <JobFooter />
       </div>
 
     </div>
