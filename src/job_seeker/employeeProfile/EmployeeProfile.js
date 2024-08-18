@@ -59,58 +59,58 @@ const EmployeeProfile = () => {
     const fetchProfileData = async () => {
       try {
         const response = await axios.post('https://api.rightships.com/employee/get', {
-          employee_id: { $in: [employeeId] },
+          employee_id: employeeId,
           page: 1,
           limit: 10
         });
 
         const result = response.data.data[0];
-
+        console.log(response)
         setProfileImage(result?.profile_photo || profileImage);
         setProfileData({
           name: result?.name || '',
-          rank: result?.rank || '',
-          position: result?.position || ''
+          rank: result?.presentRank || '',
+          position: result?.appliedRank || ''
         });
 
         setSectionData({
           lastVesselType: result?.lastVesselType || '',
           applyvessel: result?.applyvessel || '', 
           appliedRank: result?.appliedRank || '', 
-          dateOfAvailability: result?.dateOfAvailability || '',
+          dateOfAvailability: result?.availability || '',
           contactDetail: {
-            email: result?.contactDetail?.email || '',
-            whatsappNumber: result?.contactDetail?.whatsappNumber || '',
-            dob: result?.contactDetail?.dob || '',
-            age: result?.contactDetail?.age || '',
-            gender: result?.contactDetail?.gender || '',
+            email: result?.email || '',
+            whatsappNumber: result?.whatsappNumber || '',
+            dob: result?.dob || '',
+            age: '', // Age can be calculated if needed
+            gender: result?.gender || '',
           },
           experience: {
-            seaExperience: result?.experience?.seaExperience || '',
-            lastRankExperience: result?.experience?.lastRankExperience || '',
-            presentRank: result?.experience?.presentRank || '',
-            lastRank: result?.experience?.lastRank || '',
+            seaExperience: `${result?.totalSeaExperienceYears || ''} years ${result?.totalSeaExperienceMonths || ''} months`,
+            lastRankExperience: `${result?.totalRankExperienceYears || ''} years ${result?.totalRankExperienceMonths || ''} months`,
+            presentRank: result?.presentRank || '',
+            lastRank: result?.lastRank || '',
           },
           licenseHolding: {
-            coc: result?.licenseHolding?.coc || '',
-            cop: result?.licenseHolding?.cop || '',
-            watchKeeping: result?.licenseHolding?.watchKeeping || '',
+            coc: result?.coc || '',
+            cop: result?.cop || '',
+            watchKeeping: result?.watchKeeping || '',
           },
           address: {
-            address1: result?.address?.address1 || '',
-            address2: result?.address?.address2 || '',
-            state: result?.address?.state || '',
-            pincode: result?.address?.pincode || '',
-            nationality: result?.address?.nationality || '',
-            city: result?.address?.city || '',
-            country: result?.address?.country || '',
+            address1: result?.address1 || '',
+            address2: result?.address2 || '',
+            state: result?.state || '',
+            pincode: result?.pincode || '',
+            nationality: result?.nationality || '',
+            city: result?.city || '',
+            country: result?.country || '',
           },
           others: {
-            height: result?.others?.height || '',
-            bmi: result?.others?.bmi || '',
-            weight: result?.others?.weight || '',
-            sidCard: result?.others?.sidCard || '',
-            willingToAcceptLowerRank: result?.others?.willingToAcceptLowerRank || '',
+            height: result?.height || '',
+            bmi: result?.bmi || '',
+            weight: result?.weight || '',
+            sidCard: result?.sidCard || '',
+            willingToAcceptLowerRank: result?.willingToAcceptLowerRank || '',
           }
         });
 
@@ -202,15 +202,7 @@ const EmployeeProfile = () => {
 
       const payload = {
         employee_id: employeeId,
-        lastVesselType: sectionData.lastVesselType,
-        applyvessel: sectionData.applyvessel, 
-        appliedRank: sectionData.appliedRank, 
-        availability: sectionData.dateOfAvailability,
-        contactDetail: sectionData.contactDetail,
-        experience: sectionData.experience,
-        licenseHolding: sectionData.licenseHolding,
-        address: sectionData.address,
-        others: sectionData.others,
+        ...sectionData,
       };
 
       await axios.post('https://api.rightships.com/employee/update', payload, {
