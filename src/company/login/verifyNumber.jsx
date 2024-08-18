@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import logo from '../../images/logo.png';
 import { loginCompany } from '../../features/authSlice';
@@ -15,7 +15,8 @@ const OtpVerificationForm = ({ mobileNumber }) => {
 
     const dispatch = useDispatch();
     const authState = useSelector(state => state.auth);
-    
+    const navigate = useNavigate();
+
     const handleVerifyOtp = async () => {
         setOtpStatus('loading');
         
@@ -26,6 +27,7 @@ const OtpVerificationForm = ({ mobileNumber }) => {
                 setOtpStatus('success');
                 // Call the login thunk after OTP verification
                 dispatch(loginCompany({ mobile_no: mobileNumber }));
+                navigate('/post/job');
             } else {
                 setOtpStatus('failed');
                 setOtpError('Invalid OTP. Please try again.');
