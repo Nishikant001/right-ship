@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { CgProfile } from "react-icons/cg";
-import Logo from '../../images/logo.png'
+
 
 const CompanyNavbar = () => {
   return (
@@ -29,8 +29,7 @@ const CompanyNavbar = () => {
       to="/"
       className="absolute top-0 left-0 mt-2 mr-4 flex items-center"
     >
-      <img src={Logo} alt="Logo" height={40} width={40} />
-      <span className="font-bold text-gray-800 ml-2">RIGHTSHIP</span>
+      <h1 className="text-2xl font-semibold">Dashboard</h1>
     </Link>
   </div>
 </nav>
