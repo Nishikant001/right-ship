@@ -93,11 +93,56 @@ const CandidatesTable = ({ jobId }) => {
     setSortByDate(!sortByDate);
   };
 
+
+
+  const [shipOptions, setShipOptions] = useState([]);
+
+  const [rankOptions, setRankOptions] = useState([]);
+
+
+  useEffect(() => {
+    const fetchAttributes = async () => {
+      try {
+        const response = await axios.post('https://api.rightships.com/attributes/get', {}, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': '*/*',
+            'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
+          }
+        });
+
+        if (response.data && response.data.code === 200) {
+          const attributes = response.data.data;
+
+
+          const shipAttribute = attributes.find(attr => attr.name.toLowerCase() === 'ships');
+
+          const rankAttribute = attributes.find(attr => attr.name.toLowerCase() === 'rank');
+
+
+          const shipData = shipAttribute ? shipAttribute.values.sort((a, b) => a.localeCompare(b)) : []; // Sorting ship data
+
+          const rankData = rankAttribute ? rankAttribute.values.sort((a, b) => a.localeCompare(b)) : [];
+
+
+          setShipOptions(shipData); // Set ship options for Last Vessel Type
+
+          setRankOptions(rankData);
+        } else {
+          console.error('Failed to fetch attributes:', response.data.msg);
+        }
+      } catch (error) {
+        console.error('Failed to fetch attributes:', error);
+      }
+    };
+
+    fetchAttributes();
+  }, []);
+
   if (loading) {
     return <p className="text-center text-gray-600">Loading candidates...</p>;
   }
 
-  
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Candidates</h2>
@@ -109,9 +154,11 @@ const CandidatesTable = ({ jobId }) => {
           className="p-2 border rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
         >
           <option value="">Filter by Rank</option>
-          <option value="Captain">Captain</option>
-          <option value="First Mate">First Mate</option>
-          <option value="Engineer">Engineer</option>
+          {rankOptions.map((option, index) => (
+            <option key={index} value={option}>
+              {option}
+            </option>
+          ))}
         </select>
 
         <select
@@ -120,8 +167,11 @@ const CandidatesTable = ({ jobId }) => {
           className="p-2 border rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
         >
           <option value="">Filter by Ship Type</option>
-          <option value="Cargo">Cargo</option>
-          <option value="Tanker">Tanker</option>
+          {shipOptions.map((option, index) => (
+            <option key={index} value={option}>
+              {option}
+            </option>
+          ))}
         </select>
 
         <button
@@ -151,8 +201,8 @@ const CandidatesTable = ({ jobId }) => {
                 <tr key={candidate.id} className="border-t">
                   <td className="py-4 px-6 text-gray-700">
                     <Link to={`/job/candidates/detail/${candidate._id}`} className="text-blue-600 hover:underline">
-                    <ListView data={[candidate.name, `DOB : ${candidate.dateOfBirth}`, `Gender : ${candidate.gender}`]} />
-                     
+                      <ListView data={[candidate.name, `DOB : ${candidate.dateOfBirth}`, `Gender : ${candidate.gender}`]} />
+
                     </Link>
                   </td>
                   <td className="py-4 px-6 text-gray-700">{candidate.appliedRank}</td>
@@ -180,7 +230,7 @@ const CandidatesTable = ({ jobId }) => {
 const ListView = ({ data }) => {
   return (
     <div>
-     
+
       <ul>
         {data.map((vessel, index) => (
           <li key={index}>{vessel}</li>
