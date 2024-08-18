@@ -12,7 +12,7 @@ import CompanyLayout from '../src/component/layout/companyLayout';
 import HomePage from './job_seeker/landingpage/Home';
 import NotFoundPage from './pageNotFound';
 import CompanyOtpAuth from './company/login/login';
-import RegistrationForm from './company/RegistrationForm';
+import RegistrationForm from './company/registrationForm';
 import EmployeeOtpAuth from './job_seeker/login/login';
 import EmployeeSignup from './job_seeker/signup/Signup';
 
@@ -26,7 +26,7 @@ import JobPostList from './company/job/jobPostList';
 import CandidatesTable from './company/candidates/candidateList';
 import CandidateDetail from './company/candidates/candidateDetail';
 import JobDetail from './company/job/jobdetail';
-import CompanyManageUsers from './company/ManageUsers';
+import CompanyManageUsers from './company/manageUsers';
 import CompanyProfile from './company/setting';
 
 const App = () => {
