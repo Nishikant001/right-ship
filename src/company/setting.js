@@ -92,6 +92,10 @@ const CompanyProfile = () => {
     </div>
   );
 
+  const formatDate = (dateObj) => {
+    return dateObj && dateObj.$date ? new Date(dateObj.$date).toLocaleString() : 'N/A';
+  };
+
   return (
     <div className="container mx-auto p-4 md:p-6 lg:p-8">
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
@@ -134,8 +138,8 @@ const CompanyProfile = () => {
 
             <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Timestamps</h2>
-              <p className="text-gray-700"><strong>Created Date:</strong> {new Date(company.created_date.$date).toLocaleString()}</p>
-              <p className="text-gray-700"><strong>Last Updated:</strong> {new Date(company.updated_date.$date).toLocaleString()}</p>
+              <p className="text-gray-700"><strong>Created Date:</strong> {formatDate(company.created_date)}</p>
+              <p className="text-gray-700"><strong>Last Updated:</strong> {formatDate(company.updated_date)}</p>
             </div>
           </div>
 
