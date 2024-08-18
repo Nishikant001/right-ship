@@ -163,11 +163,9 @@ const CompanyManageUsers = () => {
         <div className="border border-gray-300 p-4">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center">
-              <button className="px-4 py-2 bg-customBlue text-white rounded hover:bg-blue-600">
-                Show All
-              </button>
+              
               <input
-                className="border border-gray-300 ml-4 px-4 py-2 w-full sm:w-auto rounded"
+                className="border border-gray-300 px-4 py-2 w-full sm:w-auto rounded"
                 type="text"
                 placeholder="Search by name & email"
                 value={searchQuery}
