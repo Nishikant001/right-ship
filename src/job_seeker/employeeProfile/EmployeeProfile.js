@@ -2,16 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { FaRegEdit, FaEdit } from "react-icons/fa";
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import EditModal from './EditModal';
 
 const EmployeeProfile = () => {
   const [profileImage, setProfileImage] = useState("https://i2.pickpik.com/photos/711/14/431/smile-profile-face-male-preview.jpg");
   const [profileData, setProfileData] = useState({ name: '', rank: '', position: '' });
   const [file, setFile] = useState(null);
   const [editSection, setEditSection] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false); 
+  const [editValue, setEditValue] = useState({});
   const [sectionData, setSectionData] = useState({
     lastVesselType: '',
-    applyvessel: '', // Updated for vessel applied field
-    appliedRank: '', // Added applied rank
+    applyvessel: '', 
+    appliedRank: '', 
     dateOfAvailability: '',
     contactDetail: {
       email: '',
@@ -72,8 +75,8 @@ const EmployeeProfile = () => {
 
         setSectionData({
           lastVesselType: result?.lastVesselType || '',
-          applyvessel: result?.applyvessel || '', // Updated for vessel applied field
-          appliedRank: result?.appliedRank || '', // Updated for applied rank field
+          applyvessel: result?.applyvessel || '', 
+          appliedRank: result?.appliedRank || '', 
           dateOfAvailability: result?.dateOfAvailability || '',
           contactDetail: {
             email: result?.contactDetail?.email || '',
@@ -175,17 +178,27 @@ const EmployeeProfile = () => {
     }
   };
 
-  const handleEditClick = (section) => {
+  const handleEditClick = (section, value) => {
     setEditSection(section);
+    setEditValue(value);
+    setModalOpen(true); 
   };
 
   const handleSaveClick = async () => {
     try {
+      setSectionData((prevSectionData) => ({
+        ...prevSectionData,
+        [editSection]: {
+          ...prevSectionData[editSection],
+          ...editValue,
+        },
+      }));
+
       const payload = {
         employee_id: employeeId,
         lastVesselType: sectionData.lastVesselType,
-        applyvessel: sectionData.applyvessel, // Updated for vessel applied field
-        appliedRank: sectionData.appliedRank, // Updated for applied rank field
+        applyvessel: sectionData.applyvessel, 
+        appliedRank: sectionData.appliedRank, 
         availability: sectionData.dateOfAvailability,
         contactDetail: sectionData.contactDetail,
         experience: sectionData.experience,
@@ -202,55 +215,32 @@ const EmployeeProfile = () => {
       });
 
       console.log('Data updated successfully');
+      setModalOpen(false); 
       setEditSection(null);
     } catch (error) {
       console.error('Error updating data:', error);
     }
   };
 
-  const handleChange = (section, key, value) => {
-    if (typeof sectionData[section] === 'string') {
-      setSectionData({
-        ...sectionData,
-        [section]: value,
-      });
-    } else {
-      setSectionData({
-        ...sectionData,
-        [section]: {
-          ...sectionData[section],
-          [key]: value,
-        },
-      });
-    }
-  };
-
-  const renderEditableField = (section, key, value) => {
-    const displayValue = typeof value === 'string' ? value : JSON.stringify(value);
-    return editSection === section ? (
-      <input
-        type="text"
-        className="border p-1 rounded"
-        value={displayValue}
-        onChange={(e) => handleChange(section, key, e.target.value)}
-      />
-    ) : (
-      <b>{displayValue}</b>
-    );
+  const handleChange = (e, field) => {
+    setEditValue({
+      ...editValue,
+      [field]: e.target.value,
+    });
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-100 z-0">
-      <aside className="sticky top-2 right-0 w-full lg:w-1/3 p-4 bg-white shadow-md overflow-y-auto">
-        <div className="bg-white p-4 border-b-2 shadow-lg flex flex-col items-center text-center">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50 z-0">
+      <aside className="sticky top-0 w-full lg:w-1/3 p-6 bg-white shadow-lg lg:shadow-none">
+        <div className="bg-white p-6 border rounded-lg shadow-sm flex flex-col items-center text-center">
           <div className="relative">
             <img
               src={profileImage}
               alt="Profile"
-              className="w-24 h-24 md:w-28 md:h-28 rounded-full border-2 border-gray-300 object-cover"
+              className="w-28 h-28 rounded-full border-4 border-gray-200 object-cover shadow-md"
             />
             <div
-              className="absolute bottom-0 right-0 w-8 h-8 bg-customBlue rounded-full flex items-center justify-center cursor-pointer"
+              className="absolute bottom-0 right-0 w-10 h-10 bg-customBlue rounded-full flex items-center justify-center cursor-pointer shadow"
               onClick={() => document.getElementById('profileUpload').click()}
             >
               <FaRegEdit className="text-white" />
@@ -263,18 +253,19 @@ const EmployeeProfile = () => {
               onChange={(e) => handleFileChange(e, 'profile')}
             />
           </div>
-          <h2 className="mt-4 text-lg font-semibold">{profileData.name}</h2>
-          <p className="text-gray-600 text-sm">{profileData.rank}</p>
-          <button className="mt-2 px-4 py-2 bg-customBlue text-white rounded">
+          <h2 className="mt-4 text-2xl font-bold text-gray-700">{profileData.name}</h2>
+          <p className="text-gray-500 text-sm">{profileData.rank}</p>
+          <button className="mt-3 px-6 py-2 bg-customBlue text-white rounded-full shadow-md">
             {profileData.position}
           </button>
         </div>
 
-        <div className="h-20 w-full border-b-2 p-4 flex items-center">
-          <div className="ml-auto flex items-center">
+        <div className="mt-6 bg-white p-6 border rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-600 mb-4">Upload Resume</h3>
+          <div className="flex items-center">
             {file && (
-              <div className="flex items-center mr-8 md:mr-32">
-                <span className='ml-3 text-sm md:text-base'>{file.name}</span>
+              <div className="flex items-center mr-4">
+                <span className="text-gray-700">{file.name}</span>
               </div>
             )}
             <input
@@ -284,68 +275,76 @@ const EmployeeProfile = () => {
               accept=".pdf, .doc, .docx"
               onChange={(e) => handleFileChange(e, 'resume')}
             />
-            <label htmlFor="resumeUpload" className="cursor-pointer text-black">
-              <FaRegEdit className='text-xl md:text-2xl' />
+            <label htmlFor="resumeUpload" className="cursor-pointer text-gray-600 hover:text-gray-900">
+              <FaRegEdit className="text-2xl" />
             </label>
           </div>
         </div>
 
-        <div className='h-24 border bg-gray-300 flex items-center justify-center'>
+        <div className="mt-6 bg-gray-100 p-6 border rounded-lg shadow-sm flex items-center justify-center text-gray-500">
           <span>Advertisement</span>
         </div>
       </aside>
 
-      <div className="w-full lg:w-2/3 p-0 h-screen">
-        <div className="flex-1 overflow-scroll p-4 space-y-4">
-          {Object.entries({
-            lastVesselType: 'Last Vessel Type',
-            applyvessel: 'Vessel Applied For',  // Updated for vessel applied field
-            appliedRank: 'Applied Rank',  // Added applied rank field
-            dateOfAvailability: 'Date of Availability',
-          }).map(([key, title]) => (
-            <div key={key} className="p-4 bg-white border-1 border-[#D6D6D6] px-12 py-10 relative">
-              <h3 className="text-lg font-semibold flex justify-between">
-                {title}
-                <FaEdit className="cursor-pointer" onClick={() => handleEditClick(key)} />
-              </h3>
-              <div className="mt-2 text-black">
-                {renderEditableField(key, key, sectionData[key])}
-              </div>
+      <div className="w-full lg:w-2/3 p-6 space-y-6 overflow-y-auto">
+        {Object.entries({
+          lastVesselType: 'Last Vessel Type',
+          applyvessel: 'Vessel Applied For', 
+          appliedRank: 'Applied Rank', 
+          dateOfAvailability: 'Date of Availability',
+        }).map(([key, title]) => (
+          <div key={key} className="bg-white p-6 border rounded-lg shadow-sm relative">
+            <h3 className="text-lg font-semibold text-gray-700 flex justify-between">
+              {title}
+              <FaEdit className="cursor-pointer text-gray-600 hover:text-gray-900" onClick={() => handleEditClick(key, sectionData[key])} />
+            </h3>
+            <div className="mt-2 text-gray-600">
+              <b>{sectionData[key]}</b>
+            </div>
+          </div>
+        ))}
+
+        {['contactDetail', 'experience', 'licenseHolding', 'address', 'others'].map((section) => (
+          <div key={section} className="bg-white p-6 border rounded-lg shadow-sm relative">
+            <h3 className="text-lg font-semibold text-gray-700 flex justify-between">
+              {section.charAt(0).toUpperCase() + section.slice(1).replace(/([A-Z])/g, ' $1')}
+              <FaEdit className="cursor-pointer text-gray-600 hover:text-gray-900" onClick={() => handleEditClick(section, sectionData[section])} />
+            </h3>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-600">
+              {Object.keys(sectionData[section]).map((key) => (
+                <div key={key}>
+                  <p className="text-sm font-semibold">{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}:</p>
+                  <p className="mt-1">{sectionData[section][key]}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {/* Modal for Editing */}
+        <EditModal
+          isOpen={modalOpen}
+          title={`Edit ${editSection}`}
+          onSave={handleSaveClick}
+          onClose={() => setModalOpen(false)}
+        >
+          {Object.keys(sectionData[editSection] || {}).map((field) => (
+            <div key={field} className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
+              </label>
+              <input
+                type="text"
+                className="w-full border p-2 rounded"
+                value={editValue[field] || sectionData[editSection][field]}
+                onChange={(e) => handleChange(e, field)}
+              />
             </div>
           ))}
-
-          {['contactDetail', 'experience', 'licenseHolding', 'address', 'others'].map((section) => (
-            <div key={section} className="p-4 bg-white border-1 border-[#D6D6D6] px-12 py-10 relative">
-              <h3 className="text-lg font-semibold flex justify-between">
-                {section.charAt(0).toUpperCase() + section.slice(1).replace(/([A-Z])/g, ' $1')}
-                <FaEdit className="cursor-pointer" onClick={() => handleEditClick(section)} />
-              </h3>
-              <div className="mt-2 text-black grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Object.keys(sectionData[section]).map((key) => (
-                  <p key={key} className="text-sm">
-                    {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}: <br />
-                    {renderEditableField(section, key, sectionData[section][key])}
-                  </p>
-                ))}
-              </div>
-            </div>
-          ))}
-
-          {editSection && (
-            <div className="text-right">
-              <button
-                onClick={handleSaveClick}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg"
-              >
-                Save
-              </button>
-            </div>
-          )}
-        </div>
+        </EditModal>
       </div>
     </div>
   );
 }
 
 export default EmployeeProfile;
-

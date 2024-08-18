@@ -50,7 +50,7 @@ const EmployeeNavbar = () => {
 
   return (
     <>
-      <header className="bg-white border-b py-4 px-8 border-gray-200 sticky top-0 z-0">
+      <header className="bg-white border-b py-4 px-8 border-gray-200 sticky top-0 z-50">
         <ToastContainer />
         <nav className="flex items-center justify-between">
           <div className="flex items-center">
@@ -67,23 +67,23 @@ const EmployeeNavbar = () => {
             <a href="#help-support" className="text-black flex items-center font-bold">
               <CircleHelp size={20} className="mr-2" /> Help & Support
             </a>
-            <div className="relative" ref={notificationDropdownRef}>
+            <div className="relative z-50" ref={notificationDropdownRef}>
               <button onClick={handleNotificationDropdownClick} className="flex items-center text-black font-bold">
                 <Bell size={20} className="mr-2" /> Notification <ChevronDown className="ml-2" />
               </button>
               {notificationDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50">
                   <Link to="/notifications" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 font-semibold">View All Notifications</Link>
                   <Link to="/settings" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 font-semibold">Notification Settings</Link>
                 </div>
               )}
             </div>
-            <div className="relative" ref={userDropdownRef}>
+            <div className="relative z-50" ref={userDropdownRef}>
               <button onClick={handleUserDropdownClick} className="flex items-center text-black font-bold">
                 <CircleUserRound size={20} className="mr-2" /> User <ChevronDown className="ml-2" />
               </button>
               {userDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50">
                   <Link to="/profile" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
                     <MessageSquare size={20} className="mr-2" /> Profile
                   </Link>
