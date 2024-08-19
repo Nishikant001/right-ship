@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaTimes } from 'react-icons/fa';
 
+
 const EditModal = ({ isOpen, title, children, onSave, onClose }) => {
   if (!isOpen) return null;
 

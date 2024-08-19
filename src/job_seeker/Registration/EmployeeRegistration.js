@@ -23,51 +23,90 @@ const EmployeeRegistration = () => {
 
   const { loading, error } = useSelector((state) => state.employee);
 
+
+   
+ 
   const [formData, setFormData] = useState({
-    name: '',
-    mobile_no: contactInfo || '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    mobile_no: contactInfo || '', // Assuming contactInfo is being passed correctly
     whatsappNumber: '',
     gender: '',
-    country: '',
-    email: '',
+    country: '', // corresponds to country
     dob: '',
-    availability: '',
-    lastVesselType: '',
-    presentRank: '',
+    age: '', // Age field added
+    availability: '', // corresponds to availability
+    appliedVessel: '', // corresponds to lastVesselType
+    presentVessel: '', // corresponds to presentVessel
+    vesselExp: [], // Initialize as empty array
     appliedRank: '',
-    totalSeaExperienceYears: '',
-    totalSeaExperienceMonths: '',
-    totalRankExperienceYears: '',
-    totalRankExperienceMonths: '',
+    presentRank: '',
+    presentRankExperienceInYear: '',
+    presentRankExperienceInMonth: '',
+    totalSeaExperienceYear: '',
+    totalSeaExperienceMonth: '',
     cop: '',
     coc: '',
-    watchKeeping: '',
-    profile_photo: null,
+    watchkeeping: '',
+    profile: null, // corresponds to profile_photo
     resume: null,
+    address: {
+      country: '', // Ensure this field is present and initialized
+      state: '',
+      city: '',
+      addresss: ''
+    },
+    createdDate: '',
+    updatedDate: ''
   });
+  
+  
+
+  
 
   // Define the steps array
   const steps = ['Personal Details', 'Experience', 'Upload Resume & Profile Picture'];
 
   const handleNext = async () => {
     if (currentStep === 1) {
-      const requiredFields = ['mobile_no', 'whatsappNumber', 'gender', 'country', 'email', 'dob', 'availability'];
+      const requiredFields = [
+        'mobile_no', 
+        'whatsappNumber', 
+        'gender', 
+        'country', 
+        'email', 
+        'dob', 
+        'availability'
+      ];
       const missingFields = requiredFields.filter(field => !formData[field]);
-
+  
       if (missingFields.length > 0) {
         toast.error(`Missing required fields: ${missingFields.join(', ')}`);
         return;
       }
     } else if (currentStep === 2) {
-      const requiredFields = ['lastVesselType', 'presentRank', 'appliedRank', 'totalSeaExperienceYears', 'totalSeaExperienceMonths', 'totalRankExperienceYears', 'totalRankExperienceMonths', 'cop', 'coc', 'watchKeeping'];
+      const requiredFields = [
+        'presentVessel', 
+        'appliedVessel', 
+        'presentRank',
+        'appliedRank', 
+        'totalSeaExperienceYear', // Fixed field name
+        'totalSeaExperienceMonth', // Fixed field name
+        'presentRankExperienceInYear', 
+        'presentRankExperienceInMonth', 
+        'cop', 
+        'coc', 
+        'watchkeeping'
+      ];
       const missingFields = requiredFields.filter(field => !formData[field]);
-
+  
       if (missingFields.length > 0) {
         toast.error(`Missing required fields: ${missingFields.join(', ')}`);
         return;
       }
     }
-
+  
     // Update data after each step
     try {
       await axios.post('https://api.rightships.com/employee/update', {
@@ -78,9 +117,9 @@ const EmployeeRegistration = () => {
           'Content-Type': 'application/json',
         },
       });
-
+  
       toast.success('Data updated successfully.');
-
+  
       if (currentStep < 3) {
         setCurrentStep(currentStep + 1);
       } else {
@@ -90,7 +129,7 @@ const EmployeeRegistration = () => {
       toast.error('Failed to update data.');
     }
   };
-
+  
   const handlePrevious = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
@@ -98,58 +137,72 @@ const EmployeeRegistration = () => {
   };
 
   const handleFileChange = async (event, type) => {
+    console.log('File type:', type); // Debugging line
     const selectedFile = event.target.files[0];
-
+  
     if (!selectedFile) {
       toast.error('Please select a file.');
       return;
     }
-
+  
     let validFileTypes = [];
     let apiField = '';
-
-    if (type === 'profile_photo') {
+    let errorMessage = '';
+  
+    if (type === 'profile') {
       validFileTypes = ['image/jpeg', 'image/png'];
-      apiField = 'profile_photo';
+      apiField = 'profile';
+      errorMessage = 'Invalid file type. Please upload a JPEG or PNG file.';
     } else if (type === 'resume') {
-      validFileTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      validFileTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ];
       apiField = 'resume';
+      errorMessage = 'Invalid file type. Please upload a PDF, DOC, or DOCX file.';
     }
-
+  
     if (!validFileTypes.includes(selectedFile.type)) {
-      toast.error(`Invalid file type. Please upload a ${type === 'profile_photo' ? 'JPEG or PNG' : 'PDF, DOC, or DOCX'} file.`);
+      toast.error(errorMessage);
       return;
     }
-
+  
     const formDataFile = new FormData();
     formDataFile.append('file', selectedFile);
-
+  
     try {
+      // Upload file
       const response = await axios.post('https://api.rightships.com/upload', formDataFile, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+  
       const fileUrl = response.data.file_url;
+  
+      // Update state with the file URL
       setFormData({ ...formData, [apiField]: fileUrl });
-
+  
+      // Prepare data for updating employee info
       const updatePayload = {
         employee_id: employeeId,
         [apiField]: fileUrl,
       };
-
+  
+      // Update employee data with the new file URL
       await axios.post('https://api.rightships.com/employee/update', updatePayload, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
-
-      toast.success(`${type === 'profile_photo' ? 'Profile photo' : 'Resume'} updated successfully.`);
+  
+      toast.success(`${type === 'profile' ? 'Profile photo' : 'Resume'} updated successfully.`);
     } catch (error) {
-      toast.error(`Failed to upload ${type}.`);
+      toast.error(`Failed to upload ${type === 'profile' ? 'profile photo' : 'resume'}.`);
     }
   };
+  
 
   const triggerFileUpload = (inputRef) => {
     if (inputRef && inputRef.current) {
@@ -178,29 +231,156 @@ const EmployeeRegistration = () => {
       case 1:
         return (
           <>
-            <InputField label="Name" value={formData.name} onChange={(value) => setFormData({ ...formData, name: value })} required />
-            <InputField label="Mobile Number" value={formData.mobile_no} onChange={(value) => setFormData({ ...formData, mobile_no: value })} required />
-            <InputField label="Whatsapp Number" value={formData.whatsappNumber} onChange={(value) => setFormData({ ...formData, whatsappNumber: value })} required />
-            <InputField label="Gender" value={formData.gender} onChange={(value) => setFormData({ ...formData, gender: value })} required type="select" options={["Male", "Female", "Other"]} />
-            <InputField label="Country" value={formData.country} onChange={(value) => setFormData({ ...formData, country: value })} required />
-            <InputField label="Email" value={formData.email} onChange={(value) => setFormData({ ...formData, email: value })} required type="email" />
-            <InputField label="Date of Birth" value={formData.dob} onChange={(value) => setFormData({ ...formData, dob: value })} required type="date" />
-            <InputField label="Date of Availability" value={formData.availability} onChange={(value) => setFormData({ ...formData, availability: value })} required type="date" />
+            <InputField
+              label="First Name"
+              value={formData.firstName}
+              onChange={(value) => setFormData({ ...formData, firstName: value })}
+              required
+            />
+            <InputField
+              label="Last Name"
+              value={formData.lastName}
+              onChange={(value) => setFormData({ ...formData, lastName: value })}
+              required
+            />
+            <InputField
+              label="Email"
+              value={formData.email}
+              onChange={(value) => setFormData({ ...formData, email: value })}
+              required
+              type="email"
+            />
+            <InputField
+              label="Mobile Number"
+              value={formData.mobile_no}
+              onChange={(value) => setFormData({ ...formData, mobile_no: value })}
+              required
+            />
+            <InputField
+              label="WhatsApp Number"
+              value={formData.whatsappNumber}
+              onChange={(value) => setFormData({ ...formData, whatsappNumber: value })}
+              required
+            />
+            <InputField
+              label="Gender"
+              value={formData.gender}
+              onChange={(value) => setFormData({ ...formData, gender: value })}
+              required
+              type="select"
+              options={["Male", "Female", "Other"]}
+            />
+            <InputField
+              label="Country"
+              value={formData.country}
+              onChange={(value) => setFormData({ ...formData, country: value })}
+              required
+            />
+            <InputField
+              label="Date of Birth"
+              value={formData.dob}
+              onChange={(value) => setFormData({ ...formData, dob: value })}
+              required
+              type="date"
+            />
+            <InputField
+              label="Age"
+              value={formData.age}
+              onChange={(value) => setFormData({ ...formData, age: value })}
+              required
+            />
+            <InputField
+              label="Date of Availability"
+              value={formData.availability}
+              onChange={(value) => setFormData({ ...formData, availability: value })}
+              required
+              type="date"
+            />
           </>
         );
       case 2:
         return (
           <>
-            <InputField label="Last Vessel Type" value={formData.lastVesselType} onChange={(value) => setFormData({ ...formData, lastVesselType: value })} required type="select" options={["Type 1", "Type 2"]} />
-            <InputField label="Present Rank" value={formData.presentRank} onChange={(value) => setFormData({ ...formData, presentRank: value })} required type="select" options={["Rank 1", "Rank 2"]} />
-            <InputField label="Applied Rank" value={formData.appliedRank} onChange={(value) => setFormData({ ...formData, appliedRank: value })} required type="select" options={["Rank 1", "Rank 2"]} />
-            <InputField label="Total Sea Experience (Years)" value={formData.totalSeaExperienceYears} onChange={(value) => setFormData({ ...formData, totalSeaExperienceYears: value })} required type="number" />
-            <InputField label="Total Sea Experience (Months)" value={formData.totalSeaExperienceMonths} onChange={(value) => setFormData({ ...formData, totalSeaExperienceMonths: value })} required type="number" />
-            <InputField label="Total Rank Experience (Years)" value={formData.totalRankExperienceYears} onChange={(value) => setFormData({ ...formData, totalRankExperienceYears: value })} required type="number" />
-            <InputField label="Total Rank Experience (Months)" value={formData.totalRankExperienceMonths} onChange={(value) => setFormData({ ...formData, totalRankExperienceMonths: value })} required type="number" />
-            <InputField label="COP" value={formData.cop} onChange={(value) => setFormData({ ...formData, cop: value })} required type="select" options={["COP 1", "COP 2"]} />
-            <InputField label="COC" value={formData.coc} onChange={(value) => setFormData({ ...formData, coc: value })} required type="select" options={["COC 1", "COC 2"]} />
-            <InputField label="Watch Keeping" value={formData.watchKeeping} onChange={(value) => setFormData({ ...formData, watchKeeping: value })} required type="select" options={["Yes", "No"]} />
+            <InputField
+              label="Present Vessel"
+              value={formData.presentVessel}
+              onChange={(value) => setFormData({ ...formData, presentVessel: value })}
+              required
+            />
+            <InputField
+              label="Applied Vessel"
+              value={formData.appliedVessel}
+              onChange={(value) => setFormData({ ...formData, appliedVessel: value })}
+              required
+            />
+            <InputField
+              label="Present Rank"
+              value={formData.presentRank}
+              onChange={(value) => setFormData({ ...formData, presentRank: value })}
+              required
+              type="select"
+              options={["Rank 1", "Rank 2"]}
+            />
+            <InputField
+              label="Applied Rank"
+              value={formData.appliedRank}
+              onChange={(value) => setFormData({ ...formData, appliedRank: value })}
+              required
+              type="select"
+              options={["Rank 1", "Rank 2"]}
+            />
+            <InputField
+              label="Total Sea Experience (Years)"
+              value={formData.totalSeaExperienceYear}
+              onChange={(value) => setFormData({ ...formData, totalSeaExperienceYear: value })}
+              required
+              type="number"
+            />
+            <InputField
+              label="Total Sea Experience (Months)"
+              value={formData.totalSeaExperienceMonth}
+              onChange={(value) => setFormData({ ...formData, totalSeaExperienceMonth: value })}
+              required
+              type="number"
+            />
+            <InputField
+              label="Present Rank Experience (Years)"
+              value={formData.presentRankExperienceInYear}
+              onChange={(value) => setFormData({ ...formData, presentRankExperienceInYear: value })}
+              required
+              type="number"
+            />
+            <InputField
+              label="Present Rank Experience (Months)"
+              value={formData.presentRankExperienceInMonth}
+              onChange={(value) => setFormData({ ...formData, presentRankExperienceInMonth: value })}
+              required
+              type="number"
+            />
+            <InputField
+              label="COP"
+              value={formData.cop}
+              onChange={(value) => setFormData({ ...formData, cop: value })}
+              required
+              type="select"
+              options={["COP 1", "COP 2"]}
+            />
+            <InputField
+              label="COC"
+              value={formData.coc}
+              onChange={(value) => setFormData({ ...formData, coc: value })}
+              required
+              type="select"
+              options={["COC 1", "COC 2"]}
+            />
+            <InputField
+              label="Watchkeeping"
+              value={formData.watchkeeping}
+              onChange={(value) => setFormData({ ...formData, watchkeeping: value })}
+              required
+              type="select"
+              options={["Yes", "No"]}
+            />
           </>
         );
       case 3:
@@ -215,7 +395,7 @@ const EmployeeRegistration = () => {
                   type="file"
                   className="hidden"
                   ref={profileFileInputRef}
-                  onChange={(e) => handleFileChange(e, 'profile_photo')}
+                  onChange={(e) => handleFileChange(e, 'profile')}
                   accept="image/jpeg, image/png"
                 />
               </div>
@@ -240,7 +420,7 @@ const EmployeeRegistration = () => {
         return null;
     }
   };
-
+  
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-50 to-gray-200 p-6">
       <ToastContainer />

@@ -1,18 +1,40 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CircleUserRound, CircleHelp, ChevronDown, Bell, MessageSquare, BriefcaseBusiness, Settings, LogOut, UserRoundCog } from 'lucide-react';
+import { CircleHelp, ChevronDown, Bell, MessageSquare, BriefcaseBusiness, Settings, LogOut } from 'lucide-react';
 import Logo from '../../images/logo.png';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const EmployeeNavbar = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
   const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState(null); // State to hold the profile photo URL
+  const authState = useSelector((state) => state.auth);
+  const employeeId = authState?.user?._id;
 
   const userDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch profile photo from the API
+    const fetchProfilePhoto = async () => {
+      try {
+        const response = await axios.post('https://api.rightships.com/employee/get', {
+          employee_id: employeeId, // Replace with actual employee ID
+        });
+        const result = response.data.data[0];
+        setProfilePhoto(result?.profile || ''); // Set the profile photo URL
+      } catch (error) {
+        console.error('Error fetching profile photo:', error);
+      }
+    };
+
+    fetchProfilePhoto();
+  }, []);
 
   const handleUserDropdownClick = () => {
     setUserDropdownOpen(!userDropdownOpen);
@@ -80,7 +102,18 @@ const EmployeeNavbar = () => {
             </div>
             <div className="relative z-50" ref={userDropdownRef}>
               <button onClick={handleUserDropdownClick} className="flex items-center text-black font-bold">
-                <CircleUserRound size={20} className="mr-2" /> User <ChevronDown className="ml-2" />
+                {profilePhoto ? (
+                  <img
+                    src={profilePhoto}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full object-cover mr-2"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center mr-2">
+                    <span className="text-white">U</span> {/* Placeholder if no profile photo */}
+                  </div>
+                )}
+                <ChevronDown className="ml-2" />
               </button>
               {userDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50">
@@ -133,7 +166,11 @@ const EmployeeNavbar = () => {
             {userDropdownOpen && (
               <div className="mt-2 space-y-2">
                 <Link to="/profile" className="text-gray-800 hover:bg-gray-100 flex items-center font-semibold ps-3 py-2">
-                  <CircleUserRound size={20} className="mr-2" /> Profile
+                  <img
+                    src={profilePhoto}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full object-cover mr-2"
+                  /> Profile
                 </Link>
                 <Link to="/my-jobs" className="text-gray-800 hover:bg-gray-100 flex items-center font-semibold ps-3 py-2">
                   <BriefcaseBusiness size={20} className="mr-2" /> My Jobs
@@ -160,9 +197,7 @@ const EmployeeNavbar = () => {
                 <Link to="/notifications" className="text-gray-800 hover:bg-gray-100 flex items-center font-semibold ps-3 py-2">
                   <Bell size={20} className="mr-2" /> View All Notifications
                 </Link>
-                <Link to="/settings" className="text-gray-800 hover:bg-gray-100 flex items-center font-semibold ps-3 py-2">
-                  <UserRoundCog size={20} className="mr-2" /> Notification Settings
-                </Link>
+               
               </div>
             )}
           </div>
@@ -184,3 +219,4 @@ const EmployeeNavbar = () => {
 };
 
 export default EmployeeNavbar;
+

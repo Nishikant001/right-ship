@@ -1,55 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { FaRegEdit, FaEdit } from "react-icons/fa";
+import { FaRegEdit, FaEdit, FaShareSquare } from "react-icons/fa";
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import EditModal from './EditModal';
-import { FaShareSquare } from "react-icons/fa";
 
 const EmployeeProfile = () => {
   const [profileImage, setProfileImage] = useState("https://i2.pickpik.com/photos/711/14/431/smile-profile-face-male-preview.jpg");
-  const [profileData, setProfileData] = useState({ name: '', rank: '', position: '' });
+  const [profileData, setProfileData] = useState({ name: '', presentRank: '', appliedRank: '' });
   const [file, setFile] = useState(null);
   const [editSection, setEditSection] = useState(null);
   const [modalOpen, setModalOpen] = useState(false); 
   const [editValue, setEditValue] = useState({});
   const [sectionData, setSectionData] = useState({
-    lastVesselType: '',
-    applyvessel: '', 
-    appliedRank: '', 
+    appliedVessel: '',
+    presentVessel: '',
+    appliedRank: '',
+    presentRank: '',
     dateOfAvailability: '',
     contactDetail: {
       email: '',
+      mobile_no: '',
       whatsappNumber: '',
+      gender: '',
+      country: '',
       dob: '',
       age: '',
-      gender: '',
     },
     experience: {
-      seaExperience: '',
-      lastRankExperience: '',
-      presentRank: '',
-      lastRank: '',
+      presentRankExperienceInYear: '',
+      presentRankExperienceInMonth: '',
+      totalSeaExperienceYear: '',
+      totalSeaExperienceMonth: '',
     },
     licenseHolding: {
-      coc: '',
       cop: '',
-      watchKeeping: '',
+      coc: '',
+      watchkeeping: '',
     },
     address: {
+      country: '',
+      state: '',
+      city: '',
       address1: '',
       address2: '',
-      state: '',
       pincode: '',
       nationality: '',
-      city: '',
-      country: '',
-    },
-    others: {
-      height: '',
-      bmi: '',
-      weight: '',
-      sidCard: '',
-      willingToAcceptLowerRank: '',
     }
   });
 
@@ -66,54 +61,63 @@ const EmployeeProfile = () => {
         });
 
         const result = response.data.data[0];
-        console.log(response)
-        setProfileImage(result?.profile_photo || profileImage);
+
+        // Calculate age if dob is available
+        const calculateAge = (dob) => {
+          const birthDate = new Date(dob);
+          const ageDifMs = Date.now() - birthDate.getTime();
+          const ageDate = new Date(ageDifMs);
+          return Math.abs(ageDate.getUTCFullYear() - 1970);
+        };
+
+        setProfileImage(result?.profile || profileImage);
         setProfileData({
-          name: result?.name || '',
-          rank: result?.presentRank || '',
-          position: result?.appliedRank || ''
+          name: result?.firstName + ' ' + result?.lastName || '',
+          presentRank: result?.presentRank || '',
+          appliedRank: result?.appliedRank || ''
         });
 
         setSectionData({
-          lastVesselType: result?.lastVesselType || '',
-          applyvessel: result?.applyvessel || '', 
-          appliedRank: result?.appliedRank || '', 
+          appliedVessel: result?.applyvessel || '', 
+          presentVessel: result?.presentVessel || '',
+          appliedRank: result?.appliedRank || '',
+          presentRank: result?.presentRank || '',
           dateOfAvailability: result?.availability || '',
           contactDetail: {
             email: result?.email || '',
+            mobile_no: result?.mobile_no || '', 
             whatsappNumber: result?.whatsappNumber || '',
-            dob: result?.dob || '',
-            age: '', // Age can be calculated if needed
             gender: result?.gender || '',
+            country: result?.country || '',
+            dob: result?.dob || '',
+            age: result?.dob ? calculateAge(result?.dob) : '', // Calculate age based on DOB
           },
           experience: {
-            seaExperience: `${result?.totalSeaExperienceYears || ''} years ${result?.totalSeaExperienceMonths || ''} months`,
-            lastRankExperience: `${result?.totalRankExperienceYears || ''} years ${result?.totalRankExperienceMonths || ''} months`,
-            presentRank: result?.presentRank || '',
-            lastRank: result?.lastRank || '',
+            presentRankExperienceInYear: result?.presentRankExperienceInYear || '',
+            presentRankExperienceInMonth: result?.presentRankExperienceInMonth || '',
+            totalSeaExperienceYear: result?.totalSeaExperienceYear || '',
+            totalSeaExperienceMonth: result?.totalSeaExperienceMonth || '',
           },
           licenseHolding: {
-            coc: result?.coc || '',
             cop: result?.cop || '',
-            watchKeeping: result?.watchKeeping || '',
+            coc: result?.coc || '',
+            watchkeeping: result?.watchkeeping || '',
           },
           address: {
-            address1: result?.address1 || '',
-            address2: result?.address2 || '',
-            state: result?.state || '',
-            pincode: result?.pincode || '',
-            nationality: result?.nationality || '',
-            city: result?.city || '',
-            country: result?.country || '',
-          },
-          others: {
-            height: result?.height || '',
-            bmi: result?.bmi || '',
-            weight: result?.weight || '',
-            sidCard: result?.sidCard || '',
-            willingToAcceptLowerRank: result?.willingToAcceptLowerRank || '',
+            country: result?.address?.country || '',
+            state: result?.address?.state || '',
+            city: result?.address?.city || '',
+            address1: result?.address?.address1 || '',
+            address2: result?.address?.address2 || '',
+            pincode: result?.address?.pincode || '',
+            nationality: result?.address?.nationality || '',
           }
         });
+
+        // Set the resume file name and URL if available
+        if (result?.resume) {
+          setFile({ name: "Resume", url: result.resume });
+        }
 
       } catch (error) {
         console.error('Error fetching profile data:', error);
@@ -161,14 +165,13 @@ const EmployeeProfile = () => {
         if (type === 'resume') {
           updatePayload.resume = fileUrl;
         } else if (type === 'profile') {
-          updatePayload.profile_photo = fileUrl;
+          updatePayload.profile = fileUrl;
           setProfileImage(fileUrl);
         }
 
         await axios.post('https://api.rightships.com/employee/update', updatePayload, {
           headers: {
             'Content-Type': 'application/json',
-            Accept: '*/*',
           },
         });
 
@@ -232,7 +235,7 @@ const EmployeeProfile = () => {
     if (navigator.share) {
       navigator.share({
         title: 'Employee Profile',
-        text: `Check out the profile of ${profileData.name} - ${profileData.rank}`,
+        text: `Check out the profile of ${profileData.name} - ${profileData.presentRank}`,
         url: window.location.href,
       })
       .then(() => console.log('Profile shared successfully'))
@@ -245,17 +248,15 @@ const EmployeeProfile = () => {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-100">
       {/* Sidebar for Profile Info and Uploads */}
-      <aside className=" w-full lg:my-8 lg:ms-8 rounded-xl lg:w-1/3 p-8 bg-white shadow-lg flex flex-col space-y-8">
+      <aside className="w-full lg:my-8 lg:ms-8 rounded-xl lg:w-1/3 p-8 bg-white shadow-lg flex flex-col space-y-8">
         <div className="bg-white p-8 border rounded-xl shadow-md flex flex-col items-center text-center">
-        <FaShareSquare className='ms-72 -mt-3 cursor-pointer' size={21} onClick={handleShareClick} />
+          <FaShareSquare className="ms-72 -mt-3 cursor-pointer" size={21} onClick={handleShareClick} />
           <div className="relative">
             <img
               src={profileImage}
               alt="Profile"
               className="w-32 h-32 rounded-full border-4 border-gray-200 object-cover shadow-md"
             />
-           
-
             <div
               className="absolute bottom-0 right-0 w-10 h-10 bg-customBlue rounded-full flex items-center justify-center cursor-pointer shadow"
               onClick={() => document.getElementById('profileUpload').click()}
@@ -270,14 +271,11 @@ const EmployeeProfile = () => {
               onChange={(e) => handleFileChange(e, 'profile')}
             />
           </div>
-          
           <h2 className="mt-4 text-2xl font-semibold text-black">{profileData.name}</h2>
-          <p className="text-gray-400 text-sm">{profileData.rank}</p>
-          
+          <p className="text-gray-400 text-sm">{profileData.presentRank}</p>
           <button className="mt-3 px-6 py-2 bg-customBlue text-white rounded-full shadow-md hover:bg-customBlue-dark">
-            {profileData.position}
+            {profileData.appliedRank}
           </button>
-          
         </div>
 
         <div className="bg-white p-8 border rounded-xl shadow-md">
@@ -287,7 +285,9 @@ const EmployeeProfile = () => {
           </label>
           <div className="flex items-center">
             {file && (
-              <span className="text-gray-600">{file.name}</span>
+              <span className="text-gray-600">
+                <a href={file.url} target="_blank" rel="noopener noreferrer">{file.name}</a>
+              </span>
             )}
             <input
               type="file"
@@ -307,9 +307,10 @@ const EmployeeProfile = () => {
       {/* Main Content for Profile Details */}
       <div className="w-full lg:w-2/3 p-8 space-y-8 overflow-y-auto bg-gray-100">
         {Object.entries({
-          lastVesselType: 'Last Vessel Type',
-          applyvessel: 'Vessel Applied For', 
-          appliedRank: 'Applied Rank', 
+          appliedVessel: 'Vessel Applied For',
+          presentVessel: 'Present Vessel',
+          appliedRank: 'Applied Rank',
+          presentRank: 'Present Rank',
           dateOfAvailability: 'Date of Availability',
         }).map(([key, title]) => (
           <div key={key} className="bg-white p-8 border rounded-xl shadow-md relative">
@@ -323,7 +324,7 @@ const EmployeeProfile = () => {
           </div>
         ))}
 
-        {['contactDetail', 'experience', 'licenseHolding', 'address', 'others'].map((section) => (
+        {['contactDetail', 'experience', 'licenseHolding', 'address'].map((section) => (
           <div key={section} className="bg-white p-8 border rounded-xl shadow-md relative">
             <h3 className="text-lg font-semibold text-black flex justify-between">
               {section.charAt(0).toUpperCase() + section.slice(1).replace(/([A-Z])/g, ' $1')}
