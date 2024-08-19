@@ -220,27 +220,27 @@ const JobDashboard = () => {
                     <p className="font-bold mt-2">Open Positions</p>
                     <p>{job.openPositions.join('  ')}</p>
                   </div>
-                </div>
-                <div className="flex mt-2 md:mt-0 items-center space-x-2">
-                  <button
-                    className={`mt-2 min-w-24 py-1.5 ${job.applied ? 'border border-customBlue text-customBlue font-semibold rounded-md' : 'bg-customBlue border text-white font-semibold rounded-md'}`}
-                    onClick={(e) => { e.stopPropagation(); toggleApply(job.id); }}
-                  >
-                    {job.applied ? 'Unapply' : 'Apply'}
-                  </button>
-                  <button
-                    className='mt-2'
-                    onClick={(e) => { e.stopPropagation(); toggleBookmark(job.id); }}
-                  >
-                    <Bookmark size={22} className={job.bookmarked ? 'fill-current text-[#1F5882]' : 'stroke-current text-[#1F5882]'} />
-                  </button>
+                  <div className="flex mt-2 md:mt-0 items-center space-x-2">
+                    <button
+                      className={`mt-2 min-w-24 py-1.5 ${job.applied ? 'border border-customBlue text-customBlue font-semibold rounded-md' : 'bg-customBlue border text-white font-semibold rounded-md'}`}
+                      onClick={(e) => { e.stopPropagation(); toggleApply(job.id); }}
+                    >
+                      {job.applied ? 'Unapply' : 'Apply'}
+                    </button>
+                    <button
+                      className='mt-2'
+                      onClick={(e) => { e.stopPropagation(); toggleBookmark(job.id); }}
+                    >
+                      <Bookmark size={22} className={job.bookmarked ? 'fill-current text-[#1F5882]' : 'stroke-current text-[#1F5882]'} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
           <div className="w-full px-3 lg:block overflow-y-auto xl:max-w-4xl lg:max-w-4xl hidden"  style={{ height: 'calc(110vh - 100px)' }}>
             {selectedJob && (
-              <div className="bg-white p-8 border border-gray-300 rounded-lg shadow-lg">
+              <div className="bg-white p-8 h-screen border border-gray-300 rounded-lg shadow-lg">
                 <div className="flex flex-col mb-6">
                   <div className="flex">
                     <img src={selectedJob.src} alt="Company Profile" className="w-32 h-32 object-cover rounded-md" />
@@ -312,7 +312,7 @@ const JobDashboard = () => {
               </div>
             )}
           </div>
-          <div className='w-full bg-white xl:max-w-60 lg:max-w-48 md:max-w-64 md:block hidden' style={{ height: 'calc(110vh - 100px)' }}></div>
+          <div className='w-full px-3 md:block overflow-y-auto xl:max-w-xs lg:max-w-xs bg-white'></div>
         </div>
       </div>
 
@@ -404,3 +404,4 @@ const JobDashboard = () => {
 };
 
 export default JobDashboard;
+
