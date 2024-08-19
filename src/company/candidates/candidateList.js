@@ -19,39 +19,46 @@ const CandidatesTable = ({ jobId }) => {
 
   const fetchEmployeeDetails = useCallback(async (employeeIds, page = 1, limit = 10) => {
     try {
-      const requestData = {
-        employee_id: { '$in': employeeIds },
-        page,
-        limit,
-      };
+        const requestData = {
+            employee_id: { '$in': employeeIds },
+            page,
+            limit,
+        };
 
-      if (rankFilter) {
-        requestData.appliedRank = rankFilter;
-      }
+        if (rankFilter) {
+            requestData.appliedRank = rankFilter;
+        }
 
-      if (shipTypeFilter) {
-        requestData.applyvessel = shipTypeFilter;
-      }
+        if (shipTypeFilter) {
+            requestData.applyvessel = shipTypeFilter;
+        }
 
-      const response = await axios.post('https://api.rightships.com/employee/get', requestData);
+        console.log("Request Data:", requestData);
 
-      if (response.data.code === 200) {
-        setCandidates(response.data.data);
+        const response = await axios.post('https://api.rightships.com/employee/get', requestData);
 
-        // Ensure totalPages is calculated only when response.data.total is available
-        const totalRecords = response.data.total || 0; // Fallback to 0 if undefined
-        const calculatedTotalPages = Math.ceil(totalRecords / limit);
-        setTotalPages(calculatedTotalPages > 0 ? calculatedTotalPages : 1); // Ensure totalPages is at least 1
+        console.log("API Response:", response.data);
 
-        return response.data.data;
-      } else {
-        throw new Error('Failed to fetch employee details');
-      }
+        if (response.data.code === 200) {
+            setCandidates(response.data.data);
+            const totalRecords = response.data.total || 0;
+            const calculatedTotalPages = Math.ceil(totalRecords / limit);
+            setTotalPages(calculatedTotalPages > 0 ? calculatedTotalPages : 1);
+
+            return response.data.data;
+        } else {
+            console.error("Failed to fetch employee details:", response.data);
+            throw new Error('Failed to fetch employee details');
+        }
     } catch (error) {
-      console.error("Error fetching employee details:", error.message);
-      throw error;
+        if (error.response) {
+            console.error("Error fetching employee details:", error.response.data);
+        } else {
+            console.error("Error fetching employee details:", error.message);
+        }
+        throw error;
     }
-  }, [rankFilter, shipTypeFilter]);
+}, [rankFilter, shipTypeFilter]);
 
   const fetchPosts = useCallback(async () => {
     try {
