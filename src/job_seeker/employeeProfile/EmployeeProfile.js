@@ -3,6 +3,7 @@ import { FaRegEdit, FaEdit } from "react-icons/fa";
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import EditModal from './EditModal';
+import { FaShareSquare } from "react-icons/fa";
 
 const EmployeeProfile = () => {
   const [profileImage, setProfileImage] = useState("https://i2.pickpik.com/photos/711/14/431/smile-profile-face-male-preview.jpg");
@@ -227,17 +228,34 @@ const EmployeeProfile = () => {
     });
   };
 
+  const handleShareClick = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Employee Profile',
+        text: `Check out the profile of ${profileData.name} - ${profileData.rank}`,
+        url: window.location.href,
+      })
+      .then(() => console.log('Profile shared successfully'))
+      .catch((error) => console.error('Error sharing profile:', error));
+    } else {
+      alert('Web Share API is not supported in your browser.');
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-100">
       {/* Sidebar for Profile Info and Uploads */}
       <aside className=" w-full lg:my-8 lg:ms-8 rounded-xl lg:w-1/3 p-8 bg-white shadow-lg flex flex-col space-y-8">
         <div className="bg-white p-8 border rounded-xl shadow-md flex flex-col items-center text-center">
+        <FaShareSquare className='ms-72 -mt-3 cursor-pointer' size={21} onClick={handleShareClick} />
           <div className="relative">
             <img
               src={profileImage}
               alt="Profile"
               className="w-32 h-32 rounded-full border-4 border-gray-200 object-cover shadow-md"
             />
+           
+
             <div
               className="absolute bottom-0 right-0 w-10 h-10 bg-customBlue rounded-full flex items-center justify-center cursor-pointer shadow"
               onClick={() => document.getElementById('profileUpload').click()}
@@ -252,11 +270,14 @@ const EmployeeProfile = () => {
               onChange={(e) => handleFileChange(e, 'profile')}
             />
           </div>
+          
           <h2 className="mt-4 text-2xl font-semibold text-black">{profileData.name}</h2>
           <p className="text-gray-400 text-sm">{profileData.rank}</p>
+          
           <button className="mt-3 px-6 py-2 bg-customBlue text-white rounded-full shadow-md hover:bg-customBlue-dark">
             {profileData.position}
           </button>
+          
         </div>
 
         <div className="bg-white p-8 border rounded-xl shadow-md">

@@ -106,7 +106,7 @@ const CompanyProfile = () => {
     <div className="container mx-auto p-4 md:p-6 lg:p-8">
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="bg-blue-600  p-6 flex justify-between items-center">
-          <h3 className="text-base sm:text-3xl font-bold text-white">Company Profile</h3>
+          <h3 className="text-base sm:text-2xl font-bold text-white">Company Profile</h3>
           {!isEditing && (
             <button
               onClick={handleEdit}
