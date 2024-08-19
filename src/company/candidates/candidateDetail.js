@@ -23,12 +23,11 @@ const CandidateDetail = () => {
       } catch (err) {
         console.error('Error fetching candidate details:', err);
         setError(err.message);
-       
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchCandidate();
   }, [candidateId]);
 
@@ -81,7 +80,7 @@ const CandidateDetail = () => {
                   View Email
                 </button>
               ) : (
-                <p className="text-gray-600">{candidate.email}</p>
+                <p className="text-gray-600">{candidate.email || 'N/A'}</p>
               )}
             </div>
             <div className="mt-2">
@@ -93,7 +92,7 @@ const CandidateDetail = () => {
                   View Number
                 </button>
               ) : (
-                <p className="text-gray-600">{candidate.mobile_no}</p>
+                <p className="text-gray-600">{candidate.mobile_no || 'N/A'}</p>
               )}
             </div>
           </div>
@@ -121,7 +120,6 @@ const CandidateDetail = () => {
 
         <InfoCard title="Last Sea Experience">
           <ItemList value={candidate.pastvesselExp} />
-       
         </InfoCard>
 
         <InfoCard title="Additional Details">
@@ -147,8 +145,9 @@ const InfoCard = ({ title, children }) => (
 );
 
 const ItemList = ({ value }) => {
-  console.log(value); 
-  // Array(3) [ "AHTS DP-II", "Car Carrier", "Crude Oil Tanke" ]
+  if (!Array.isArray(value) || value.length === 0) {
+    return <p className="text-gray-900">N/A</p>;
+  }
 
   return (
     <ul>
@@ -158,9 +157,6 @@ const ItemList = ({ value }) => {
     </ul>
   );
 };
-
-
-
 
 const InfoItem = ({ icon, label, value }) => (
   <div className="flex items-center">

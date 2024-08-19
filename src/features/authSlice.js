@@ -1,5 +1,3 @@
-// src/features/authSlice.js
-
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -10,6 +8,7 @@ const initialState = {
   error: null,
 };
 
+// Async thunk for employee login
 export const login = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
@@ -25,6 +24,7 @@ export const login = createAsyncThunk(
   }
 );
 
+// Async thunk for company login
 export const loginCompany = createAsyncThunk(
   'auth/login/company',
   async (credentials, { rejectWithValue }) => {
@@ -40,11 +40,13 @@ export const loginCompany = createAsyncThunk(
   }
 );
 
-export const logout = createAsyncThunk('auth/logout', async (_, { dispatch }) => {
-  // Clear the user's data locally
+// Async thunk for logout
+export const logout = createAsyncThunk('auth/logout', async () => {
+  // Clear local storage
   localStorage.removeItem('user');
   localStorage.removeItem('token');
-  return true; // Dispatch the logout action to clear the Redux state
+  // Return a fulfilled action to trigger the logout reducer
+  return true;
 });
 
 const authSlice = createSlice({
@@ -53,10 +55,6 @@ const authSlice = createSlice({
   reducers: {
     clearError: (state) => {
       state.error = null;
-    },
-    logout: (state) => {
-      state.user = null;
-      state.token = null;
     },
   },
   extraReducers: (builder) => {
@@ -69,8 +67,6 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
-
-        console.log('User logged in:', action.payload.user);  // Debugging line
 
         // Store user and token in localStorage
         localStorage.setItem('user', JSON.stringify(action.payload.user));
@@ -89,8 +85,6 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
 
-        console.log('Company logged in:', action.payload.user);  // Debugging line
-
         // Store user and token in localStorage
         localStorage.setItem('user', JSON.stringify(action.payload.user));
         localStorage.setItem('token', action.payload.token);
@@ -98,6 +92,10 @@ const authSlice = createSlice({
       .addCase(loginCompany.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.user = null;
+        state.token = null;
       });
   },
 });

@@ -39,39 +39,42 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Global Routes accessible to all users */}
-        <Route element={isLoggedIn ? <EmployeeLayout /> : <DefaultLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/jobs" element={<JobDashboard />} />
-          <Route path="/company/login" element={<CompanyOtpAuth />} />
-          <Route path="/company/register" element={<RegistrationForm />} />
-          <Route path="/login" element={<EmployeeOtpAuth />} />
-          <Route path="/register" element={<EmployeeSignup />} />
-          <Route path="/verify-signup-otp" element={<VerifySignupOtp />} />
-          <Route path="/employee-registration" element={<EmployeeRegistration />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Route>
 
-        {/* Routes available to logged-in employees */}
-        {isLoggedIn && user.role === 'employee' && (
+        {isLoggedIn ? (
+         
+         user.role === 'employee' ? (
           <Route element={<EmployeeLayout />}>
+            <Route path="/jobs" element={<JobDashboard />} />
             <Route path="/profile" element={<EmployeeProfile />} />
             <Route path="/my-jobs" element={<MyJobs />} />
+            <Route path="*" element={<JobDashboard />} />
           </Route>
-        )}
-
-        {/* Routes available to logged-in companies */}
-        {isLoggedIn && user.role === 'company' && (
+        ) : (
           <Route element={<CompanyLayout />}>
-            <Route path="/create/job" element={<CreateJobStepForm/>} />
-            <Route path="/post/job" element={<JobPostList/>} />
+            <Route path="/create/job" element={<CreateJobStepForm />} />
+            <Route path="/post/job" element={<JobPostList />} />
             <Route path="/post/job/detail/:id" element={<JobDetail />} />
-            <Route path="/job/candidates" element={<CandidatesTable/>} />
-            <Route path="/job/candidates/detail/:candidateId" element={<CandidateDetail/>} />
-            <Route path="/manage/company/team" element={<CompanyManageUsers/>} />
-            <Route path="/setting" element={<CompanyProfile/>} />
-
+            <Route path="/job/candidates" element={<CandidatesTable />} />
+            <Route path="/job/candidates/detail/:candidateId" element={<CandidateDetail />} />
+            <Route path="/manage/company/team" element={<CompanyManageUsers />} />
+            <Route path="/setting" element={<CompanyProfile />} />
+            <Route path="*" element={<JobPostList />} />
           </Route>
+        )
+        ) : (
+          <>
+           <Route element={<DefaultLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/jobs" element={<JobDashboard />} />
+              <Route path="/company/login" element={<CompanyOtpAuth />} />
+              <Route path="/login" element={<EmployeeOtpAuth />} />
+              <Route path="/register" element={<EmployeeSignup />} />
+              <Route path="/verify-signup-otp" element={<VerifySignupOtp />} />
+              <Route path="/employee-registration" element={<EmployeeRegistration />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+            <Route path="/company/register" element={<RegistrationForm />} />
+          </>
         )}
       </Routes>
     </BrowserRouter>
