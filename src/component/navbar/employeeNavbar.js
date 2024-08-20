@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CircleHelp, ChevronDown, Bell, MessageSquare, BriefcaseBusiness, Settings, LogOut } from 'lucide-react';
+import { CircleHelp, ChevronDown, Bell, UserRound, BriefcaseBusiness, Settings, LogOut } from 'lucide-react';
 import Logo from '../../images/logo.png';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -91,14 +91,8 @@ const EmployeeNavbar = () => {
             </a>
             <div className="relative z-50" ref={notificationDropdownRef}>
               <button onClick={handleNotificationDropdownClick} className="flex items-center text-black font-bold">
-                <Bell size={20} className="mr-2" /> Notification <ChevronDown className="ml-2" />
+                <Bell size={20} className="mr-2" /> Notification
               </button>
-              {notificationDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50">
-                  <Link to="/notifications" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 font-semibold">View All Notifications</Link>
-                  <Link to="/settings" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 font-semibold">Notification Settings</Link>
-                </div>
-              )}
             </div>
             <div className="relative z-50" ref={userDropdownRef}>
               <button onClick={handleUserDropdownClick} className="flex items-center text-black font-bold">
@@ -118,13 +112,13 @@ const EmployeeNavbar = () => {
               {userDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50">
                   <Link to="/profile" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
-                    <MessageSquare size={20} className="mr-2" /> Profile
+                    <UserRound size={20} className="mr-2" /> Profile
                   </Link>
                   <Link to="/my-jobs" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
-                    <MessageSquare size={20} className="mr-2" /> My Jobs
+                    <BriefcaseBusiness size={20} className="mr-2" /> My Jobs
                   </Link>
                   <Link to="/settings" className="px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center font-semibold">
-                    <MessageSquare size={20} className="mr-2" /> Settings
+                    <Settings size={20} className="mr-2" /> Settings
                   </Link>
                   <Link to="/" onClick={handleLogout} className="px-4 py-2 mt-1 text-gray-800 hover:bg-gray-100 flex justify-center border-t font-bold">Sign Out</Link>
                 </div>
@@ -190,16 +184,8 @@ const EmployeeNavbar = () => {
               onClick={handleNotificationDropdownClick}
               className="w-full text-left text-black font-bold flex items-center justify-between"
             >
-              Notification <ChevronDown size={20} />
+              Notification
             </button>
-            {notificationDropdownOpen && (
-              <div className="mt-2 space-y-2">
-                <Link to="/notifications" className="text-gray-800 hover:bg-gray-100 flex items-center font-semibold ps-3 py-2">
-                  <Bell size={20} className="mr-2" /> View All Notifications
-                </Link>
-               
-              </div>
-            )}
           </div>
 
           <a href="#help-support" className="px-6 text-black flex items-center font-bold">
