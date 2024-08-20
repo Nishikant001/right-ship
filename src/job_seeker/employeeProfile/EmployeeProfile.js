@@ -248,8 +248,8 @@ const EmployeeProfile = () => {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-100">
       {/* Sidebar for Profile Info and Uploads */}
-      <aside className="w-full lg:my-8 lg:ms-8 rounded-xl lg:w-1/3 p-8 bg-white shadow-lg flex flex-col space-y-8">
-        <div className="bg-white p-8 border rounded-xl shadow-md flex flex-col items-center text-center">
+      <aside className="w-full lg:my-4 lg:ms-8 lg:w-1/3 p-8 bg-white shadow-lg flex flex-col space-y-4">
+        <div className="bg-white p-8 flex flex-col items-center text-center">
           <FaShareSquare className="ms-72 -mt-3 cursor-pointer" size={21} onClick={handleShareClick} />
           <div className="relative">
             <img
@@ -279,10 +279,13 @@ const EmployeeProfile = () => {
         </div>
 
         <div className="bg-white p-8 border rounded-xl shadow-md">
-          <h3 className="text-lg font-semibold text-black mb-4">Upload Resume</h3>
-          <label htmlFor="resumeUpload" className="cursor-pointer text-gray-600 mb-2 hover:text-gray-900">
-            <FaRegEdit className="text-2xl" />
-          </label>
+          <div className='flex align-center'>
+            
+            <label htmlFor="resumeUpload" className="cursor-pointer text-gray-600 mb-2 hover:text-gray-900 me-3">
+              <FaRegEdit className="text-2xl" />
+            </label>
+            <h3 className="text-lg font-semibold text-black mb-4">Upload Resume</h3>
+          </div>
           <div className="flex items-center">
             {file && (
               <span className="text-gray-600">
@@ -299,13 +302,13 @@ const EmployeeProfile = () => {
           </div>
         </div>
 
-        <div className="bg-gray-100 p-8 border rounded-xl shadow-md flex items-center justify-center text-gray-500">
+        {/* <div className="bg-gray-100 p-8 border rounded-xl shadow-md flex items-center justify-center text-gray-500">
           <span>Advertisement</span>
-        </div>
+        </div> */}
       </aside>
 
       {/* Main Content for Profile Details */}
-      <div className="w-full lg:w-2/3 p-8 space-y-8 overflow-y-auto bg-gray-100">
+      <div className="w-full lg:w-2/3 p-4 space-y-3 overflow-y-auto bg-gray-100 me-4">
         {Object.entries({
           appliedVessel: 'Vessel Applied For',
           presentVessel: 'Present Vessel',
@@ -313,7 +316,7 @@ const EmployeeProfile = () => {
           presentRank: 'Present Rank',
           dateOfAvailability: 'Date of Availability',
         }).map(([key, title]) => (
-          <div key={key} className="bg-white p-8 border rounded-xl shadow-md relative">
+          <div key={key} className="bg-white p-8 border shadow-sm relative">
             <h3 className="text-lg font-semibold text-black flex justify-between">
               {title}
               <FaEdit className="cursor-pointer text-gray-600 hover:text-gray-900" onClick={() => handleEditClick(key, sectionData[key])} />
