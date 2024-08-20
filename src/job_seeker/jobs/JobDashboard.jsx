@@ -1,407 +1,268 @@
 import React, { useState, useEffect } from 'react';
-import { Bookmark } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
-import { applyJob, unapplyJob, bookmarkJob, removeJob, applyJobToCompany, unapplyJobFromCompany } from '../../features/jobSlice';
-import Modal from 'react-modal';
+import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const JobDashboard = () => {
-  const dispatch = useDispatch();
-  const authState = useSelector(state => state.auth);
-  const savedJobs = useSelector(state => state.job.savedJobs);
-  const appliedJobs = useSelector(state => state.job.appliedJobs);
-  const employeeId = authState?.user?._id;
+const Loader = () => (
+  <div className="fixed inset-0 flex items-center justify-center bg-gray-50 z-50">
+    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600"></div>
+  </div>
+);
 
-  const [jobsData, setJobsData] = useState({ savedJobs: [], appliedJobs: [], bookmarkedJobs: [] });
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const CardLoader = () => (
+  <motion.div
+    className="bg-white p-6 rounded-xl shadow-sm animate-pulse"
+  >
+    <div className="h-6 bg-gray-200 rounded mb-4"></div>
+    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+    <div className="h-8 bg-gray-200 rounded mt-4"></div>
+  </motion.div>
+);
 
-  useEffect(() => {
-    console.log('Auth State:', authState);
-    if (!employeeId) {
-      console.error('Employee ID is not available in the auth state');
-    } else {
-      console.log('Employee ID:', employeeId);
-    }
-  }, [authState, employeeId]);
+const JobTypeFilter = ({ selectedTypes, setSelectedTypes, options, title, onFilterChange }) => {
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch jobs and load from localStorage
-  useEffect(() => {
-    const storedSavedJobs = JSON.parse(localStorage.getItem('savedJobs')) || [];
-    const storedAppliedJobs = JSON.parse(localStorage.getItem('appliedJobs')) || [];
+  const filteredOptions = options.filter(option =>
+    option.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-    setJobsData(prevJobsData => ({
-      ...prevJobsData,
-      savedJobs: storedSavedJobs,
-      appliedJobs: storedAppliedJobs,
-    }));
-
-    fetchJobsData();
-  }, []);
-
-  // Set the selected job when the jobsData changes
-  useEffect(() => {
-    if (window.innerWidth >= 1024 && jobsData.savedJobs.length > 0) {
-      setSelectedJob(jobsData.savedJobs[0]);
-    }
-  }, [jobsData.savedJobs]);
-
-  const fetchJobsData = async () => {
-    try {
-      const response = await fetch('https://api.rightships.com/company/application/get', {
-        method: 'POST',
-        headers: {
-          'Accept': '*/*',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({}),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        const data = result.applications || [];
-
-        const formattedData = data.slice(0, 40).map(job => ({
-          id: job.application_id || 'undefined-id',
-          companyId: job.company_id || 'undefined-company-id',
-          companyName: job.company_name || '',
-          rpslNo: job.rspl_no || '',
-          shipType: job.ship_type || '',
-          hiringFor: job.hiring_for || '',
-          openPositions: job.open_positions || [],
-          src: job.website_url || '',
-          contact: {
-            number: job.mobile_no || '',
-            email: job.email || '',
-          },
-          benefits: job.benifits || [],
-          description: job.description || '',
-          applied: appliedJobs.some(appliedJob => appliedJob.id === job.application_id),
-          bookmarked: savedJobs.some(savedJob => savedJob.id === job.application_id),
-          postedDate: job.created_date || '',
-        }));
-
-        setJobsData(prevJobsData => ({ ...prevJobsData, savedJobs: formattedData }));
-      } else {
-        console.error('Failed to fetch job data');
-      }
-    } catch (error) {
-      console.error('Error fetching job data:', error);
-    }
+  const handleCheckboxChange = (type) => {
+    setSelectedTypes(prev =>
+      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+    );
+    onFilterChange();
   };
-
-  const toggleApply = (jobId) => {
-    if (!employeeId) {
-      console.error('Employee ID is undefined. Cannot apply for the job.');
-      return;
-    }
-
-    setJobsData(prevJobsData => {
-      const savedJobs = [...prevJobsData.savedJobs];
-      const appliedJobs = [...prevJobsData.appliedJobs];
-      const jobIndex = savedJobs.findIndex(job => job.id === jobId);
-
-      if (jobIndex !== -1) {
-        const job = { ...savedJobs[jobIndex] };
-        job.applied = !job.applied;
-
-        if (job.applied) {
-          appliedJobs.push(job);
-          dispatch(applyJob(job));
-          dispatch(applyJobToCompany({ jobId: job.id, companyId: job.companyId, employeeId })); 
-        } else {
-          const appliedJobIndex = appliedJobs.findIndex(j => j.id === jobId);
-          if (appliedJobIndex !== -1) {
-            appliedJobs.splice(appliedJobIndex, 1);
-          }
-          dispatch(unapplyJob(job.id));
-          dispatch(unapplyJobFromCompany({ jobId: job.id, companyId: job.companyId, employeeId })); 
-        }
-
-        localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
-        savedJobs[jobIndex] = job;
-
-        if (selectedJob?.id === jobId) {
-          setSelectedJob({ ...job });
-        }
-      }
-
-      return { ...prevJobsData, savedJobs, appliedJobs };
-    });
-  };
-
-  const toggleBookmark = (jobId) => {
-    setJobsData(prevJobsData => {
-      const savedJobs = [...prevJobsData.savedJobs];
-      const bookmarkedJobs = prevJobsData.bookmarkedJobs ? [...prevJobsData.bookmarkedJobs] : [];
-      const jobIndex = savedJobs.findIndex(job => job.id === jobId);
-
-      if (jobIndex !== -1) {
-        const job = { ...savedJobs[jobIndex] };
-        job.bookmarked = !job.bookmarked;
-
-        if (job.bookmarked) {
-          bookmarkedJobs.push(job);
-          dispatch(bookmarkJob(job));
-        } else {
-          const bookmarkedJobIndex = bookmarkedJobs.findIndex(j => j.id === jobId);
-          if (bookmarkedJobIndex !== -1) {
-            bookmarkedJobs.splice(bookmarkedJobIndex, 1);
-          }
-          dispatch(removeJob(job.id));
-        }
-
-        localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
-        savedJobs[jobIndex] = job;
-
-        if (selectedJob?.id === jobId) {
-          setSelectedJob({ ...job });
-        }
-      }
-
-      return { ...prevJobsData, savedJobs, bookmarkedJobs };
-    });
-  };
-
-  const handleJobClick = (job) => {
-    if (window.innerWidth >= 1024) {
-      setSelectedJob(selectedJob?.id === job.id ? null : job);
-    } else {
-      setSelectedJob(job);
-      setIsModalOpen(true);
-    }
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const filteredJobs = jobsData.savedJobs.filter(job => {
-    const companyName = job.companyName ? job.companyName.toLowerCase() : '';
-    const openPositions = Array.isArray(job.openPositions) ? job.openPositions.join(' ').toLowerCase() : '';
-    const shipType = job.shipType ? job.shipType.toLowerCase() : ''; 
-  
-    const searchLower = searchQuery.toLowerCase();
-  
-    return companyName.includes(searchLower) ||
-           openPositions.includes(searchLower) ||
-           shipType.includes(searchLower);
-  });
 
   return (
-    <div>
-      <div className='w-full h-20 bg-white content-center'>
-        <div className='flex flex-row justify-center'>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Enter skills, designation or company"
-            className="w-3/5 rounded-s-md p-2 border border-gray-300"
-            style={{ outline: 'none', borderColor: 'gray' }}
-          />
-          <button className="bg-customBlue rounded-e-md text-white p-2">Search</button>
-        </div>
+    <div className="mb-6">
+      <h3 className="text-lg font-semibold mb-3">{title}</h3>
+      <input
+        type="text"
+        placeholder={`Search ${title.toLowerCase()}...`}
+        className="w-full px-4 py-2 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <div className="mt-3 max-h-48 overflow-y-auto">
+        {filteredOptions.map(option => (
+          <label key={option} className="flex items-center mb-2 cursor-pointer">
+            <input
+              type="checkbox"
+              className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+              checked={selectedTypes.includes(option)}
+              onChange={() => handleCheckboxChange(option)}
+            />
+            <span className="ml-2 text-gray-700">{option}</span>
+          </label>
+        ))}
       </div>
-      <div className="min-h-screen bg-gray-200 p-3 z-50">
-        <div className="flex flex-col md:flex-row z-50">
-          <div className="w-full pr-3 h-screen overflow-y-auto xl:max-w-md lg:max-w-xs md:max-w-lg" style={{ height: 'calc(110vh - 100px)' }}>
-            {filteredJobs.map(job => (
-              <div
-                key={job.id}
-                className={`relative p-4 mb-4 border rounded-md bg-white cursor-pointer ${selectedJob && selectedJob.id === job.id ? 'border-customBlue border' : ''}`}
-                onClick={() => handleJobClick(job)}
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p>{job.companyName} | {job.rpslNo}</p>
-                    <p className="font-bold">Hiring For</p>
-                    <p>{job.hiringFor}</p>
-                    <p className="font-bold mt-2">Open Positions</p>
-                    <p>{job.openPositions.join('  ')}</p>
-                  </div>
-                  <div className="flex mt-2 md:mt-0 items-center space-x-2">
-                    <button
-                      className={`mt-2 min-w-24 py-1.5 ${job.applied ? 'border border-customBlue text-customBlue font-semibold rounded-md' : 'bg-customBlue border text-white font-semibold rounded-md'}`}
-                      onClick={(e) => { e.stopPropagation(); toggleApply(job.id); }}
-                    >
-                      {job.applied ? 'Unapply' : 'Apply'}
-                    </button>
-                    <button
-                      className='mt-2'
-                      onClick={(e) => { e.stopPropagation(); toggleBookmark(job.id); }}
-                    >
-                      <Bookmark size={22} className={job.bookmarked ? 'fill-current text-[#1F5882]' : 'stroke-current text-[#1F5882]'} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="w-full px-3 lg:block overflow-y-auto xl:max-w-4xl lg:max-w-4xl hidden"  style={{ height: 'calc(110vh - 100px)' }}>
-            {selectedJob && (
-              <div className="bg-white p-8 h-screen border border-gray-300 rounded-lg shadow-lg">
-                <div className="flex flex-col mb-6">
-                  <div className="flex">
-                    <img src={selectedJob.src} alt="Company Profile" className="w-32 h-32 object-cover rounded-md" />
-                    <div className="ml-4 flex-grow">
-                      <h2 className="text-2xl font-bold text-gray-800">{selectedJob.companyName}</h2>
-                      <p className="text-black mt-2">{selectedJob.rpslNo}</p>
-                      <p className="text-gray-500 text-xs mt-1">Posted on {selectedJob.postedDate}</p>
-                      <div className="flex mt-4 space-x-4">
-                        <button
-                          className={`px-8 py-2 ${selectedJob.applied ? 'bg-gray-400' : 'bg-customBlue'} text-white font-bold rounded-md`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleApply(selectedJob.id);
-                          }}
-                        >
-                          {selectedJob.applied ? 'Applied' : 'Apply'}
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleBookmark(selectedJob.id);
-                          }}
-                        >
-                          <Bookmark size={22} className={selectedJob.bookmarked ? 'fill-current text-[#1F5882]' : 'stroke-current text-[#1F5882]'} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="border-t border-gray-300 my-6"></div>
-                <div className="my-6">
-                  <p className="font-semibold text-xl">Contact</p>
-                  <div className="flex flex-col sm:flex-row justify-between mt-2">
-                    <p className="text-sm">Company Number:<br />{selectedJob.contact.number}</p>
-                    <p className="text-sm mt-2 sm:mt-0">Email:<br />{selectedJob.contact.email}</p>
-                  </div>
-                </div>
-                <div className="border-t border-gray-300 my-6"></div>
-                <div className="flex flex-col sm:flex-row justify-between my-6">
-                  <div>
-                    <p className="font-semibold text-xl">Hiring For</p>
-                    <p className="text-sm mt-2">{selectedJob.hiringFor}</p>
-                  </div>
-                  <div className="border-l-2 border-gray-300 my-6 sm:my-0"></div>
-                  <div>
-                    <p className="font-semibold text-xl">Open Positions</p>
-                    <div className="grid grid-cols-1 gap-1 mt-2">
-                      {selectedJob.openPositions.map((position, index) => (
-                        <p key={index} className="text-sm">{position}</p>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <div className="border-t border-gray-300 my-6"></div>
-                <div className="my-6">
-                  <p className="font-semibold text-xl">Benefits</p>
-                  <ul className="list-disc pl-5 mt-2">
-                    {selectedJob.benefits.map((benefit, index) => (
-                      <li key={index} className="text-sm">{benefit}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="border-t border-gray-300 my-6"></div>
-                <div className="my-6">
-                  <p className="font-semibold text-xl">Description</p>
-                  <p className="text-sm mt-2">{selectedJob.description}</p>
-                </div>
-                <button className="mt-4 px-4 py-2 border border-customBlue bg-customBlue text-white hover:bg-white hover:text-customBlue rounded-md" onClick={closeModal}>Close</button>
-              </div>
-            )}
-          </div>
-          <div className='w-full px-3 md:block overflow-y-auto xl:max-w-xs lg:max-w-xs bg-white'></div>
-        </div>
-      </div>
-
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        className="bg-white p-8 border border-gray-300 rounded-lg shadow-lg w-full mx-auto overflow-y-auto h-screen z-50" 
-        contentLabel="Job Details"
-        ariaHideApp={false}
-      >
-        <button className="absolute top-2 right-2 text-gray-600" onClick={closeModal}>
-          &times;
-        </button>
-        {selectedJob && (
-          <div>
-            <div className="flex flex-col mb-6">
-              <div className="flex">
-                <img src={selectedJob.src} alt="Company Profile" className="w-32 h-32 object-cover rounded-md" />
-                <div className="ml-4 flex-grow">
-                  <h2 className="text-2xl font-bold text-gray-800">{selectedJob.companyName}</h2>
-                  <p className="text-black mt-2">{selectedJob.rpslNo}</p>
-                  <p className="text-gray-500 text-xs mt-1">Posted on {selectedJob.postedDate}</p>
-                  <div className="flex mt-4 space-x-4">
-                    <button
-                      className={`px-8 py-2 ${selectedJob.applied ? 'bg-gray-400' : 'bg-customBlue'} text-white font-bold rounded-md`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleApply(selectedJob.id);
-                      }}
-                    >
-                      {selectedJob.applied ? 'Applied' : 'Apply'}
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleBookmark(selectedJob.id);
-                      }}
-                    >
-                      <Bookmark size={22} className={selectedJob.bookmarked ? 'fill-current text-[#1F5882]' : 'stroke-current text-[#1F5882]'} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="border-t border-gray-300 my-6"></div>
-            <div className="my-6">
-              <p className="font-semibold text-xl">Contact</p>
-              <div className="flex flex-col sm:flex-row justify-between mt-2">
-                <p className="text-sm">Company Number:<br />{selectedJob.contact.number}</p>
-                <p className="text-sm mt-2 sm:mt-0">Email:<br />{selectedJob.contact.email}</p>
-              </div>
-            </div>
-            <div className="border-t border-gray-300 my-6"></div>
-            <div className="flex flex-col sm:flex-row justify-between my-6">
-              <div>
-                <p className="font-semibold text-xl">Hiring For</p>
-                <p className="text-sm mt-2">{selectedJob.hiringFor}</p>
-              </div>
-              <div className="border-l-2 border-gray-300 my-6 sm:my-0"></div>
-              <div>
-                <p className="font-semibold text-xl">Open Positions</p>
-                <div className="grid grid-cols-1 gap-1 mt-2">
-                  {selectedJob.openPositions.map((position, index) => (
-                    <p key={index} className="text-sm">{position}</p>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="border-t border-gray-300 my-6"></div>
-            <div className="my-6">
-              <p className="font-semibold text-xl">Benefits</p>
-              <ul className="list-disc pl-5 mt-2">
-                {selectedJob.benefits.map((benefit, index) => (
-                  <li key={index} className="text-sm">{benefit}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="border-t border-gray-300 my-6"></div>
-            <div className="my-6">
-              <p className="font-semibold text-xl">Description</p>
-              <p className="text-sm mt-2">{selectedJob.description}</p>
-            </div>
-            <button className="mt-4 px-4 py-2 border border-customBlue bg-customBlue text-white hover:bg-white hover:text-customBlue rounded-md" onClick={closeModal}>Close</button>
-          </div>
-        )}
-      </Modal>
     </div>
   );
 };
 
-export default JobDashboard;
+const JobCard = ({ job, onCardClick }) => (
+  <motion.div
+    className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition duration-300 cursor-pointer"
+    onClick={() => onCardClick(job)}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+  >
+    <h3 className="text-xl font-bold text-gray-800">{job.open_positions.join(', ')}</h3>
+    <p className="text-sm text-gray-600 mt-1">{job.company_name} • {new Date(job.created_date).toLocaleDateString()}</p>
+    <p className="mt-3 text-gray-700">{job.description || "No description available"}</p>
+    <div className="mt-4 flex space-x-3">
+      <button className="px-4 py-2 rounded-lg bg-green-100 text-green-700 font-medium hover:bg-green-200 transition duration-200">Save</button>
+      <button className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition duration-200">Apply</button>
+    </div>
+  </motion.div>
+);
 
+const JobDetailsCanvas = ({ job, onClose }) => (
+  <motion.div
+    initial={{ x: '100%' }}
+    animate={{ x: 0 }}
+    exit={{ x: '100%' }}
+    transition={{ type: 'tween', duration: 0.3 }}
+    className="fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-lg p-6 overflow-y-auto z-50"
+  >
+    <button onClick={onClose} className="absolute top-4 right-4 text-2xl text-gray-500 hover:text-gray-700">&times;</button>
+    <h2 className="text-2xl font-bold mb-4 text-gray-800">{job.open_positions.join(', ')}</h2>
+    <p className="text-gray-600 mb-2">{job.company_name} • {new Date(job.created_date).toLocaleDateString()}</p>
+    <p className="mb-4 text-gray-700">{job.description || "No description available"}</p>
+  </motion.div>
+);
+
+const App = () => {
+  const [selectedRanks, setSelectedRanks] = useState([]);
+  const [selectedVessels, setSelectedVessels] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [inputSearchTerm, setInputSearchTerm] = useState(''); // New state to hold input value
+  const [selectedJob, setSelectedJob] = useState(null);
+
+  const [rankOptions, setRankOptions] = useState([]);
+  const [shipOptions, setShipOptions] = useState([]);
+
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchingJobs, setFetchingJobs] = useState(false);
+  const [error, setError] = useState('');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 10;
+
+  // Fetch rank and ship options on mount
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const response = await axios.post('https://api.rightships.com/attributes/get', {});
+        if (response.data.code === 200) {
+          const attributes = response.data.data;
+          const shipAttribute = attributes.find(attr => attr.name.toLowerCase() === 'ships');
+          const rankAttribute = attributes.find(attr => attr.name.toLowerCase() === 'rank');
+
+          setShipOptions(shipAttribute ? shipAttribute.values : []);
+          setRankOptions(rankAttribute ? rankAttribute.values : []);
+        } else {
+          setError('Failed to fetch options data.');
+        }
+      } catch (error) {
+        setError('An error occurred while fetching options data.');
+      }
+    };
+
+    fetchOptions();
+  }, []);
+
+  const fetchJobDetails = async () => {
+    setFetchingJobs(true);
+    try {
+      const response = await axios.post('https://api.rightships.com/company/application/get', {
+        searchTerm,
+        rank: selectedRanks,
+        shiptype: selectedVessels,
+        page: currentPage,
+        limit: jobsPerPage,
+      });
+      if (response.data.code === 200) {
+        setJobs(response.data.applications);
+      } else {
+        setError('Failed to fetch job details.');
+      }
+    } catch (error) {
+      setError('An error occurred while fetching job details.');
+    } finally {
+      setFetchingJobs(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobDetails();
+    setLoading(false);
+  }, [currentPage]);
+
+  useEffect(() => {
+    fetchJobDetails();
+  }, [selectedRanks, selectedVessels]);
+
+  const handleSearchClick = () => {
+    setSearchTerm(inputSearchTerm); // Update searchTerm with the input value
+    fetchJobDetails();
+  };
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  return (
+    <div className="bg-gray-50 min-h-screen relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col md:flex-row gap-8">
+          <div className="w-full md:w-1/4">
+            <div className="bg-white p-6 rounded-xl shadow-sm sticky top-8">
+              <h2 className="text-2xl font-bold mb-6 text-gray-800">Filters</h2>
+
+              <JobTypeFilter
+                selectedTypes={selectedRanks}
+                setSelectedTypes={setSelectedRanks}
+                options={rankOptions}
+                title="Rank"
+                onFilterChange={fetchJobDetails}
+              />
+
+              <JobTypeFilter
+                selectedTypes={selectedVessels}
+                setSelectedTypes={setSelectedVessels}
+                options={shipOptions}
+                title="Vessel Type"
+                onFilterChange={fetchJobDetails}
+              />
+            </div>
+          </div>
+
+          <div className="w-full md:w-3/4">
+            <div className="flex mb-6">
+              <input
+                type="text"
+                placeholder="Search jobs..."
+                className="flex-grow px-4 py-3 rounded-l-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                value={inputSearchTerm} // Bind to inputSearchTerm
+                onChange={(e) => setInputSearchTerm(e.target.value)}
+              />
+              <button
+                onClick={handleSearchClick}
+                className="px-4 py-3 bg-blue-600 text-white font-medium rounded-r-lg hover:bg-blue-700 transition duration-200"
+              >
+                Search
+              </button>
+            </div>
+
+            <div className="grid gap-6">
+              {fetchingJobs
+                ? Array.from({ length: jobsPerPage }).map((_, index) => (
+                    <CardLoader key={index} />
+                  ))
+                : jobs.map(job => (
+                    <JobCard key={job.application_id} job={job} onCardClick={setSelectedJob} />
+                  ))}
+            </div>
+
+            <div className="flex justify-center mt-6">
+              <nav className="inline-flex rounded-md shadow">
+                <button
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 rounded-l-md bg-white text-gray-500 hover:bg-gray-50"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={jobs.length < jobsPerPage}
+                  className="ml-1 px-3 py-2 rounded-r-md bg-white text-gray-500 hover:bg-gray-50"
+                >
+                  Next
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {selectedJob && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black z-40"
+            />
+            <JobDetailsCanvas job={selectedJob} onClose={() => setSelectedJob(null)} />
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default App;
