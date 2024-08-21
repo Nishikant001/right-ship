@@ -128,7 +128,7 @@ const JobCard = ({ job, onCardClick, currentUserId }) => {
     console.log('Saving job with payload:', payload);
   
     try {
-      const response = await axios.post('https://api.rightships.com/employee/save_job', payload);
+      const response = await axios.post('https://api.rightships.com/employee/save_jobs', payload);
       if (response.data) {
         alert('Successfully saved the job');
       } else {
