@@ -1,5 +1,3 @@
-// src/job_seeker/login/MobileNumberForm.jsx
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -7,19 +5,21 @@ import 'react-toastify/dist/ReactToastify.css';
 import logo from '../../images/logo.png';
 
 const MobileNumberForm = ({ onOtpRequested }) => {
-    
-    const [mobileNumber, setMobileNumber] = useState('');
+    const [contactInfo, setContactInfo] = useState('');
     const [otpStatus, setOtpStatus] = useState('idle');
     const [otpError, setOtpError] = useState('');
 
     const handleRequestOtp = async () => {
-        
         setOtpStatus('loading');
         try {
-            const response = await axios.post('https://api.rightships.com/otp/send_otp', { mobile_no: mobileNumber });
+            const isEmail = contactInfo.includes('@');
+            const payload = isEmail ? { email: contactInfo } : { mobile_no: contactInfo };
+
+            const response = await axios.post('https://api.rightships.com/otp/send_otp', payload);
             console.log(response.data);
-            if (response.data.code == 200) {
-                onOtpRequested(mobileNumber);
+
+            if (response.data.code === 200) {
+                onOtpRequested(contactInfo);
                 setOtpStatus('success');
             } else {
                 setOtpStatus('failed');
@@ -41,10 +41,10 @@ const MobileNumberForm = ({ onOtpRequested }) => {
                 <h2 className="text-center text-2xl font-semibold mb-6">Log in to Rightship</h2>
                 <input
                     type="text"
-                    value={mobileNumber}
-                    placeholder="Enter the phone number"
+                    value={contactInfo}
+                    placeholder="Enter your phone number or email"
                     className="w-full px-4 py-4 mb-4 border border-gray-300 rounded-md focus:outline-none focus:border-customBlue"
-                    onChange={(e) => setMobileNumber(e.target.value)}
+                    onChange={(e) => setContactInfo(e.target.value)}
                 />
                 <button
                     onClick={handleRequestOtp}

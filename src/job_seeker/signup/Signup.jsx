@@ -44,7 +44,7 @@ const EmployeeSignup = () => {
       <div className="bg-white p-10 mt-3 rounded-lg shadow-lg border w-full max-w-md">
         <h2 className="text-center text-2xl font-semibold mb-6">Signup with Phone Number</h2>
         <input
-          type="text"
+          type="tel"
           placeholder="Enter the phone number"
           className="w-full px-4 py-4 mb-4 border border-gray-300 rounded-md focus:outline-none focus:border-customBlue"
           value={phoneNumber}

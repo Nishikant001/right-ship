@@ -13,7 +13,7 @@ import HomePage from './job_seeker/landingpage/Home';
 import NotFoundPage from './pageNotFound';
 import CompanyOtpAuth from './company/login/login';
 import RegistrationForm from './company/registrationForm';
-import EmployeeOtpAuth from './job_seeker/login/login';
+import EmployeeOtpAuth from './job_seeker/login/employeelogin';
 import EmployeeSignup from './job_seeker/signup/Signup';
 import VerifySignupOtp from './job_seeker/signup/VerifySignupOtp';
 import EmployeeRegistration from './job_seeker/Registration/EmployeeRegistration';

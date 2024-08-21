@@ -1,15 +1,13 @@
-// src/job_seeker/login/OtpAuth.jsx
-
 import React, { useState } from 'react';
-import MobileNumberForm from './mobileNumberForm';
-import OtpVerificationForm from './verifyNumber';
+import MobileNumberForm from './employeeloginform';
+import OtpVerificationForm from './employeeverifyNumber';
 
 const EmployeeOtpAuth = () => {
-    const [mobileNumber, setMobileNumber] = useState('');
+    const [contactInfo, setContactInfo] = useState('');
     const [otpRequested, setOtpRequested] = useState(false);
 
-    const handleOtpRequested = (mobile) => {
-        setMobileNumber(mobile);
+    const handleOtpRequested = (contact) => {
+        setContactInfo(contact);
         setOtpRequested(true);
     };
 
@@ -18,7 +16,7 @@ const EmployeeOtpAuth = () => {
             {!otpRequested ? (
                 <MobileNumberForm onOtpRequested={handleOtpRequested} />
             ) : (
-                <OtpVerificationForm mobileNumber={mobileNumber} />
+                <OtpVerificationForm contactInfo={contactInfo} />
             )}
         </div>
     );

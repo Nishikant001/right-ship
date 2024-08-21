@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import logo from '../../images/logo.png';
 import { login } from '../../features/authSlice';
 
-const OtpVerificationForm = ({ mobileNumber }) => {
+const OtpVerificationForm = ({ contactInfo }) => {
     const [otp, setOtp] = useState('');
     const [otpStatus, setOtpStatus] = useState('idle');
     const [otpError, setOtpError] = useState('');
@@ -20,12 +20,16 @@ const OtpVerificationForm = ({ mobileNumber }) => {
         setOtpStatus('loading');
         
         try {
-            const response = await axios.post('https://api.rightships.com/otp/verify_otp', { mobile_no: mobileNumber, otp });
+            const isEmail = contactInfo.includes('@');
+            const payload = isEmail ? { email: contactInfo, otp } : { mobile_no: contactInfo, otp };
+
+            const response = await axios.post('https://api.rightships.com/otp/verify_otp', payload);
             console.log(response.data);
+
             if (response.data.code === 200) {
                 setOtpStatus('success');
-                await dispatch(login({ mobile_no: mobileNumber }));
-                navigate('/profile', { replace: true });  // Use replace to prevent going back to login
+                await dispatch(login(payload));
+                navigate('/profile', { replace: true });
             } else {
                 setOtpStatus('failed');
                 setOtpError('Invalid OTP. Please try again.');
@@ -39,8 +43,11 @@ const OtpVerificationForm = ({ mobileNumber }) => {
     const handleSendOtp = async () => {
         setOtpStatus('loading');
         try {
-            const response = await axios.post('https://api.rightships.com/otp/send_otp', { mobile_no: mobileNumber });
-            if (response.data.success) {
+            const isEmail = contactInfo.includes('@');
+            const payload = isEmail ? { email: contactInfo } : { mobile_no: contactInfo };
+
+            const response = await axios.post('https://api.rightships.com/otp/send_otp', payload);
+            if (response.data.code === 200) {
                 setOtpStatus('success');
                 setCanResend(false);
                 setTimer(60); 
@@ -78,7 +85,7 @@ const OtpVerificationForm = ({ mobileNumber }) => {
             </div>
             <div className="bg-white p-10 mt-3 rounded-lg shadow-lg w-full max-w-md">
                 <h2 className="text-center text-2xl font-semibold mb-4">Verify OTP</h2>
-                <p className="text-center text-sm mb-4">OTP sent to: {mobileNumber}</p>
+                <p className="text-center text-sm mb-4">OTP sent to: {contactInfo}</p>
                 <input
                     type="text"
                     placeholder="Enter OTP"
@@ -106,7 +113,7 @@ const OtpVerificationForm = ({ mobileNumber }) => {
                         `Resend OTP in: ${formatTime(timer)}`
                     )}
                 </p>
-                <Link className="text-blue-700 block text-center text-sm underline mt-4" to="/login">Change Number</Link>
+                <Link className="text-blue-700 block text-center text-sm underline mt-4" to="/login">Change Contact Info</Link>
             </div>
         </section>
     );
