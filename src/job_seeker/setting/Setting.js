@@ -9,7 +9,11 @@ import { useDispatch, useSelector } from 'react-redux';
 Modal.setAppElement('#root'); // Set the app root element for accessibility
 
 function Setting() {
-  const contactInfo = useSelector((state) => state.contact.contactInfo);
+  const contactInfo = useSelector((state) => state.auth.user.mobile_no);
+  // const state = useSelector((state) => state);
+  // console.log(state);
+  
+  console.log(contactInfo)
   // const stateEmail = useSelector((state) => state.employee.data.email);
 
 
@@ -81,7 +85,7 @@ function Setting() {
           <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-md">
             <div>
               <p className="text-sm font-medium text-gray-700">Security Number</p>
-              <p className="text-sm text-gray-500">{mobileNumber}</p>
+              <p className="text-sm text-gray-500">{contactInfo}</p>
             </div>
             <button className="p-2 text-gray-500 hover:text-gray-700" onClick={openNumberModal}>
               <FaRegEdit className='text-black' />

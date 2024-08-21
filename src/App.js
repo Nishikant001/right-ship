@@ -31,6 +31,7 @@ import CandidateDetail from './company/candidates/candidateDetail';
 import JobDetail from './company/job/jobdetail';
 import CompanyManageUsers from './company/manageUsers';
 import CompanyProfile from './company/setting';
+import Setting from './job_seeker/setting/Setting';
 
 const App = () => {
   const user = useSelector((state) => state.auth.user);
@@ -47,6 +48,7 @@ const App = () => {
             <Route path="/jobs" element={<JobDashboard />} />
             <Route path="/profile" element={<EmployeeProfile />} />
             <Route path="/my-jobs" element={<MyJobs />} />
+            <Route path="/settings" element={<Setting />} />
             <Route path="*" element={<JobDashboard />} />
           </Route>
         ) : (
