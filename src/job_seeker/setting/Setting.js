@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaRegEdit } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Modal from 'react-modal';
 import ChangeMail from './ChangeMail';
 import ChangeNumber from './ChangeNumber';
@@ -10,6 +10,7 @@ Modal.setAppElement('#root'); // Set the app root element for accessibility
 
 function Setting() {
   const contactInfo = useSelector((state) => state.auth.user.mobile_no);
+  let navigate=useNavigate()
   // const state = useSelector((state) => state);
   // console.log(state);
   
@@ -29,6 +30,15 @@ function Setting() {
 
   const openNumberModal = () => setIsNumberModalOpen(true);
   const closeNumberModal = () => setIsNumberModalOpen(false);
+
+
+
+  
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/');
+    window.location.reload();
+  };
 
   useEffect(() => {
     // Fetch user details from API
@@ -94,7 +104,7 @@ function Setting() {
         </div>
         <div className="flex justify-center">
           <Link to="/">
-            <button className="px-4 py-2 font-medium text-white bg-red-500 rounded-sm hover:bg-red-600">
+            <button onClick={handleLogout} className="px-4 py-2 font-medium text-white bg-red-500 rounded-sm hover:bg-red-600">
               Logout
             </button>
           </Link>
