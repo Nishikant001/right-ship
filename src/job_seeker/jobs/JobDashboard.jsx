@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSelector, useDispatch } from 'react-redux';
-
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Loader = () => (
   <div className="fixed inset-0 flex items-center justify-center bg-gray-50 z-50">
@@ -68,15 +69,23 @@ const JobCard = ({ job, onCardClick, currentUserId }) => {
   const [saving, setSaving] = useState(false);
   const [unsaving, setUnsaving] = useState(false);
 
-  
+  // Defensive checks for applied and saved status
+  const [isApplied, setIsApplied] = useState(job.applied_by ? job.applied_by.some((application) => application.employee_id === currentUserId) : false);
+  const [isSaved, setIsSaved] = useState(job.save_jobs_applications ? job.save_jobs_applications.some((save) => save.employee_id === currentUserId) : false);
 
-  // Check if the current user has applied for the job
-  const hasApplied = job.applied_by?.some((application) => application.employee_id === currentUserId);
+  // Function to check if user is logged in
+  const checkLoginStatus = () => {
+    if (!currentUserId) {
+      toast.error('Please log in to continue.');
+      return false;
+    }
+    return true;
+  };
 
-  // Check if the current user has saved the job
-  const hasSaved = job.save_jobs_applications?.some((save) => save.employee_id === currentUserId);
+  const applyForJob = async (event) => {
+    event.stopPropagation();
+    if (!checkLoginStatus()) return;
 
-  const applyForJob = async () => {
     setApplying(true);
     try {
       const response = await axios.post('https://api.rightships.com/employee/apply_job', {
@@ -84,20 +93,23 @@ const JobCard = ({ job, onCardClick, currentUserId }) => {
         application_id: job.application_id,
         company_id: job.company_id
       });
-      if (response.data) {
-        alert('Successfully applied for the job');
-        // Handle UI update after applying
+      if (response && response.data) {
+        toast.success('Successfully applied for the job');
+        setIsApplied(true);
       } else {
-        alert('Failed to apply for the job');
+        toast.error('Failed to apply for the job');
       }
     } catch (error) {
-      alert('An error occurred while applying for the job');
+      toast.error(`An error occurred while applying: ${error.message}`);
     } finally {
       setApplying(false);
     }
   };
 
-  const unapplyForJob = async () => {
+  const unapplyForJob = async (event) => {
+    event.stopPropagation();
+    if (!checkLoginStatus()) return;
+
     setUnapplying(true);
     try {
       const response = await axios.post('https://api.rightships.com/employee/unapply', {
@@ -105,60 +117,62 @@ const JobCard = ({ job, onCardClick, currentUserId }) => {
         application_id: job.application_id,
         company_id: job.company_id
       });
-      if (response.data) {
-        alert('Successfully unapplied from the job');
-        // Handle UI update after unapplying
+      if (response && response.data) {
+        toast.success('Successfully unapplied from the job');
+        setIsApplied(false);
       } else {
-        alert('Failed to unapply from the job');
+        toast.error('Failed to unapply from the job');
       }
     } catch (error) {
-      alert('An error occurred while unapplying from the job');
+      toast.error(`An error occurred while unapplying: ${error.message}`);
     } finally {
       setUnapplying(false);
     }
   };
 
-  const saveJob = async () => {
-    setSaving(true);
-    const payload = {
-      employee_id: currentUserId,
-      application_id: job.application_id,
-      company_id: job.company_id
-    };
-    console.log('Saving job with payload:', payload);
-  
-    try {
-      const response = await axios.post('https://api.rightships.com/employee/save_jobs', payload);
-      if (response.data) {
-        alert('Successfully saved the job');
-      } else {
-        alert('Failed to save the job');
-      }
-    } catch (error) {
-      console.error('An error occurred while saving the job:', error);
-      alert('An error occurred while saving the job');
-    } finally {
-      setSaving(false);
-    }
-  };
-  
+  const saveJob = async (event) => {
+    event.stopPropagation();
+    if (!checkLoginStatus()) return;
 
-  const unsaveJob = async () => {
-    setUnsaving(true);
+    setSaving(true);
     try {
-      const response = await axios.post('https://api.rightships.com/employee/unsave_job', {
+      const response = await axios.post('https://api.rightships.com/employee/save_jobs', {
         employee_id: currentUserId,
         application_id: job.application_id,
         company_id: job.company_id
       });
-      if (response.data) {
-        alert('Successfully unsaved the job');
-        // Handle UI update after unsaving
+      if (response && response.data) {
+        toast.success('Successfully saved the job');
+        setIsSaved(true);
       } else {
-        alert('Failed to unsave the job');
+        toast.error('Failed to save the job');
       }
     } catch (error) {
-      alert('An error occurred while unsaving the job');
+      toast.error(`An error occurred while saving: ${error.message}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const unsaveJob = async (event) => {
+    event.stopPropagation();
+    if (!checkLoginStatus()) return;
+
+    setUnsaving(true);
+    try {
+      const response = await axios.post('https://api.rightships.com/employee/unsave', {
+        employee_id: currentUserId,
+        application_id: job.application_id,
+        company_id: job.company_id
+      });
+      if (response && response.data) {
+        toast.success('Successfully unsaved the job');
+        setIsSaved(false);
+      } else {
+        toast.error('Failed to unsave the job');
+      }
+    } catch (error) {
+      toast.error(`An error occurred while unsaving: ${error.message}`);
     } finally {
       setUnsaving(false);
     }
@@ -175,7 +189,7 @@ const JobCard = ({ job, onCardClick, currentUserId }) => {
       <p className="text-sm text-gray-600 mt-1">{job.company_name} • {new Date(job.created_date).toLocaleDateString()}</p>
       <p className="mt-3 text-gray-700">{job.description || "No description available"}</p>
       <div className="mt-4 flex space-x-3">
-        {hasApplied ? (
+        {isApplied ? (
           <button
             className="px-4 py-2 rounded-lg bg-red-100 text-red-700 font-medium hover:bg-red-200 transition duration-200"
             onClick={unapplyForJob}
@@ -193,7 +207,7 @@ const JobCard = ({ job, onCardClick, currentUserId }) => {
           </button>
         )}
         
-        {hasSaved ? (
+        {isSaved ? (
           <button
             className="px-4 py-2 rounded-lg bg-yellow-100 text-yellow-700 font-medium hover:bg-yellow-200 transition duration-200"
             onClick={unsaveJob}
@@ -211,9 +225,11 @@ const JobCard = ({ job, onCardClick, currentUserId }) => {
           </button>
         )}
       </div>
+      
     </motion.div>
   );
 };
+
 
 const JobDetailsCanvas = ({ job, onClose }) => (
   <motion.div
@@ -229,6 +245,7 @@ const JobDetailsCanvas = ({ job, onClose }) => (
     <p className="mb-4 text-gray-700">{job.description || "No description available"}</p>
   </motion.div>
 );
+
 
 const App = () => {
   const [selectedRanks, setSelectedRanks] = useState([]);
@@ -249,7 +266,7 @@ const App = () => {
   const jobsPerPage = 10;
 
   const user = useSelector(state => state.auth.user);
-  
+
   // Fetch rank and ship options on mount
   useEffect(() => {
     const fetchOptions = async () => {
@@ -273,24 +290,24 @@ const App = () => {
     fetchOptions();
   }, []);
 
-  const fetchJobDetails = async () => {
+  const fetchJobDetails = async (searchTerm) => {
     setFetchingJobs(true);
-  
+
     // Initialize the query object
     const query = {
       "status": "active",
     };
-  
+
     // Conditionally add `open_positions` if `selectedRanks` is not empty
     if (selectedRanks && selectedRanks.length > 0) {
-      query.open_positions = { "$exists": true, "$ne": selectedRanks };
+      query.open_positions = { "$exists": true, "$in": selectedRanks };
     }
-  
+
     // Conditionally add `hiring_for` if `selectedVessels` is not empty
     if (selectedVessels && selectedVessels.length > 0) {
       query.hiring_for = { '$in': selectedVessels };
     }
-  
+
     // Conditionally add search term if it is not empty
     if (searchTerm) {
       query["$or"] = [
@@ -302,11 +319,10 @@ const App = () => {
 
     query.page = currentPage;
     query.limit = jobsPerPage;
-  
+
     try {
-      const response = await axios.post('https://api.rightships.com/company/application/get', 
+      const response = await axios.post('https://api.rightships.com/company/application/get',
         query,  // Send the dynamically built query object
-       
       );
       if (response.data.code === 200) {
         setJobs(response.data.applications);
@@ -319,20 +335,27 @@ const App = () => {
       setFetchingJobs(false);
     }
   };
-  
 
   useEffect(() => {
-    fetchJobDetails();
+    fetchJobDetails(searchTerm);
     setLoading(false);
   }, [currentPage]);
 
   useEffect(() => {
-    fetchJobDetails();
+    fetchJobDetails(searchTerm);
   }, [selectedRanks, selectedVessels]);
 
   const handleSearchClick = () => {
-    setSearchTerm(inputSearchTerm); // Update searchTerm with the input value
-    fetchJobDetails();
+    fetchJobDetails(inputSearchTerm);  // Use inputSearchTerm directly
+    setSearchTerm(inputSearchTerm);    // Update searchTerm state for further use
+  };
+
+  const removeSelectedRank = (rank) => {
+    setSelectedRanks(prev => prev.filter(item => item !== rank));
+  };
+
+  const removeSelectedVessel = (vessel) => {
+    setSelectedVessels(prev => prev.filter(item => item !== vessel));
   };
 
   if (loading) {
@@ -352,7 +375,7 @@ const App = () => {
                 setSelectedTypes={setSelectedRanks}
                 options={rankOptions}
                 title="Rank"
-                onFilterChange={fetchJobDetails}
+                onFilterChange={() => fetchJobDetails(searchTerm)}
               />
 
               <JobTypeFilter
@@ -360,12 +383,26 @@ const App = () => {
                 setSelectedTypes={setSelectedVessels}
                 options={shipOptions}
                 title="Vessel Type"
-                onFilterChange={fetchJobDetails}
+                onFilterChange={() => fetchJobDetails(searchTerm)}
               />
             </div>
           </div>
 
           <div className="w-full md:w-3/4">
+            {/* Show Selected Filters */}
+            <div className="mb-4">
+              {selectedRanks.map(rank => (
+                <span key={rank} className="inline-block bg-blue-100 text-blue-700 rounded-full px-3 py-1 text-sm font-semibold mr-2">
+                  {rank} <button onClick={() => removeSelectedRank(rank)}>x</button>
+                </span>
+              ))}
+              {selectedVessels.map(vessel => (
+                <span key={vessel} className="inline-block bg-green-100 text-green-700 rounded-full px-3 py-1 text-sm font-semibold mr-2">
+                  {vessel} <button onClick={() => removeSelectedVessel(vessel)}>x</button>
+                </span>
+              ))}
+            </div>
+
             <div className="flex mb-6">
               <input
                 type="text"
@@ -385,11 +422,11 @@ const App = () => {
             <div className="grid gap-6">
               {fetchingJobs
                 ? Array.from({ length: jobsPerPage }).map((_, index) => (
-                    <CardLoader key={index} />
-                  ))
+                  <CardLoader key={index} />
+                ))
                 : jobs.map(job => (
-                    <JobCard key={job.application_id} job={job} onCardClick={setSelectedJob} currentUserId={user._id} />
-                  ))}
+                  <JobCard key={job.application_id} job={job} onCardClick={setSelectedJob} currentUserId={user?._id} />
+                ))}
             </div>
 
             <div className="flex justify-center mt-6">
@@ -427,8 +464,12 @@ const App = () => {
           </>
         )}
       </AnimatePresence>
+      <ToastContainer />
     </div>
   );
 };
 
 export default App;
+
+
+
