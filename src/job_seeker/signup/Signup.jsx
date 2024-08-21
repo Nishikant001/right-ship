@@ -59,7 +59,7 @@ const EmployeeSignup = () => {
         </button>
         {otpStatus === 'failed' && <p className="text-red-600 mt-4 text-center">{otpError}</p>}
         <p className="text-center mt-4">
-          <Link to="/signup-email" className="text-blue-600 block text-center text-md underline mt-6 hover:text-customBlue2">Signup with Email</Link>
+          <Link to="/email-register" className="text-blue-600 block text-center text-md underline mt-6 hover:text-customBlue2">Signup with Email</Link>
         </p>
       </div>
     </section>

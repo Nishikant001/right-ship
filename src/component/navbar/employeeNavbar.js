@@ -145,19 +145,17 @@ const EmployeeNavbar = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-          <Link to="/" className="flex px-6 py-3 border-b-2 font-bold">
+          <Link className="flex px-6 py-3 border-b-2 font-bold">
             <span className="text-gray-800">MENU</span>
           </Link>
           <Link to="/jobs" className="text-black pb-4 px-6 font-semibold border-b-2 hover:text-customBlue">Jobs</Link>
 
           <div className="pb-4 px-6 border-b-2">
             <button
-              onClick={handleUserDropdownClick}
               className="w-full text-left text-black font-bold flex items-center justify-between"
             >
-              User <ChevronDown size={20} />
-            </button>
-            {userDropdownOpen && (
+              User
+            </button>         
               <div className="mt-2 space-y-2">
                 <Link to="/profile" className="text-gray-800 hover:bg-gray-100 flex items-center font-semibold ps-3 py-2">
                   <img
@@ -176,7 +174,6 @@ const EmployeeNavbar = () => {
                   <LogOut size={20} className="mr-2" /> Sign Out
                 </Link>
               </div>
-            )}
           </div>
 
           <div className="pb-4 px-6 border-b-2">
