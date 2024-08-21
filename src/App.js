@@ -49,6 +49,7 @@ const App = () => {
             <Route path="/jobs" element={<JobDashboard />} />
             <Route path="/profile" element={<EmployeeProfile />} />
             <Route path="/my-jobs" element={<MyJobs />} />
+            <Route path="/settings" element={<Setting />} />
             <Route path="*" element={<JobDashboard />} />
           </Route>
         ) : (
