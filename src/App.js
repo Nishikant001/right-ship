@@ -15,14 +15,14 @@ import CompanyOtpAuth from './company/login/login';
 import RegistrationForm from './company/registrationForm';
 import EmployeeOtpAuth from './job_seeker/login/login';
 import EmployeeSignup from './job_seeker/signup/Signup';
-import VerifySignupOtp from './job_seeker/signup/VerifyWithPhone'
+import VerifySignupOtp from './job_seeker/signup/VerifySignupOtp';
 import EmployeeRegistration from './job_seeker/Registration/EmployeeRegistration';
 
 
 import JobDashboard from './job_seeker/jobs/JobDashboard';
 import MyJobs from './job_seeker/jobs/MyJobs';
 
-
+import SignupWithEmail from './job_seeker/signup/SignupWithEmail';
 import EmployeeProfile from './job_seeker/employeeProfile/EmployeeProfile';
 import CreateJobStepForm from './company/job/createJob/step';
 import JobPostList from './company/job/jobPostList';
@@ -71,7 +71,8 @@ const App = () => {
               <Route path="/company/login" element={<CompanyOtpAuth />} />
               <Route path="/login" element={<EmployeeOtpAuth />} />
               <Route path="/register" element={<EmployeeSignup />} />
-              <Route path="/verify-signup-otp" element={<VerifySignupOtp />} />
+              <Route path='/email-register' element={<SignupWithEmail />}/>
+              <Route path='/verify-signup-otp' element={<VerifySignupOtp />} />
               <Route path="/employee-registration" element={<EmployeeRegistration />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
