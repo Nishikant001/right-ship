@@ -60,12 +60,12 @@ const VerifySignupOtp = () => {
         body: JSON.stringify(payload),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to verify OTP');
+        throw new Error(data.message || 'Failed to verify OTP');
       }
 
-      const data = await response.json();
       if (data.code === 200) {
         const employeeId = data.employee_id;
 
@@ -77,15 +77,16 @@ const VerifySignupOtp = () => {
           body: JSON.stringify(isEmail ? { email: contactInfo } : { mobile_no: contactInfo }),
         });
 
+        const registrationData = await registrationResponse.json();
+
         if (!registrationResponse.ok) {
-          const registrationErrorData = await registrationResponse.json();
-          throw new Error(registrationErrorData.message || 'Failed to register employee');
+          throw new Error(registrationData.message || 'Failed to register employee');
         }
 
-        const registrationData = await registrationResponse.json();
         if (registrationData.code === 200) {
           toast.success('Contact verified and employee registered successfully!');
           navigate('/employee-registration', {
+            replace: true, // Use replace to prevent navigating back to this page
             state: { employeeId: registrationData.employee._id, contactInfo },
           });
         } else {
@@ -136,10 +137,7 @@ const VerifySignupOtp = () => {
             `Resend OTP in: ${formatTime(timer)}`
           )}
         </p>
-        <Link
-          className="text-blue-600 block text-center text-md underline mt-6 hover:text-customBlue2"
-          to={contactInfo.includes('@') ? '/email-register' : '/register'}
-        >
+        <Link className="text-blue-600 block text-center text-md underline mt-6 hover:text-customBlue2" to="/register">
           Change Contact Info
         </Link>
       </div>
