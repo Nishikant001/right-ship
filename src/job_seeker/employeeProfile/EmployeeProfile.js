@@ -37,15 +37,6 @@ const EmployeeProfile = () => {
       cop: '',
       coc: '',
       watchkeeping: '',
-    },
-    address: {
-      country: '',
-      state: '',
-      city: '',
-      address1: '',
-      address2: '',
-      pincode: '',
-      nationality: '',
     }
   });
 
@@ -103,15 +94,6 @@ const EmployeeProfile = () => {
             cop: result?.cop || '',
             coc: result?.coc || '',
             watchkeeping: result?.watchkeeping || '',
-          },
-          address: {
-            country: result?.address?.country || '',
-            state: result?.address?.state || '',
-            city: result?.address?.city || '',
-            address1: result?.address?.address1 || '',
-            address2: result?.address?.address2 || '',
-            pincode: result?.address?.pincode || '',
-            nationality: result?.address?.nationality || '',
           }
         });
 
@@ -328,7 +310,7 @@ const EmployeeProfile = () => {
           </div>
         ))}
 
-        {['contactDetail', 'experience', 'licenseHolding', 'address'].map((section) => (
+        {['contactDetail', 'experience', 'licenseHolding'].map((section) => (
           <div key={section} className="bg-white p-8 border rounded-xl shadow-md relative">
             <h3 className="text-lg font-semibold text-black flex justify-between">
               {section.charAt(0).toUpperCase() + section.slice(1).replace(/([A-Z])/g, ' $1')}
