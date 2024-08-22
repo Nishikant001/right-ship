@@ -7,11 +7,14 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useSelector } from 'react-redux';
 
 const JobBoard = ({ employeeId }) => {
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [savedJobs, setSavedJobs] = useState([]);
   const [jobList, setJoblists] = useState([]);
+
+  const user = useSelector((state) => state.auth.user);
 
   // Fetch employee details on component mount
   useEffect(() => {
@@ -22,20 +25,22 @@ const JobBoard = ({ employeeId }) => {
     try {
         
       const requestData = {
-          employee_id: { '$in': ["66c6d591b9efd7c4f01aa443"] }
+          employee_id: { '$in': [user._id] }
       };
 
+      console.log(requestData);
+
       const response = await axios.post("https://api.rightships.com/employee/get", requestData );
-  
+      
       const employeeData = response.data.data[0]; // Assuming the data is in the first object
      
       // Extract job application IDs from `applied_by` array
       const appliedJobIds = extractAppliedJobs(response.data.data[0])
   
-      console.log("====>",appliedJobIds);
+     
       // Extract job application IDs from `save_jobs_applications` array
       const savedJobIds = extractSaveJobs(response.data.data[0])
-      console.log("====>",savedJobIds);
+      
 
       // Fetch jobs for the extracted IDs
       fetchJobs(appliedJobIds, savedJobIds);
@@ -62,6 +67,7 @@ const JobBoard = ({ employeeId }) => {
     try {
       // Fetch applied jobs
       if (appliedJobIds.length > 0) {
+        console.log("========> s", appliedJobIds);
         const appliedJobsResponse = await axios.post(
           "https://api.rightships.com/company/application/get",
           {
@@ -70,7 +76,8 @@ const JobBoard = ({ employeeId }) => {
             },
           }
         );
-        setAppliedJobs(appliedJobsResponse.data.jobs); // Assuming 'jobs' contains the relevant job data
+       
+        setAppliedJobs(appliedJobsResponse.data.applications); // Assuming 'jobs' contains the relevant job data
       }
 
       // Fetch saved jobs
@@ -83,7 +90,7 @@ const JobBoard = ({ employeeId }) => {
             },
           }
         );
-        setSavedJobs(savedJobsResponse.data.jobs); // Assuming 'jobs' contains the relevant job data
+        setSavedJobs(savedJobsResponse.data.applications); // Assuming 'jobs' contains the relevant job data
       }
     } catch (error) {
       console.error("Error fetching jobs:", error);
