@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { registerEmployee } from '../../features/employeeRegistrationSlice';
 import ProfileImage from '../../images/upload.jpg';
 import File from '../../images/File img.png';
+import imageCompression from 'browser-image-compression';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 
@@ -16,9 +17,6 @@ const EmployeeRegistration = () => {
   const state = location.state || {};
   const employeeId = state.employeeId || '';
   const contactInfo = useSelector((state) => state.contact.contactInfo);
-
-  const isEmail = contactInfo && contactInfo.includes('@');
-  
   const dispatch = useDispatch();
   const profileFileInputRef = useRef(null);
   const resumeFileInputRef = useRef(null);
@@ -31,6 +29,31 @@ const EmployeeRegistration = () => {
 
   const { loading, error } = useSelector((state) => state.employee);
 
+
+
+  const handleDateOfBirthChange = (value) => {
+    setFormData({ ...formData, dob: value });
+
+    // Calculate the age
+    const calculateAge = (dob) => {
+      const today = new Date();
+      const birthDate = new Date(dob);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDifference = today.getMonth() - birthDate.getMonth();
+
+      if (
+        monthDifference < 0 ||
+        (monthDifference === 0 && today.getDate() < birthDate.getDate())
+      ) {
+        age--;
+      }
+
+      return age;
+    };
+
+    const age = calculateAge(value);
+    setFormData({ ...formData, dob: value, age: age.toString() }); // Update age field as string
+  };
 
    
  
@@ -71,7 +94,49 @@ const EmployeeRegistration = () => {
   
   
 
-  
+  useEffect(() => {
+    const fetchAttributes = async () => {
+        try {
+            const response = await axios.post('https://api.rightships.com/attributes/get', {}, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': '*/*',
+                    'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
+                }
+            });
+
+            if (response.data && response.data.code === 200) {
+                const attributes = response.data.data;
+
+                const copAttribute = attributes.find(attr => attr.name.toLowerCase() === 'cop');
+                const cocAttribute = attributes.find(attr => attr.name.toLowerCase() === 'coc');
+                const shipAttribute = attributes.find(attr => attr.name.toLowerCase() === 'ships');
+                const watchKeepingAttribute = attributes.find(attr => attr.name.toLowerCase() === 'watch keeping');
+                const rankAttribute = attributes.find(attr => attr.name.toLowerCase() === 'rank');
+
+                const copData = copAttribute ? copAttribute.values : [];
+                const cocData = cocAttribute ? cocAttribute.values.sort((a, b) => a.localeCompare(b)) : [];
+                const shipData = shipAttribute ? shipAttribute.values.sort((a, b) => a.localeCompare(b)) : []; // Sorting ship data
+                const watchKeepingData = watchKeepingAttribute ? watchKeepingAttribute.values : [];
+                const rankData = rankAttribute ? rankAttribute.values.sort((a, b) => a.localeCompare(b)) : [];
+
+                setCopOptions(copData);
+                setCocOptions(cocData);
+                setShipOptions(shipData); // Set ship options for Last Vessel Type
+                setWatchKeepingOptions(watchKeepingData);
+                setRankOptions(rankData);
+                // console.log(rankOptions)
+            } else {
+                console.error('Failed to fetch attributes:', response.data.msg);
+            }
+        } catch (error) {
+            console.error('Failed to fetch attributes:', error);
+        }
+    };
+
+    fetchAttributes();
+}, []);
+
 
   // Define the steps array
   const steps = ['Personal Details', 'Experience', 'Upload Resume & Profile Picture'];
@@ -99,8 +164,8 @@ const EmployeeRegistration = () => {
         'appliedVessel', 
         'presentRank',
         'appliedRank', 
-        'totalSeaExperienceYear', 
-        'totalSeaExperienceMonth', 
+        'totalSeaExperienceYear', // Fixed field name
+        'totalSeaExperienceMonth', // Fixed field name
         'presentRankExperienceInYear', 
         'presentRankExperienceInMonth', 
         'cop', 
@@ -115,6 +180,7 @@ const EmployeeRegistration = () => {
       }
     }
   
+    // Update data after each step
     try {
       await axios.post('https://api.rightships.com/employee/update', {
         employee_id: employeeId,
@@ -144,6 +210,7 @@ const EmployeeRegistration = () => {
   };
 
   const handleFileChange = async (event, type) => {
+    console.log('File type:', type); // Debugging line
     const selectedFile = event.target.files[0];
   
     if (!selectedFile) {
@@ -178,6 +245,7 @@ const EmployeeRegistration = () => {
     formDataFile.append('file', selectedFile);
   
     try {
+      // Upload file
       const response = await axios.post('https://api.rightships.com/upload', formDataFile, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -186,13 +254,16 @@ const EmployeeRegistration = () => {
   
       const fileUrl = response.data.file_url;
   
+      // Update state with the file URL
       setFormData({ ...formData, [apiField]: fileUrl });
   
+      // Prepare data for updating employee info
       const updatePayload = {
         employee_id: employeeId,
         [apiField]: fileUrl,
       };
   
+      // Update employee data with the new file URL
       await axios.post('https://api.rightships.com/employee/update', updatePayload, {
         headers: {
           'Content-Type': 'application/json',
@@ -204,6 +275,7 @@ const EmployeeRegistration = () => {
       toast.error(`Failed to upload ${type === 'profile' ? 'profile photo' : 'resume'}.`);
     }
   };
+  
 
   const triggerFileUpload = (inputRef) => {
     if (inputRef && inputRef.current) {
@@ -220,7 +292,6 @@ const EmployeeRegistration = () => {
 
       if (!loading && !error) {
         toast.success('Registration successful!');
-        localStorage.removeItem('employeeRegistrationFormData'); // Clear data after successful registration
         navigate('/jobs');
       }
     } catch (err) {
@@ -278,14 +349,14 @@ const EmployeeRegistration = () => {
               onChange={(value) => setFormData({ ...formData, country: value })}
               required
             />
-            <InputField
+           <InputField
               label="Date of Birth"
               value={formData.dob}
-              onChange={(value) => setFormData({ ...formData, dob: value })}
+              onChange={(value) => handleDateOfBirthChange(value)}
               required
               type="date"
             />
-            <InputField
+             <InputField
               label="Age"
               value={formData.age}
               onChange={(value) => setFormData({ ...formData, age: value })}
@@ -303,87 +374,92 @@ const EmployeeRegistration = () => {
       case 2:
         return (
           <>
-            <InputField
-              label="Present Vessel"
-              value={formData.presentVessel}
-              onChange={(value) => setFormData({ ...formData, presentVessel: value })}
-              required
-            />
-            <InputField
-              label="Applied Vessel"
-              value={formData.appliedVessel}
-              onChange={(value) => setFormData({ ...formData, appliedVessel: value })}
-              required
-            />
-            <InputField
-              label="Present Rank"
-              value={formData.presentRank}
-              onChange={(value) => setFormData({ ...formData, presentRank: value })}
-              required
-              type="select"
-              options={["Rank 1", "Rank 2"]}
-            />
-            <InputField
-              label="Applied Rank"
-              value={formData.appliedRank}
-              onChange={(value) => setFormData({ ...formData, appliedRank: value })}
-              required
-              type="select"
-              options={["Rank 1", "Rank 2"]}
-            />
-            <InputField
-              label="Total Sea Experience (Years)"
-              value={formData.totalSeaExperienceYear}
-              onChange={(value) => setFormData({ ...formData, totalSeaExperienceYear: value })}
-              required
-              type="number"
-            />
-            <InputField
-              label="Total Sea Experience (Months)"
-              value={formData.totalSeaExperienceMonth}
-              onChange={(value) => setFormData({ ...formData, totalSeaExperienceMonth: value })}
-              required
-              type="number"
-            />
-            <InputField
-              label="Present Rank Experience (Years)"
-              value={formData.presentRankExperienceInYear}
-              onChange={(value) => setFormData({ ...formData, presentRankExperienceInYear: value })}
-              required
-              type="number"
-            />
-            <InputField
-              label="Present Rank Experience (Months)"
-              value={formData.presentRankExperienceInMonth}
-              onChange={(value) => setFormData({ ...formData, presentRankExperienceInMonth: value })}
-              required
-              type="number"
-            />
-            <InputField
-              label="COP"
-              value={formData.cop}
-              onChange={(value) => setFormData({ ...formData, cop: value })}
-              required
-              type="select"
-              options={["COP 1", "COP 2"]}
-            />
-            <InputField
-              label="COC"
-              value={formData.coc}
-              onChange={(value) => setFormData({ ...formData, coc: value })}
-              required
-              type="select"
-              options={["COC 1", "COC 2"]}
-            />
-            <InputField
-              label="Watchkeeping"
-              value={formData.watchkeeping}
-              onChange={(value) => setFormData({ ...formData, watchkeeping: value })}
-              required
-              type="select"
-              options={["Yes", "No"]}
-            />
-          </>
+    <InputField
+        label="Present Vessel"
+        value={formData.presentVessel}
+        onChange={(value) => setFormData({ ...formData, presentVessel: value })}
+        required
+        type="select"
+        options={shipOptions}
+    />
+    <InputField
+        label="Applied Vessel"
+        value={formData.appliedVessel}
+        onChange={(value) => setFormData({ ...formData, appliedVessel: value })}
+        required
+        type="select"
+        options={shipOptions}
+    />
+    <InputField
+        label="Present Rank"
+        value={formData.presentRank}
+        onChange={(value) => setFormData({ ...formData, presentRank: value })}
+        required
+        type="select"
+        options={rankOptions} // Use the dynamically fetched rank options
+    />
+    <InputField
+        label="Applied Rank"
+        value={formData.appliedRank}
+        onChange={(value) => setFormData({ ...formData, appliedRank: value })}
+        required
+        type="select"
+        options={rankOptions} // Use the dynamically fetched rank options
+    />
+    <InputField
+        label="Total Sea Experience (Years)"
+        value={formData.totalSeaExperienceYear}
+        onChange={(value) => setFormData({ ...formData, totalSeaExperienceYear: value })}
+        required
+        type="number"
+    />
+    <InputField
+        label="Total Sea Experience (Months)"
+        value={formData.totalSeaExperienceMonth}
+        onChange={(value) => setFormData({ ...formData, totalSeaExperienceMonth: value })}
+        required
+        type="number"
+    />
+    <InputField
+        label="Present Rank Experience (Years)"
+        value={formData.presentRankExperienceInYear}
+        onChange={(value) => setFormData({ ...formData, presentRankExperienceInYear: value })}
+        required
+        type="number"
+    />
+    <InputField
+        label="Present Rank Experience (Months)"
+        value={formData.presentRankExperienceInMonth}
+        onChange={(value) => setFormData({ ...formData, presentRankExperienceInMonth: value })}
+        required
+        type="number"
+    />
+    <InputField
+        label="COP"
+        value={formData.cop}
+        onChange={(value) => setFormData({ ...formData, cop: value })}
+        required
+        type="select"
+        options={copOptions} // Use the dynamically fetched COP options
+    />
+    <InputField
+        label="COC"
+        value={formData.coc}
+        onChange={(value) => setFormData({ ...formData, coc: value })}
+        required
+        type="select"
+        options={cocOptions} // Use the dynamically fetched COC options
+    />
+    <InputField
+        label="Watchkeeping"
+        value={formData.watchkeeping}
+        onChange={(value) => setFormData({ ...formData, watchkeeping: value })}
+        required
+        type="select"
+        options={watchKeepingOptions} // Use the dynamically fetched Watchkeeping options
+    />
+</>
+
         );
       case 3:
         return (
