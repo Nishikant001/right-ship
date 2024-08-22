@@ -32,6 +32,7 @@ import JobDetail from './company/job/jobdetail';
 import CompanyManageUsers from './company/manageUsers';
 import CompanyProfile from './company/setting';
 import Setting from './job_seeker/setting/Setting'
+import JobBoard from './job_seeker/jobs/MyJobs';
 
 const App = () => {
   const user = useSelector((state) => state.auth.user);
@@ -48,7 +49,7 @@ const App = () => {
             <Route path="/settings" element={<Setting />} />
             <Route path="/jobs" element={<JobDashboard />} />
             <Route path="/profile" element={<EmployeeProfile />} />
-            <Route path="/my-jobs" element={<MyJobs />} />
+            <Route path="/my-jobs" element={<JobBoard />} />
             <Route path="/settings" element={<Setting />} />
             <Route path="*" element={<JobDashboard />} />
           </Route>
