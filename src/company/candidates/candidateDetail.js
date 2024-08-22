@@ -109,7 +109,7 @@ const CandidateDetail = () => {
         <InfoCard title="Professional Experience">
           <InfoItem label="Total Sea Experience" value={candidate.experience?.seaExperience || 'N/A'} />
           <InfoItem label="Last Vessel Type" value={candidate.lastVesselType || 'N/A'} />
-          <InfoItem label="Vessel Applied For" value={candidate.applyvessel || 'N/A'} />
+          <InfoItem label="Vessel Applied For" value={candidate.appliedVessel || 'N/A'} />
         </InfoCard>
 
         <InfoCard title="Certifications">

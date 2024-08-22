@@ -14,6 +14,7 @@ const EmployeeProfile = () => {
   const [sectionData, setSectionData] = useState({
     appliedVessel: '',
     presentVessel: '',
+    vesselExperience: '',
     appliedRank: '',
     presentRank: '',
     dateOfAvailability: '',
@@ -78,7 +79,7 @@ const EmployeeProfile = () => {
         });
 
         setSectionData({
-          appliedVessel: result?.applyvessel || '', 
+          appliedVessel: result?.appliedVessel || '', 
           presentVessel: result?.presentVessel || '',
           appliedRank: result?.appliedRank || '',
           presentRank: result?.presentRank || '',
