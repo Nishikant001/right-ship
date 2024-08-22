@@ -379,12 +379,16 @@ const EmployeeRegistration = () => {
         value={formData.presentVessel}
         onChange={(value) => setFormData({ ...formData, presentVessel: value })}
         required
+        type="select"
+        options={shipOptions}
     />
     <InputField
         label="Applied Vessel"
         value={formData.appliedVessel}
         onChange={(value) => setFormData({ ...formData, appliedVessel: value })}
         required
+        type="select"
+        options={shipOptions}
     />
     <InputField
         label="Present Rank"
