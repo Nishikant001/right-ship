@@ -30,8 +30,11 @@ export const loginCompany = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await axios.post('https://api.rightships.com/company/login', credentials);
+      console.log("======> 1", credentials );
       const { _id, company_id, mobile_no } = response.data.data;
+      console.log("======> 2", response.data.data );
       const user = { _id, company_id, mobile_no, role: "company" };
+      console.log("======> 2", user );
       return { user, token: response.data.token };
     } catch (error) {
       const message = error.response?.data?.message || 'An unexpected error occurred';
