@@ -68,7 +68,6 @@ const EmployeeProfile = () => {
           presentRank: result?.presentRank || '',
           appliedRank: result?.appliedRank || ''
         });
-
         setSectionData({
           appliedVessel: result?.appliedVessel || '', 
           presentVessel: result?.presentVessel || '',
