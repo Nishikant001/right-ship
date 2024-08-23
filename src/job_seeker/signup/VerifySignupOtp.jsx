@@ -112,7 +112,7 @@ const VerifySignupOtp = () => {
   }}
 >
   {/* Overlay */}
-  <div className="absolute inset-0 bg-white opacity-50 z-10"></div>
+  <div className="absolute inset-0 bg-white opacity-80 z-10"></div>
 
   {/* Content */}
   <div className="relative z-20 flex flex-col items-center">
